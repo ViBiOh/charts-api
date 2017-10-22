@@ -12,16 +12,16 @@ SELECT
   city,
   department,
   zip,
-  lat,
-  lng
+  latitude,
+  longitude
 FROM
   conservatories
+ORDER BY
+  $3 $4
 LIMIT
   $1
 OFFSET
   $2
-ORDER BY
-  $3 $4
 `
 
 // ReadConservatories retrieves conservatories
