@@ -127,7 +127,7 @@ func prepareFullTextSearch(search string, index int) (string, string) {
 		transformedWords = append(transformedWords, word+`:*`)
 	}
 
-	return strings.Replace(conservatoriesSearchWhere, `$INDEX`, fmt.Sprintf(`$%d`, index), -1), strings.Join(transformedWords, ` & `)
+	return strings.Replace(conservatoriesSearchWhere, `$INDEX`, fmt.Sprintf(`$%d`, index), -1), strings.Join(transformedWords, ` | `)
 }
 
 func countConservatories(search string) (count int64, err error) {
