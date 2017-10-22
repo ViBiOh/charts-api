@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/ViBiOh/httputils"
 )
@@ -71,7 +72,23 @@ func listCrud(w http.ResponseWriter, r *http.Request) {
 	if count, list, err := findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
 		httputils.InternalServer(w, err)
 	} else {
-		httputils.ResponsPaginatedJSON(w, http.StatusOK, count, list)
+		httputils.ResponsePaginatedJSON(w, http.StatusOK, count, list)
+	}
+}
+
+func aggregate(w http.ResponseWriter, r *http.Request) {
+	if count, err := countByDepartment(); err != nil {
+		httputils.InternalServer(w, err)
+	} else {
+		httputils.ResponseJSON(w, 200, count)
+	}
+}
+
+func aggregateByDepartment(w http.ResponseWriter, r *http.Request, path string) {
+	if count, err := countByZipOfDepartment(strings.TrimPrefix(path, `/`)); err != nil {
+		httputils.InternalServer(w, err)
+	} else {
+		httputils.ResponseJSON(w, 200, count)
 	}
 }
 
@@ -81,6 +98,10 @@ func conservatoriesHandler() http.Handler {
 			w.WriteHeader(http.StatusNoContent)
 		} else if r.Method == http.MethodGet && r.URL.Path == `/` {
 			listCrud(w, r)
+		} else if r.Method == http.MethodGet && r.URL.Path == `/aggregate` {
+			aggregate(w, r)
+		} else if r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, `/aggregate/zip`) {
+			aggregateByDepartment(w, r, strings.TrimPrefix(r.URL.Path, `/aggregate/zip`))
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}

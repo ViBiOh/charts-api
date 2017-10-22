@@ -47,6 +47,29 @@ WHERE
   OR to_tsvector('french', zip) @@ to_tsquery('french', $INDEX)
 `
 
+const conservatoriesByDepartementLabel = `conservatoriesByDepartement`
+const conservatoriesByDepartementQuery = `
+SELECT
+  department,
+  COUNT(id)
+FROM
+  conservatories
+GROUP BY
+  department
+`
+
+const conservatoriesByZipOfDepartmentQuery = `
+SELECT
+  zip,
+  COUNT(id)
+FROM
+  conservatories
+WHERE
+  departement = $1
+GROUP BY
+  zip
+`
+
 func scanConservatoryRows(rows *sql.Rows, pageSize int64) ([]*conservatory, error) {
 	var (
 		id         int64
@@ -71,6 +94,25 @@ func scanConservatoryRows(rows *sql.Rows, pageSize int64) ([]*conservatory, erro
 	}
 
 	return conservatories, nil
+}
+
+func scanAggregateRows(rows *sql.Rows) (map[string]int64, error) {
+	var (
+		key   string
+		count int64
+	)
+
+	aggregate := make(map[string]int64, 0)
+
+	for rows.Next() {
+		if err := rows.Scan(&key, &count); err != nil {
+			return nil, err
+		}
+
+		aggregate[key] = count
+	}
+
+	return aggregate, nil
 }
 
 func prepareFullTextSearch(search string, index int) (string, string) {
@@ -130,4 +172,22 @@ func searchConservatories(page, pageSize int64, sortKey string, sortAsc bool, se
 	}()
 
 	return scanConservatoryRows(rows, pageSize)
+}
+
+func countByDepartment() (map[string]int64, error) {
+	rows, err := chartsDB.Query(conservatoriesByDepartementQuery)
+
+	if err != nil {
+		return nil, err
+	}
+	return scanAggregateRows(rows)
+}
+
+func countByZipOfDepartment(department string) (map[string]int64, error) {
+	rows, err := chartsDB.Query(conservatoriesByZipOfDepartmentQuery, department)
+
+	if err != nil {
+		return nil, err
+	}
+	return scanAggregateRows(rows)
 }
