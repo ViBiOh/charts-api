@@ -12,6 +12,7 @@ const defaultPage = int64(1)
 const defaultPageSize = int64(10)
 const defaultSort = `name`
 const defaultOrder = true
+const maxPageSize = int64(50)
 
 func parsePaginationParams(r *http.Request) (page, pageSize int64, sortKey string, sortAsc bool, err error) {
 	var parsedInt int64
@@ -34,6 +35,9 @@ func parsePaginationParams(r *http.Request) (page, pageSize int64, sortKey strin
 		parsedInt, err = strconv.ParseInt(rawPageSize, 10, 64)
 		if err != nil {
 			err = fmt.Errorf(`Error while parsing pageSize param: %v`, err)
+			return
+		} else if parsedInt > maxPageSize {
+			err = fmt.Errorf(`maxPageSize exceeded`)
 			return
 		}
 
