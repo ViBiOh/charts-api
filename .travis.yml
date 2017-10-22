@@ -1,0 +1,26 @@
+language: go
+sudo: required
+services:
+- docker
+go: 1.9
+install: make
+script: |
+  DOCKER_IMAGE_NAME=${DOCKER_USER}/charts-api
+  docker build -t ${DOCKER_IMAGE_NAME} .
+after_success: |
+  if [ "${TRAVIS_BRANCH}" == "master" ]; then
+    bash <(curl -s https://codecov.io/bash) &&
+    docker login -u ${DOCKER_USER} -p ${DOCKER_PASS} && docker push ${DOCKER_IMAGE_NAME}
+
+    sed \
+      -e "s|\${CHARTS_DATABASE_PASS}|${CHARTS_DATABASE_PASS}|g" \
+      docker-compose.yml > docker-compose-env.yml
+  fi
+notifications:
+  email: false
+deploy:
+- provider: script
+  skip_cleanup: true
+  script: "curl -H 'Authorization: GitHub ${GITHUB_OAUTH_TOKEN}' -X POST https://dashboard-api.vibioh.fr/containers/charts-api/ --data-binary @docker-compose-env.yml"
+  on:
+    branch: master

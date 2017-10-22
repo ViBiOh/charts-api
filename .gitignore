@@ -1,0 +1,4 @@
+# Go binary
+bin/
+coverage.txt
+debug.test

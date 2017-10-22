@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+  api:
+    image: vibioh/charts-api
+    command:
+    - -prometheusMetricsHost
+    - charts-api:1080
+    - -dbHost
+    - db
+    - -dbUser
+    - charts
+    - -dbPass
+    - ${CHARTS_DATABASE_PASS}
+    - -dbName
+    - charts
+    labels:
+      traefik.frontend.passHostHeader: 'true'
+      traefik.frontend.rule: 'Host: charts-api.vibioh.fr'
+      traefik.port: '1080'
+    external_links:
+    - postgres_db_1:db
+    logging:
+      driver: json-file
+      options:
+        max-size: '50m'
+    restart: on-failure:5
+    read_only: true
+    cpu_shares: 128
+    mem_limit: 25165824
+    security_opt:
+    - no-new-privileges
+
+networks:
+  default:
+    external:
+      name: traefik
