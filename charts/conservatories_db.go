@@ -17,11 +17,11 @@ SELECT
 FROM
   conservatories
 ORDER BY
-  $1 $2
+  ? ?
 LIMIT
-  $3
+  ?
 OFFSET
-  $4
+  ?
 `
 
 // ReadConservatories retrieves conservatories
