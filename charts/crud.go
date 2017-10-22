@@ -4,51 +4,67 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/ViBiOh/httputils"
 )
 
 const defaultPage = int64(1)
-const defaultPageSize = int64(20)
+const defaultPageSize = int64(10)
 const defaultSort = `name`
+const defaultOrder = true
 
-func getRequestID(r *http.Request) (int64, error) {
-	return strconv.ParseInt(strings.TrimPrefix(r.URL.Path, `/`), 10, 64)
-}
+func parsePaginationParams(r *http.Request) (page, pageSize int64, sortKey string, sortAsc bool, err error) {
+	var parsedInt int64
 
-func listCrud(w http.ResponseWriter, r *http.Request) {
-	page := defaultPage
+	page = defaultPage
 	rawPage := r.URL.Query().Get(`page`)
 	if rawPage != `` {
-		parsedPage, err := strconv.ParseInt(rawPage, 10, 64)
+		parsedInt, err = strconv.ParseInt(rawPage, 10, 64)
 		if err != nil {
-			httputils.BadRequest(w, fmt.Errorf(`Error while parsing page param: %v`, err))
+			err = fmt.Errorf(`Error while parsing page param: %v`, err)
 			return
 		}
 
-		page = parsedPage
+		page = parsedInt
 	}
 
-	pageSize := defaultPageSize
+	pageSize = defaultPageSize
 	rawPageSize := r.URL.Query().Get(`pageSize`)
 	if rawPageSize != `` {
-		parsedPageSize, err := strconv.ParseInt(rawPageSize, 10, 64)
+		parsedInt, err = strconv.ParseInt(rawPageSize, 10, 64)
 		if err != nil {
-			httputils.BadRequest(w, fmt.Errorf(`Error while parsing pageSize param: %v`, err))
+			err = fmt.Errorf(`Error while parsing pageSize param: %v`, err)
 			return
 		}
 
-		pageSize = parsedPageSize
+		pageSize = parsedInt
 	}
 
-	sortKey := defaultSort
-	rawSortKey := r.URL.Query().Get(`o`)
+	sortKey = defaultSort
+	rawSortKey := r.URL.Query().Get(`sort`)
 	if rawSortKey != `` {
 		sortKey = rawSortKey
 	}
 
-	if count, list, err := listConservatories(page, pageSize, sortKey); err != nil {
+	sortAsc = defaultOrder
+	rawOrder := r.URL.Query().Get(`order`)
+	if rawOrder != `` {
+		if rawOrder == `desc` {
+			sortAsc = false
+		}
+	}
+
+	return
+}
+
+func listCrud(w http.ResponseWriter, r *http.Request) {
+	page, pageSize, sort, asc, err := parsePaginationParams(r)
+	if err != nil {
+		httputils.BadRequest(w, err)
+		return
+	}
+
+	if count, list, err := findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
 		httputils.InternalServer(w, err)
 	} else {
 		httputils.ResponsPaginatedJSON(w, http.StatusOK, count, list)

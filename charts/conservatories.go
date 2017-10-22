@@ -12,13 +12,14 @@ type conservatory struct {
 	Longitude  float64 `json:"lng"`
 }
 
-func listConservatories(page, pageSize int64, sortKey string) (int64, []*conservatory, error) {
-	count, err := countConservatories()
+func findConservatories(page, pageSize int64, sortKey string, ascending bool, query string) (int64, []*conservatory, error) {
+	count, err := countConservatories(query)
 	if err != nil {
 		return 0, nil, err
 	}
 
-	list, err := readConservatories(page, pageSize, sortKey, true)
+	list, err := searchConservatories(page, pageSize, sortKey, ascending, query)
 
 	return count, list, err
+
 }
