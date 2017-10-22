@@ -36,7 +36,7 @@ func readConservatories(page, pageSize int64, sortKey string, sortAsc bool) (con
 		sortOrder = `DESC`
 	}
 
-	rows, err := chartsDB.Query(conservatoriesQuery, pageSize, offset, sortKey, sortOrder)
+	rows, err := chartsDB.Query(conservatoriesQuery, sortKey, sortOrder, pageSize, offset)
 	if err != nil {
 		return
 	}
