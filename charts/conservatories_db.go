@@ -33,11 +33,11 @@ FROM
 	conservatories
 %s
 ORDER BY
-  $1 %s
+  %s %s
 LIMIT
-  $2
+  $1
 OFFSET
-  $3
+  $2
 `
 
 const conservatoriesSearchWhere = `
@@ -111,14 +111,14 @@ func searchConservatories(page, pageSize int64, sortKey string, sortAsc bool, se
 		sortOrder = `DESC`
 	}
 
-	where, words := prepareFullTextSearch(search, 4)
+	where, words := prepareFullTextSearch(search, 3)
 	var rows *sql.Rows
 	var err error
 
 	if words != `` {
-		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortOrder), sortKey, pageSize, offset, words)
+		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset, words)
 	} else {
-		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortOrder), sortKey, pageSize, offset)
+		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset)
 	}
 
 	if err != nil {
