@@ -100,8 +100,8 @@ func conservatoriesHandler() http.Handler {
 			listCrud(w, r)
 		} else if r.Method == http.MethodGet && r.URL.Path == `/aggregate` {
 			aggregate(w, r)
-		} else if r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, `/aggregate/zip`) {
-			aggregateByDepartment(w, r, strings.TrimPrefix(r.URL.Path, `/aggregate/zip`))
+		} else if r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, `/aggregate/department`) {
+			aggregateByDepartment(w, r, strings.TrimPrefix(r.URL.Path, `/aggregate/department`))
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
