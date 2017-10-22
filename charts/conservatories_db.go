@@ -65,7 +65,7 @@ SELECT
 FROM
   conservatories
 WHERE
-  departement = $1
+  department = $1
 GROUP BY
   zip
 `
