@@ -1,6 +1,10 @@
 package charts
 
-import "github.com/ViBiOh/httputils/db"
+import (
+	"fmt"
+
+	"github.com/ViBiOh/httputils/db"
+)
 
 const conservatoriesLabel = `conservatories`
 const conservatoriesQuery = `
@@ -17,11 +21,11 @@ SELECT
 FROM
   conservatories
 ORDER BY
-  ? ?
+  $3 %s
 LIMIT
-  ?
+  $1
 OFFSET
-  ?
+  $2
 `
 
 // ReadConservatories retrieves conservatories
@@ -36,7 +40,7 @@ func readConservatories(page, pageSize int64, sortKey string, sortAsc bool) (con
 		sortOrder = `DESC`
 	}
 
-	rows, err := chartsDB.Query(conservatoriesQuery, sortKey, sortOrder, pageSize, offset)
+	rows, err := chartsDB.Query(fmt.Sprintf(conservatoriesQuery, sortOrder), pageSize, offset, sortKey)
 	if err != nil {
 		return
 	}
