@@ -6,6 +6,14 @@ import (
 	"github.com/ViBiOh/httputils/db"
 )
 
+const conservatoriesCountLabel = `conservatoriesCount`
+const conservatoriesCountQuery = `
+SELECT
+  COUNT(id)
+FROM
+  conservatories
+`
+
 const conservatoriesLabel = `conservatories`
 const conservatoriesQuery = `
 SELECT
@@ -21,14 +29,44 @@ SELECT
 FROM
   conservatories
 ORDER BY
-  $3 %s
+  $1 %s
 LIMIT
-  $1
-OFFSET
   $2
+OFFSET
+  $3
 `
 
-// ReadConservatories retrieves conservatories
+const conservatoriesSearchLabel = `conservatoriesSearch`
+const conservatoriesSearchQuery = `
+SELECT
+  id,
+  name,
+  category,
+  street,
+  city,
+  department,
+  zip,
+  latitude,
+  longitude
+FROM
+  conservatories
+WHERE
+  to_tsvector('french', name) @@ to_tsquery('french', $1)
+  OR to_tsvector('french', city) @@ to_tsquery('french', $1)
+  OR to_tsvector('french', zip) @@ to_tsquery('french', $1)
+LIMIT
+  $2
+OFFSET
+  $3
+`
+
+func countConservatories() (int64, error) {
+	var count int64
+	err := chartsDB.QueryRow(conservatoriesCountQuery).Scan(&count)
+
+	return count, err
+}
+
 func readConservatories(page, pageSize int64, sortKey string, sortAsc bool) (conservatories []*conservatory, err error) {
 	var offset int64
 	if page > 1 {
@@ -40,7 +78,7 @@ func readConservatories(page, pageSize int64, sortKey string, sortAsc bool) (con
 		sortOrder = `DESC`
 	}
 
-	rows, err := chartsDB.Query(fmt.Sprintf(conservatoriesQuery, sortOrder), pageSize, offset, sortKey)
+	rows, err := chartsDB.Query(fmt.Sprintf(conservatoriesQuery, sortOrder), sortKey, pageSize, offset)
 	if err != nil {
 		return
 	}

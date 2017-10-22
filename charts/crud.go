@@ -48,10 +48,10 @@ func listCrud(w http.ResponseWriter, r *http.Request) {
 		sortKey = rawSortKey
 	}
 
-	if list, err := listConservatories(page, pageSize, sortKey); err != nil {
+	if count, list, err := listConservatories(page, pageSize, sortKey); err != nil {
 		httputils.InternalServer(w, err)
 	} else {
-		httputils.ResponseArrayJSON(w, http.StatusOK, list)
+		httputils.ResponsPaginatedJSON(w, http.StatusOK, count, list)
 	}
 }
 
