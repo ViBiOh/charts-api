@@ -39,11 +39,11 @@ func main() {
 	url := flag.String(`c`, ``, `URL to check`)
 	port := flag.String(`port`, `1080`, `Listen port`)
 	tls := flag.Bool(`tls`, false, `Serve TLS content`)
-	prometheusConfig := prometheus.Flags(``)
-	rateConfig := rate.Flags(``)
+	prometheusConfig := prometheus.Flags(`prometheus`)
+	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
-	corsConfig := cors.Flags(``)
-	dbConfig := db.Flags(``)
+	corsConfig := cors.Flags(`cors`)
+	dbConfig := db.Flags(`db`)
 	flag.Parse()
 
 	if *url != `` {

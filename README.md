@@ -20,6 +20,8 @@ Usage of api:
     	Access-Control-Allow-Methods (default "GET")
   -corsOrigin string
     	Access-Control-Allow-Origin (default "*")
+  -csp string
+    	Content-Security-Policy (default "default-src 'self'")
   -dbHost string
     	Database Host
   -dbName string
@@ -30,9 +32,7 @@ Usage of api:
     	Database Port (default "5432")
   -dbUser string
     	Database User
-  -owaspCsp string
-    	Content-Security-Policy (default "default-src 'self'")
-  -owaspHsts
+  -hsts
     	Indicate Strict Transport Security (default true)
   -port string
     	Listen port (default "1080")
