@@ -23,7 +23,7 @@ const healthcheckPath = `/health`
 
 var chartsHandler = charts.Handler()
 var healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
-var restHandler = prometheus.Handler(`http`, rate.Handler(gziphandler.GzipHandler(owasp.Handler(cors.Handler(cors.Flags(``), handler())))))
+var restHandler http.Handler
 
 func handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -40,6 +40,7 @@ func main() {
 	port := flag.String(`port`, `1080`, `Listen port`)
 	tls := flag.Bool(`tls`, false, `Serve TLS content`)
 	dbConfig := db.Flags(``)
+	corsConfig := cors.Flags(``)
 	flag.Parse()
 
 	if *url != `` {
@@ -63,6 +64,7 @@ func main() {
 		log.Printf(`Error while initializing charts: %v`, err)
 	}
 
+	restHandler = prometheus.Handler(`http`, rate.Handler(gziphandler.GzipHandler(owasp.Handler(cors.Handler(corsConfig, handler())))))
 	server := &http.Server{
 		Addr:    `:` + *port,
 		Handler: restHandler,
