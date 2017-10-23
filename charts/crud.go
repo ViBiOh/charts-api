@@ -72,7 +72,7 @@ func listCrud(w http.ResponseWriter, r *http.Request) {
 	if count, list, err := findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
 		httputils.InternalServer(w, err)
 	} else {
-		httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list)
+		httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery))
 	}
 }
 
@@ -80,7 +80,7 @@ func aggregate(w http.ResponseWriter, r *http.Request) {
 	if count, err := countByDepartment(); err != nil {
 		httputils.InternalServer(w, err)
 	} else {
-		httputils.ResponseJSON(w, 200, count)
+		httputils.ResponseJSON(w, 200, count, httputils.IsPretty(r.URL.RawQuery))
 	}
 }
 
@@ -88,7 +88,7 @@ func aggregateByDepartment(w http.ResponseWriter, r *http.Request, path string) 
 	if count, err := countByZipOfDepartment(strings.TrimPrefix(path, `/`)); err != nil {
 		httputils.InternalServer(w, err)
 	} else {
-		httputils.ResponseJSON(w, 200, count)
+		httputils.ResponseJSON(w, 200, count, httputils.IsPretty(r.URL.RawQuery))
 	}
 }
 
