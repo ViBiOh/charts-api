@@ -39,8 +39,11 @@ func main() {
 	url := flag.String(`c`, ``, `URL to check`)
 	port := flag.String(`port`, `1080`, `Listen port`)
 	tls := flag.Bool(`tls`, false, `Serve TLS content`)
-	dbConfig := db.Flags(``)
+	prometheusConfig := prometheus.Flags(``)
+	rateConfig := rate.Flags(``)
+	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(``)
+	dbConfig := db.Flags(``)
 	flag.Parse()
 
 	if *url != `` {
@@ -64,7 +67,7 @@ func main() {
 		log.Printf(`Error while initializing charts: %v`, err)
 	}
 
-	restHandler = prometheus.Handler(`http`, rate.Handler(gziphandler.GzipHandler(owasp.Handler(cors.Handler(corsConfig, handler())))))
+	restHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler())))))
 	server := &http.Server{
 		Addr:    `:` + *port,
 		Handler: restHandler,

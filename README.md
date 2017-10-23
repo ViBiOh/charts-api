@@ -20,8 +20,6 @@ Usage of api:
     	Access-Control-Allow-Methods (default "GET")
   -corsOrigin string
     	Access-Control-Allow-Origin (default "*")
-  -csp string
-    	Content-Security-Policy (default "default-src 'self'")
   -dbHost string
     	Database Host
   -dbName string
@@ -32,14 +30,18 @@ Usage of api:
     	Database Port (default "5432")
   -dbUser string
     	Database User
-  -hsts
+  -owaspCsp string
+    	Content-Security-Policy (default "default-src 'self'")
+  -owaspHsts
     	Indicate Strict Transport Security (default true)
   -port string
     	Listen port (default "1080")
   -prometheusMetricsHost string
-    	Prometheus - Allowed hostname to call metrics endpoint (default "localhost")
+    	Prometheus allowed hostname to call metrics endpoint (default "localhost")
   -prometheusMetricsPath string
-    	Prometheus - Metrics endpoint path (default "/metrics")
+    	Prometheus metrics endpoint path (default "/metrics")
+  -prometheusPrefix string
+    	Prometheus prefix (default "http")
   -rateCount int
     	Rate IP limit (default 5000)
   -tls
