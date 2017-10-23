@@ -72,7 +72,7 @@ func listCrud(w http.ResponseWriter, r *http.Request) {
 	if count, list, err := findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
 		httputils.InternalServer(w, err)
 	} else {
-		httputils.ResponsePaginatedJSON(w, http.StatusOK, count, list)
+		httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list)
 	}
 }
 
