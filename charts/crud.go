@@ -3,6 +3,7 @@ package charts
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -17,9 +18,15 @@ const maxPageSize = int64(50)
 
 func parsePaginationParams(r *http.Request) (page, pageSize int64, sortKey string, sortAsc bool, err error) {
 	var parsedInt int64
+	var params url.Values
+
+	params, err = url.ParseQuery(r.URL.RawQuery)
+	if err != nil {
+		return
+	}
 
 	page = defaultPage
-	rawPage := r.URL.Query().Get(`page`)
+	rawPage := params.Get(`page`)
 	if rawPage != `` {
 		parsedInt, err = strconv.ParseInt(rawPage, 10, 64)
 		if err != nil {
@@ -31,7 +38,7 @@ func parsePaginationParams(r *http.Request) (page, pageSize int64, sortKey strin
 	}
 
 	pageSize = defaultPageSize
-	rawPageSize := r.URL.Query().Get(`pageSize`)
+	rawPageSize := params.Get(`pageSize`)
 	if rawPageSize != `` {
 		parsedInt, err = strconv.ParseInt(rawPageSize, 10, 64)
 		if err != nil {
@@ -46,17 +53,14 @@ func parsePaginationParams(r *http.Request) (page, pageSize int64, sortKey strin
 	}
 
 	sortKey = defaultSort
-	rawSortKey := r.URL.Query().Get(`sort`)
+	rawSortKey := params.Get(`sort`)
 	if rawSortKey != `` {
 		sortKey = rawSortKey
 	}
 
 	sortAsc = defaultOrder
-	rawOrder := r.URL.Query().Get(`order`)
-	if rawOrder != `` {
-		if rawOrder == `desc` {
-			sortAsc = false
-		}
+	if _, ok := params[`desc`]; ok {
+		sortAsc = false
 	}
 
 	return
