@@ -10,5 +10,5 @@ tar -zxvf snowboard-${version}.${os}-amd64.tar.gz
 rm -f snowboard-${version}.${os}-amd64.tar.gz
 
 mkdir -p doc
-./snowboard html -i api.apib -o doc/api.html
+./snowboard html -o doc/api.html api.apib
 
