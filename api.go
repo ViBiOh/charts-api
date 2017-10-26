@@ -29,6 +29,8 @@ func handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, healthcheckPath) {
 			healthcheckHandler.ServeHTTP(w, r)
+		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
+			http.ServeFile(w, r, `doc/api.html`)
 		} else {
 			chartsHandler.ServeHTTP(w, r)
 		}
@@ -54,7 +56,7 @@ func main() {
 	chartsDB, err := db.GetDB(dbConfig)
 	if err != nil {
 		log.Printf(`Error while initializing database: %v`, err)
-	} else {
+	} else if chartsDB != nil {
 		log.Print(`Database ready`)
 	}
 

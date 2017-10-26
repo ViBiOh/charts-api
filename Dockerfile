@@ -6,3 +6,4 @@ ENTRYPOINT [ "/bin/sh" ]
 EXPOSE 1080
 
 COPY bin/api /bin/sh
+COPY doc/api.html /doc/api.html

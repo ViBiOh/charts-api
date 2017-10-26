@@ -6,6 +6,7 @@ go: 1.9
 install: make
 script: |
   DOCKER_IMAGE_NAME=${DOCKER_USER}/charts-api
+  ./blueprint.sh
   docker build -t ${DOCKER_IMAGE_NAME} .
 after_success: |
   if [ "${TRAVIS_BRANCH}" == "master" ]; then
