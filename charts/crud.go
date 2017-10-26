@@ -100,7 +100,7 @@ func conservatoriesHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
-		} else if r.Method == http.MethodGet && r.URL.Path == `/` {
+		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
 			listCrud(w, r)
 		} else if r.Method == http.MethodGet && r.URL.Path == `/aggregate` {
 			aggregate(w, r)
