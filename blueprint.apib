@@ -1,0 +1,62 @@
+FORMAT: 1A
+HOST: https://charts-api.vibioh.fr/
+
+# eponae
+
+API for [eponae](https://eponae.fr) projects.
+
+## Ile-de-France conservatories [/conservatories]
+
+### Get API Options [OPTIONS]
+
++ Response 204
+
+### List Conservatories [GET /conservatories{?page}{?pageSize}{?sort}{?desc}{?pretty}]
+
++ Parameters
+
+    + page (number, optional) - Page of results.
+        + Default: `1`
+    + pageSize (number, optional) - Page size of results.
+        + Default: `10`
+    + sort (string, optional) - Order of result.
+        + Default: `name`
+    + desc (optional) - Order descending.
+    + pretty (optional) - Output JSON in pretty print.
+
++ Response 200 (application/json)
+
+        {
+            "results": [
+                {
+                    "id": 223,
+                    "name": "CENTRE CULTUREL DE RUEIL-MALMAISON - EDMOND ROSTAND",
+                    "category": "Ecole de musique et de danse municipale ou intercommunale",
+                    "street": "20 boulevard Edmond Rostand",
+                    "city": "RUEIL-MALMAISON",
+                    "department": 92,
+                    "zip": "92500",
+                    "lat": 48.874384,
+                    "lng": 2.19011
+                },
+                {
+                    "id": 23,
+                    "name": "ÉCOLE MUNICIPALE DE MUSIQUE ET DE DANSE DU PLESSIS-PÂTÉ",
+                    "category": "Ecole de musique et de danse municipale ou intercommunale",
+                    "street": "Place du 8 mai 1945",
+                    "city": "LE PLESSIS-PÂTÉ",
+                    "department": 91,
+                    "zip": "91220",
+                    "lat": 48.612327,
+                    "lng": 2.325123
+                },
+            ],
+            "page": 1,
+            "pageSize": 10,
+            "pageCount": 34,
+            "total": 331
+        }
+
++ Response 400 (text/plain)
+
+        Error while parsing page param: strconv.ParseInt: parsing "invalid": invalid syntax
