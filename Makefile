@@ -1,7 +1,6 @@
 default: deps format lint tst bench build
 
 deps:
-	go get -u github.com/bukalapak/snowboard
 	go get -u github.com/golang/lint/golint
 	go get -u github.com/NYTimes/gziphandler
 	go get -u github.com/ViBiOh/alcotest/alcotest
