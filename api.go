@@ -10,6 +10,7 @@ import (
 	"github.com/ViBiOh/alcotest/alcotest"
 	"github.com/ViBiOh/charts-api/charts"
 	"github.com/ViBiOh/charts-api/healthcheck"
+	"github.com/ViBiOh/charts-api/readings"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
 	"github.com/ViBiOh/httputils/cors"
@@ -20,19 +21,26 @@ import (
 )
 
 const healthcheckPath = `/health`
+const conservatoriesPath = `/conservatories`
+const readingsPath = `/readings`
 
-var chartsHandler = charts.Handler()
 var healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
+var chartsHandler = http.StripPrefix(conservatoriesPath, charts.Handler())
+var readingsHandler = http.StripPrefix(readingsPath, readings.Handler())
 var restHandler http.Handler
 
 func handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, healthcheckPath) {
 			healthcheckHandler.ServeHTTP(w, r)
+		} else if strings.HasPrefix(r.URL.Path, conservatoriesPath) {
+			chartsHandler.ServeHTTP(w, r)
+		} else if strings.HasPrefix(r.URL.Path, readingsPath) {
+			readingsHandler.ServeHTTP(w, r)
 		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
 			http.ServeFile(w, r, `doc/api.html`)
 		} else {
-			chartsHandler.ServeHTTP(w, r)
+			w.WriteHeader(http.StatusNotFound)
 		}
 	})
 }
