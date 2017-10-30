@@ -4,3 +4,4 @@ coverage.txt
 debug*
 snowboard
 doc/*
+cacert.pem
