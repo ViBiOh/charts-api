@@ -3,25 +3,34 @@ package charts
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/ViBiOh/httputils"
+	"github.com/ViBiOh/httputils/db"
 )
 
-var chartsDB *sql.DB
-
+const healthcheckPath = `/health`
 const defaultPage = int64(1)
 const defaultPageSize = int64(10)
 const defaultSort = `name`
 const defaultOrder = true
 const maxPageSize = int64(50)
 
+var chartsDB *sql.DB
+var dbConfig = db.Flags(`db`)
+
 // Init charts handler
-func Init(db *sql.DB) error {
-	chartsDB = db
+func Init() (err error) {
+	chartsDB, err = db.GetDB(dbConfig)
+	if err != nil {
+		log.Printf(`[charts] Error while initializing database: %v`, err)
+	} else if chartsDB != nil {
+		log.Print(`[charts] Database ready`)
+	}
 
 	return nil
 }
@@ -111,7 +120,19 @@ func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
-		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
+			return
+		}
+
+		if r.Method == http.MethodGet && r.URL.Path == healthcheckPath {
+			if db.Ping(chartsDB) {
+				w.WriteHeader(http.StatusOK)
+			} else {
+				w.WriteHeader(http.StatusServiceUnavailable)
+			}
+			return
+		}
+
+		if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
 			listCrud(w, r)
 		} else if r.Method == http.MethodGet && r.URL.Path == `/aggregate` {
 			aggregate(w, r)

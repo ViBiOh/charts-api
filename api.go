@@ -8,14 +8,12 @@ import (
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
-	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/eponae-api/charts"
 	"github.com/ViBiOh/eponae-api/healthcheck"
 	"github.com/ViBiOh/eponae-api/readings"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
 	"github.com/ViBiOh/httputils/cors"
-	"github.com/ViBiOh/httputils/db"
 	"github.com/ViBiOh/httputils/owasp"
 	"github.com/ViBiOh/httputils/prometheus"
 	"github.com/ViBiOh/httputils/rate"
@@ -25,10 +23,9 @@ const healthcheckPath = `/health`
 const conservatoriesPath = `/conservatories`
 const readingsPath = `/readings`
 
-var healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
 var chartsHandler = http.StripPrefix(conservatoriesPath, charts.Handler())
 var readingsHandler = http.StripPrefix(readingsPath, readings.Handler())
-var restHandler http.Handler
+var healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
 
 func handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -50,12 +47,10 @@ func main() {
 	url := flag.String(`c`, ``, `URL to check`)
 	port := flag.String(`port`, `1080`, `Listen port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
-	authConfig := auth.Flags(`auth`)
 	prometheusConfig := prometheus.Flags(`prometheus`)
 	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
-	dbConfig := db.Flags(`db`)
 	flag.Parse()
 
 	if *url != `` {
@@ -63,29 +58,21 @@ func main() {
 		return
 	}
 
-	chartsDB, err := db.GetDB(dbConfig)
-	if err != nil {
-		log.Printf(`Error while initializing database: %v`, err)
-	} else if chartsDB != nil {
-		log.Print(`Database ready`)
-	}
-
 	log.Printf(`Starting server on port %s`, *port)
 
-	if err := healthcheck.Init(chartsDB); err != nil {
-		log.Printf(`Error while initializing healthcheck: %v`, err)
-	}
-	if err := charts.Init(chartsDB); err != nil {
+	if err := charts.Init(); err != nil {
 		log.Printf(`Error while initializing charts: %v`, err)
 	}
-	if err := readings.Init(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`])); err != nil {
+	if err := readings.Init(); err != nil {
 		log.Printf(`Error while initializing readings: %v`, err)
 	}
+	if err := healthcheck.Init([]http.Handler{chartsHandler, readingsHandler}); err != nil {
+		log.Printf(`Error while initializing healthcheck: %v`, err)
+	}
 
-	restHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler())))))
 	server := &http.Server{
 		Addr:    `:` + *port,
-		Handler: restHandler,
+		Handler: prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler()))))),
 	}
 
 	var serveError = make(chan error)

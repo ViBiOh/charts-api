@@ -7,13 +7,17 @@ import (
 	"github.com/ViBiOh/httputils"
 )
 
+const healthcheckPath = `/health`
+
 var authURL string
 var authUsers map[string]*auth.User
 
+var authConfig = auth.Flags(`readingsAuth`)
+
 // Init readings API
-func Init(url string, users map[string]*auth.User) error {
-	authURL = url
-	authUsers = users
+func Init() error {
+	authURL = *authConfig[`url`]
+	authUsers = auth.LoadUsersProfiles(*authConfig[`users`])
 
 	return nil
 }
@@ -23,6 +27,12 @@ func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		if r.Method == http.MethodGet && r.URL.Path == healthcheckPath {
+			w.WriteHeader(http.StatusOK)
+			return
 		}
 
 		user, err := auth.IsAuthenticated(authURL, authUsers, r)

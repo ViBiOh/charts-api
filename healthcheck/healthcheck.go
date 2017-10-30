@@ -1,17 +1,16 @@
 package healthcheck
 
 import (
-	"database/sql"
 	"net/http"
-
-	"github.com/ViBiOh/httputils/db"
 )
 
-var chartsDB *sql.DB
+const healthcheckPath = `/health`
+
+var handlersToCheck []http.Handler
 
 // Init charts handler
-func Init(db *sql.DB) error {
-	chartsDB = db
+func Init(handlers []http.Handler) error {
+	handlersToCheck = handlers
 
 	return nil
 }
@@ -20,11 +19,7 @@ func Init(db *sql.DB) error {
 func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			if db.Ping(chartsDB) {
-				w.WriteHeader(http.StatusOK)
-			} else {
-				w.WriteHeader(http.StatusServiceUnavailable)
-			}
+			w.WriteHeader(http.StatusOK)
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
