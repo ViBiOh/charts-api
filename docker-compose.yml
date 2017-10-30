@@ -2,7 +2,7 @@ version: '2'
 
 services:
   api:
-    image: vibioh/charts-api
+    image: vibioh/eponae-api
     command:
     - -tls
     - -prometheusMetricsHost

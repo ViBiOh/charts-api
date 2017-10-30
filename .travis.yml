@@ -5,7 +5,7 @@ services:
 go: 1.9
 install: make
 script: |
-  DOCKER_IMAGE_NAME=${DOCKER_USER}/charts-api
+  DOCKER_IMAGE_NAME=${DOCKER_USER}/eponae-api
   curl -o cacert.pem https://curl.haxx.se/ca/cacert.pem &&
   ./blueprint.sh &&
   docker build -t ${DOCKER_IMAGE_NAME} .
@@ -23,6 +23,6 @@ notifications:
 deploy:
 - provider: script
   skip_cleanup: true
-  script: "curl -H 'Authorization: GitHub ${GITHUB_OAUTH_TOKEN}' -X POST https://dashboard-api.vibioh.fr/containers/charts_api/ --data-binary @docker-compose-env.yml"
+  script: "curl -H 'Authorization: GitHub ${GITHUB_OAUTH_TOKEN}' -X POST https://dashboard-api.vibioh.fr/containers/eponae_api/ --data-binary @docker-compose-env.yml"
   on:
     branch: master
