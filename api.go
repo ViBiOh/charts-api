@@ -66,7 +66,7 @@ func main() {
 	if err := readings.Init(); err != nil {
 		log.Printf(`Error while initializing readings: %v`, err)
 	}
-	if err := healthcheck.Init([]http.Handler{chartsHandler, readingsHandler}); err != nil {
+	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: chartsHandler, `/readings`: readingsHandler}); err != nil {
 		log.Printf(`Error while initializing healthcheck: %v`, err)
 	}
 

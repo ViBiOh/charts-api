@@ -4,20 +4,15 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/writer"
 )
 
-var handlersToCheck []http.Handler
-var healthRequest *http.Request
+var handlers map[string]http.Handler
 
 // Init charts handler
-func Init(handlers []http.Handler) (err error) {
-	handlersToCheck = handlers
-
-	healthRequest, err = http.NewRequest(http.MethodGet, `/health`, nil)
-	if err != nil {
-		err = fmt.Errorf(`Error while creating health request: %v`, err)
-	}
+func Init(handlersToCheck map[string]http.Handler) (err error) {
+	handlers = handlersToCheck
 
 	return
 }
@@ -26,10 +21,15 @@ func Init(handlers []http.Handler) (err error) {
 func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			for _, handler := range handlersToCheck {
+			for url, handler := range handlers {
 				fakeWriter := writer.ResponseWriter{}
+				request, err := http.NewRequest(http.MethodGet, url+`/health`, nil)
+				if err != nil {
+					httputils.InternalServer(w, fmt.Errorf(`Error while creating health request: %v`, err))
+					return
+				}
 
-				handler.ServeHTTP(&fakeWriter, healthRequest)
+				handler.ServeHTTP(&fakeWriter, request)
 
 				if status := fakeWriter.Status(); status != http.StatusOK {
 					w.WriteHeader(status)
