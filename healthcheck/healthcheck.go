@@ -32,7 +32,6 @@ func Handler() http.Handler {
 				handler.ServeHTTP(&fakeWriter, healthRequest)
 
 				if status := fakeWriter.Status(); status != http.StatusOK {
-					w.Write([]byte(fmt.Sprintf(`Healthcheck failed for handler at index %d`, index)))
 					w.WriteHeader(status)
 					return
 				}
