@@ -1,8 +1,8 @@
-# charts-api
+# eponae-api
 
-[![Build Status](https://travis-ci.org/ViBiOh/charts-api.svg?branch=master)](https://travis-ci.org/ViBiOh/charts-api)
-[![codecov](https://codecov.io/gh/ViBiOh/charts-api/branch/master/graph/badge.svg)](https://codecov.io/gh/ViBiOh/charts-api)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ViBiOh/charts-api)](https://goreportcard.com/report/github.com/ViBiOh/charts-api)
+[![Build Status](https://travis-ci.org/ViBiOh/eponae-api.svg?branch=master)](https://travis-ci.org/ViBiOh/eponae-api)
+[![codecov](https://codecov.io/gh/ViBiOh/eponae-api/branch/master/graph/badge.svg)](https://codecov.io/gh/ViBiOh/eponae-api)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ViBiOh/eponae-api)](https://goreportcard.com/report/github.com/ViBiOh/eponae-api)
 
 ## Usage
 
