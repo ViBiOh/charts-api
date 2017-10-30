@@ -1,14 +1,43 @@
 version: '2'
 
 services:
+  auth:
+    image: vibioh/auth
+    command:
+    - -corsHeaders
+    - Authorization
+    - -corsCredentials
+    - -prometheusMetricsHost
+    - eponae-auth:1080
+    - -basicUsers
+    - ${USERS}
+    labels:
+      traefik.frontend.passHostHeader: 'true'
+      traefik.frontend.rule: 'Host: auth.eponae.fr'
+      traefik.protocol: 'https'
+      traefik.port: '1080'
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+    restart: on-failure:5
+    read_only: true
+    cpu_shares: 128
+    mem_limit: 67108864
+    security_opt:
+    - no-new-privileges
+
   api:
     image: vibioh/eponae-api
     command:
-    - -tls
     - -prometheusMetricsHost
     - eponae-api:1080
     - -csp
     - "default-src 'self'; script-src 'unsafe-inline' ajax.googleapis.com cdnjs.cloudflare.com; style-src 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; font-src data: fonts.gstatic.com cdnjs.cloudflare.com; img-src data:"
+    - authUrl
+    - https://auth.eponae.fr
+    - authUsers
+    - eponae:admin
     - -dbHost
     - db
     - -dbUser

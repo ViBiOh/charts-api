@@ -8,6 +8,7 @@ import (
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
+	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/eponae-api/charts"
 	"github.com/ViBiOh/eponae-api/healthcheck"
 	"github.com/ViBiOh/eponae-api/readings"
@@ -48,7 +49,8 @@ func handler() http.Handler {
 func main() {
 	url := flag.String(`c`, ``, `URL to check`)
 	port := flag.String(`port`, `1080`, `Listen port`)
-	tls := flag.Bool(`tls`, false, `Serve TLS content`)
+	tls := flag.Bool(`tls`, true, `Serve TLS content`)
+	authConfig := auth.Flags(`auth`)
 	prometheusConfig := prometheus.Flags(`prometheus`)
 	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
@@ -76,6 +78,9 @@ func main() {
 	if err := charts.Init(chartsDB); err != nil {
 		log.Printf(`Error while initializing charts: %v`, err)
 	}
+	if err := readings.Init(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`])); err != nil {
+		log.Printf(`Error while initializing readings: %v`, err)
+	}
 
 	restHandler = prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler())))))
 	server := &http.Server{
@@ -90,6 +95,7 @@ func main() {
 			log.Print(`Listening with TLS enabled`)
 			serveError <- cert.ListenAndServeTLS(server)
 		} else {
+			log.Print(`⚠ api is running without secure connection ⚠`)
 			serveError <- server.ListenAndServe()
 		}
 	}()
