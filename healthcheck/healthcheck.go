@@ -26,12 +26,13 @@ func Init(handlers []http.Handler) (err error) {
 func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			for _, handler := range handlersToCheck {
+			for index, handler := range handlersToCheck {
 				fakeWriter := writer.ResponseWriter{}
 
 				handler.ServeHTTP(&fakeWriter, healthRequest)
 
 				if status := fakeWriter.Status(); status != http.StatusOK {
+					w.Write([]byte(fmt.Sprintf(`Healthcheck failed for handler at index %d`, index)))
 					w.WriteHeader(status)
 					return
 				}

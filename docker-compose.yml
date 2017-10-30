@@ -38,13 +38,13 @@ services:
     - https://auth.eponae.fr
     - -readingsAuthUsers
     - eponae:admin
-    - -dbHost
+    - -chartsDbHost
     - db
-    - -dbUser
+    - -chartsDbUser
     - charts
-    - -dbPass
+    - -chartsDbPass
     - ${CHARTS_DATABASE_PASS}
-    - -dbName
+    - -chartsDbName
     - charts
     labels:
       traefik.frontend.passHostHeader: 'true'

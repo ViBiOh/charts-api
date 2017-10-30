@@ -21,7 +21,7 @@ const defaultOrder = true
 const maxPageSize = int64(50)
 
 var chartsDB *sql.DB
-var dbConfig = db.Flags(`db`)
+var dbConfig = db.Flags(`chartsDb`)
 
 // Init charts handler
 func Init() (err error) {
