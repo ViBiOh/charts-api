@@ -17,7 +17,6 @@ after_success: |
     sed \
       -e "s|\${CHARTS_DATABASE_PASS}|${CHARTS_DATABASE_PASS}|g" \
       -e "s|\${READINGS_DATABASE_PASS}|${READINGS_DATABASE_PASS}|g" \
-      -e "s|\${USERS}|${USERS}|g" \
       docker-compose.yml > docker-compose-env.yml
   fi
 notifications:
