@@ -26,7 +26,7 @@ func Init(handlers []http.Handler) (err error) {
 func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodGet {
-			for index, handler := range handlersToCheck {
+			for _, handler := range handlersToCheck {
 				fakeWriter := writer.ResponseWriter{}
 
 				handler.ServeHTTP(&fakeWriter, healthRequest)
