@@ -10,7 +10,7 @@ services:
     - -prometheusMetricsHost
     - eponae-auth:1080
     - -basicUsers
-    - ${USERS}
+    - eponae:$$2a$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: auth.eponae.fr'
