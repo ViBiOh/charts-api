@@ -1,10 +1,13 @@
 package readings
 
 import (
+	"database/sql"
+	"log"
 	"net/http"
 
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/httputils"
+	"github.com/ViBiOh/httputils/db"
 )
 
 const healthcheckPath = `/health`
@@ -13,11 +16,20 @@ var authURL string
 var authUsers map[string]*auth.User
 
 var authConfig = auth.Flags(`readingsAuth`)
+var dbConfig = db.Flags(`readingsDb`)
+var readingsDB *sql.DB
 
 // Init readings API
-func Init() error {
+func Init() (err error) {
 	authURL = *authConfig[`url`]
 	authUsers = auth.LoadUsersProfiles(*authConfig[`users`])
+
+	readingsDB, err = db.GetDB(dbConfig)
+	if err != nil {
+		log.Printf(`[readings] Error while initializing database: %v`, err)
+	} else if readingsDB != nil {
+		log.Print(`[readings] Database ready`)
+	}
 
 	return nil
 }
@@ -31,7 +43,11 @@ func Handler() http.Handler {
 		}
 
 		if r.Method == http.MethodGet && r.URL.Path == healthcheckPath {
-			w.WriteHeader(http.StatusOK)
+			if db.Ping(readingsDB) {
+				w.WriteHeader(http.StatusOK)
+			} else {
+				w.WriteHeader(http.StatusServiceUnavailable)
+			}
 			return
 		}
 

@@ -34,10 +34,6 @@ services:
     - eponae-api:1080
     - -csp
     - "default-src 'self'; script-src 'unsafe-inline' ajax.googleapis.com cdnjs.cloudflare.com; style-src 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; font-src data: fonts.gstatic.com cdnjs.cloudflare.com; img-src data:"
-    - -readingsAuthUrl
-    - https://auth.eponae.fr
-    - -readingsAuthUsers
-    - eponae:admin
     - -chartsDbHost
     - db
     - -chartsDbUser
@@ -46,6 +42,18 @@ services:
     - ${CHARTS_DATABASE_PASS}
     - -chartsDbName
     - charts
+    - -readingsAuthUrl
+    - https://auth.eponae.fr
+    - -readingsAuthUsers
+    - eponae:admin
+    - -readingsDbHost
+    - db
+    - -readingsDbUser
+    - readings
+    - -readingsDbPass
+    - ${READINGS_DATABASE_PASS}
+    - -readingsDbName
+    - readings
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: api.eponae.fr'

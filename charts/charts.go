@@ -20,8 +20,8 @@ const defaultSort = `name`
 const defaultOrder = true
 const maxPageSize = int64(50)
 
-var chartsDB *sql.DB
 var dbConfig = db.Flags(`chartsDb`)
+var chartsDB *sql.DB
 
 // Init charts handler
 func Init() (err error) {
@@ -32,7 +32,7 @@ func Init() (err error) {
 		log.Print(`[charts] Database ready`)
 	}
 
-	return nil
+	return
 }
 
 func parsePaginationParams(r *http.Request) (page, pageSize int64, sortKey string, sortAsc bool, err error) {
