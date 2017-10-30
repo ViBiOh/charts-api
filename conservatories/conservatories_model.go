@@ -1,4 +1,4 @@
-package charts
+package conservatories
 
 type conservatory struct {
 	ID         int64   `json:"id"`

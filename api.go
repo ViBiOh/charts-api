@@ -8,7 +8,7 @@ import (
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
-	"github.com/ViBiOh/eponae-api/charts"
+	"github.com/ViBiOh/eponae-api/conservatories"
 	"github.com/ViBiOh/eponae-api/healthcheck"
 	"github.com/ViBiOh/eponae-api/readings"
 	"github.com/ViBiOh/httputils"
@@ -23,7 +23,7 @@ const healthcheckPath = `/health`
 const conservatoriesPath = `/conservatories`
 const readingsPath = `/readings`
 
-var chartsHandler = http.StripPrefix(conservatoriesPath, charts.Handler())
+var conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatories.Handler())
 var readingsHandler = http.StripPrefix(readingsPath, readings.Handler())
 var healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
 
@@ -32,7 +32,7 @@ func handler() http.Handler {
 		if strings.HasPrefix(r.URL.Path, healthcheckPath) {
 			healthcheckHandler.ServeHTTP(w, r)
 		} else if strings.HasPrefix(r.URL.Path, conservatoriesPath) {
-			chartsHandler.ServeHTTP(w, r)
+			conservatoriesHandler.ServeHTTP(w, r)
 		} else if strings.HasPrefix(r.URL.Path, readingsPath) {
 			readingsHandler.ServeHTTP(w, r)
 		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
@@ -60,13 +60,13 @@ func main() {
 
 	log.Printf(`Starting server on port %s`, *port)
 
-	if err := charts.Init(); err != nil {
-		log.Printf(`Error while initializing charts: %v`, err)
+	if err := conservatories.Init(); err != nil {
+		log.Printf(`Error while initializing conservatories: %v`, err)
 	}
 	if err := readings.Init(); err != nil {
 		log.Printf(`Error while initializing readings: %v`, err)
 	}
-	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: chartsHandler, `/readings`: readingsHandler}); err != nil {
+	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: conservatoriesHandler, `/readings`: readingsHandler}); err != nil {
 		log.Printf(`Error while initializing healthcheck: %v`, err)
 	}
 

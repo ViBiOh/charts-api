@@ -1,4 +1,4 @@
-package charts
+package conservatories
 
 import (
 	"database/sql"
