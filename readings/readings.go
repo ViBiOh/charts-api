@@ -31,7 +31,7 @@ func Init() (err error) {
 		log.Print(`[readings] Database ready`)
 	}
 
-	return nil
+	return
 }
 
 // Handler for Readings request. Should be use with net/http
