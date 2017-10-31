@@ -16,6 +16,7 @@ after_success: |
 
     sed \
       -e "s|\${CHARTS_DATABASE_PASS}|${CHARTS_DATABASE_PASS}|g" \
+      -e "s|\${CHARTS_DATABASE_DIR}|${CHARTS_DATABASE_DIR}|g" \
       -e "s|\${READINGS_DATABASE_PASS}|${READINGS_DATABASE_PASS}|g" \
       -e "s|\${READINGS_DATABASE_DIR}|${READINGS_DATABASE_DIR}|g" \
       docker-compose.yml > docker-compose-env.yml
