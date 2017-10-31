@@ -1,6 +1,26 @@
 version: '2'
 
 services:
+  db:
+    image: vibioh/postgres
+    labels:
+      traefik.enable: 'false'
+    environment:
+    - POSTGRES_DB=readings
+    - POSTGRES_USER=readings
+    - POSTGRES_PASSWORD=${READINGS_DATABASE_PASS}
+    volumes:
+    - ${READINGS_DATABASE_DIR}:/var/lib/postgresql/data
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+    restart: on-failure:5
+    cpu_shares: 256
+    mem_limit: 134217728
+    security_opt:
+    - no-new-privileges
+
   auth:
     image: vibioh/auth
     command:

@@ -1,12 +1,3 @@
-DROP DATABASE IF EXISTS readings;
-DROP USER IF EXISTS readings;
-
-CREATE DATABASE readings;
-CREATE USER readings WITH PASSWORD 'MotDePasseBaseDeDonneesReadings1';
-
-GRANT ALL PRIVILEGES ON DATABASE readings to readings;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO readings;
-
 -- Cleaning
 DROP TABLE IF EXISTS readings_tags;
 DROP TABLE IF EXISTS readings;
