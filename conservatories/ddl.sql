@@ -1,16 +1,11 @@
-DROP DATABASE IF EXISTS charts;
-CREATE DATABASE charts;
-
-DROP USER IF EXISTS charts;
-CREATE USER charts WITH PASSWORD 'password';
-
-GRANT ALL PRIVILEGES ON DATABASE charts to charts;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO charts;
-
+-- Cleaning
+DROP TABLE IF EXISTS conservatories;
+DROP INDEX IF EXISTS conservatories_id;
 DROP SEQUENCE IF EXISTS conservatories_id_seq;
+
+-- Conservatories
 CREATE SEQUENCE conservatories_id_seq;
 
-DROP TABLE IF EXISTS conservatories;
 CREATE TABLE conservatories (
   id INTEGER DEFAULT nextval('conservatories_id_seq') NOT NULL,
   name TEXT NOT NULL,
@@ -24,5 +19,4 @@ CREATE TABLE conservatories (
   creation_date TIMESTAMP DEFAULT now()
 );
 
-DROP INDEX IF EXISTS conservatories_id;
 CREATE UNIQUE INDEX conservatories_id ON conservatories (id);

@@ -19,7 +19,7 @@ DROP SEQUENCE IF EXISTS tags_id_seq;
 DROP SEQUENCE IF EXISTS users_id_seq;
 DROP SEQUENCE IF EXISTS users_id_seq;
 
--- Users table
+-- Users
 CREATE SEQUENCE users_id_seq;
 
 CREATE TABLE users (
@@ -31,7 +31,7 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX users_id ON users (id);
 CREATE INDEX users_name ON users (name);
 
--- Readings table
+-- Readings
 CREATE SEQUENCE readings_id_seq;
 
 CREATE TABLE readings (
@@ -45,7 +45,7 @@ CREATE TABLE readings (
 
 CREATE UNIQUE INDEX readings_id ON readings (id);
 
--- Tags table
+-- Tags
 CREATE SEQUENCE tags_id_seq;
 
 CREATE TABLE tags (
@@ -58,7 +58,7 @@ CREATE TABLE tags (
 CREATE UNIQUE INDEX tags_id ON tags (id);
 CREATE INDEX tags_name ON tags (name);
 
--- Tags / Readings table
+-- Tags / Readings
 CREATE TABLE readings_tags (
   readings_id INTEGER NOT NULL REFERENCES readings(id),
   tags_id INTEGER NOT NULL REFERENCES tags(id),
