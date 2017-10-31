@@ -6,8 +6,8 @@ services:
     labels:
       traefik.enable: 'false'
     environment:
-      POSTGRES_DB: 'readings'
-      POSTGRES_USER: 'readings'
+      POSTGRES_DB: 'charts'
+      POSTGRES_USER: 'charts'
       POSTGRES_PASSWORD: '${CHARTS_DATABASE_PASS}'
     volumes:
     - ${CHARTS_DATABASE_DIR}:/var/lib/postgresql/data
