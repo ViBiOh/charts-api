@@ -3,7 +3,6 @@ package conservatories
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -27,9 +26,7 @@ var chartsDB *sql.DB
 func Init() (err error) {
 	chartsDB, err = db.GetDB(dbConfig)
 	if err != nil {
-		log.Printf(`[charts] Error while initializing database: %v`, err)
-	} else if chartsDB != nil {
-		log.Print(`[charts] Database ready`)
+		err = fmt.Errorf(`Error while initializing database: %v`, err)
 	}
 
 	return

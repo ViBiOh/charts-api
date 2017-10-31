@@ -2,7 +2,7 @@ package readings
 
 import (
 	"database/sql"
-	"log"
+	"fmt"
 	"net/http"
 
 	"github.com/ViBiOh/auth/auth"
@@ -26,9 +26,7 @@ func Init() (err error) {
 
 	readingsDB, err = db.GetDB(dbConfig)
 	if err != nil {
-		log.Printf(`[readings] Error while initializing database: %v`, err)
-	} else if readingsDB != nil {
-		log.Print(`[readings] Database ready`)
+		err = fmt.Errorf(`Error while initializing database: %v`, err)
 	}
 
 	return

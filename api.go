@@ -61,13 +61,13 @@ func main() {
 	log.Printf(`Starting server on port %s`, *port)
 
 	if err := conservatories.Init(); err != nil {
-		log.Printf(`Error while initializing conservatories: %v`, err)
+		log.Printf(`[conservatories] Error while initializing: %v`, err)
 	}
 	if err := readings.Init(); err != nil {
-		log.Printf(`Error while initializing readings: %v`, err)
+		log.Printf(`[readings] Error while initializing: %v`, err)
 	}
 	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: conservatoriesHandler, `/readings`: readingsHandler}); err != nil {
-		log.Printf(`Error while initializing healthcheck: %v`, err)
+		log.Printf(`[healthcheck] Error while initializing: %v`, err)
 	}
 
 	server := &http.Server{
