@@ -53,3 +53,14 @@ Usage of api:
   -tlskey string
     	TLS PEM Key file
 ```
+
+## Postgres installation
+
+```bash
+export CHARTS_DATABASE_DIR=`realpath ./data_charts`
+export READINGS_DATABASE_DIR=`realpath ./data_readings`
+mkdir ${CHARTS_DATABASE_DIR}
+mkdir ${READINGS_DATABASE_DIR}
+sudo chown -R 70:70 ${CHARTS_DATABASE_DIR}
+sudo chown -R 70:70 ${READINGS_DATABASE_DIR}
+```

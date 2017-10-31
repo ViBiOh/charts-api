@@ -1,6 +1,26 @@
 version: '2'
 
 services:
+  charts_db:
+    image: vibioh/postgres
+    labels:
+      traefik.enable: 'false'
+    environment:
+    - POSTGRES_DB=charts
+    - POSTGRES_USER=charts
+    - POSTGRES_PASSWORD=${CHARTS_DATABASE_PASS}
+    volumes:
+    - ${CHARTS_DATABASE_DIR}:/var/lib/postgresql/data
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+    restart: on-failure:5
+    cpu_shares: 256
+    mem_limit: 134217728
+    security_opt:
+    - no-new-privileges
+
   readings_db:
     image: vibioh/postgres
     labels:
@@ -55,15 +75,13 @@ services:
     - -csp
     - "default-src 'self'; script-src 'unsafe-inline' ajax.googleapis.com cdnjs.cloudflare.com; style-src 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; font-src data: fonts.gstatic.com cdnjs.cloudflare.com; img-src data:"
     - -chartsDbHost
-    - db
+    - charts_db
     - -chartsDbUser
     - charts
     - -chartsDbPass
     - ${CHARTS_DATABASE_PASS}
     - -chartsDbName
     - charts
-    - -readingsAuthUrl
-    - https://auth.eponae.fr
     - -readingsAuthUsers
     - eponae:admin
     - -readingsDbHost
@@ -74,13 +92,13 @@ services:
     - ${READINGS_DATABASE_PASS}
     - -readingsDbName
     - readings
+    - -readingsAuthUrl
+    - https://auth.eponae.fr
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: api.eponae.fr'
       traefik.protocol: 'https'
       traefik.port: '1080'
-    external_links:
-    - postgres_db_1:db
     logging:
       driver: json-file
       options:
