@@ -1,14 +1,14 @@
 version: '2'
 
 services:
-  db:
+  readings_db:
     image: vibioh/postgres
     labels:
       traefik.enable: 'false'
     environment:
-    - POSTGRES_DB=readings
-    - POSTGRES_USER=readings
-    - POSTGRES_PASSWORD=${READINGS_DATABASE_PASS}
+      POSTGRES_DB: 'readings'
+      POSTGRES_USER: 'readings'
+      POSTGRES_PASSWORD: '${READINGS_DATABASE_PASS}'
     volumes:
     - ${READINGS_DATABASE_DIR}:/var/lib/postgresql/data
     logging:
@@ -67,7 +67,7 @@ services:
     - -readingsAuthUsers
     - eponae:admin
     - -readingsDbHost
-    - db
+    - readings_db
     - -readingsDbUser
     - readings
     - -readingsDbPass
