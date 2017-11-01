@@ -25,7 +25,7 @@ func Handler() http.Handler {
 				fakeWriter := writer.ResponseWriter{}
 				request, err := http.NewRequest(http.MethodGet, url+`/health`, nil)
 				if err != nil {
-					httputils.InternalServer(w, fmt.Errorf(`Error while creating health request: %v`, err))
+					httputils.InternalServerError(w, fmt.Errorf(`Error while creating health request: %v`, err))
 					return
 				}
 
