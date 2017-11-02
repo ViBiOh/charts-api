@@ -7,7 +7,6 @@ import (
 type tag struct {
 	id   int64
 	Name string     `json:"name"`
-	User *auth.User `json:"user"`
 }
 
 type reading struct {
