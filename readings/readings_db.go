@@ -2,6 +2,7 @@ package readings
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/httputils/db"
@@ -31,7 +32,7 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &url, &public, &read); err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`Error while scanning reading line: %v`, err)
 		}
 
 		list = append(list, &reading{id: id, URL: url, Public: public, Read: read})
@@ -43,16 +44,16 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 func listReadingsOfUser(user *auth.User) ([]*reading, error) {
 	rows, err := readingsDB.Query(listReadingsOfUserQuery, user.Username)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`Error while listing readings of user: %v`, err)
 	}
 
 	defer func() {
-		err = db.RowsClose(`list readings`, rows, err)
+		err = db.RowsClose(`list readings of user`, rows, err)
 	}()
 
 	list, err := scanReadings(rows)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`Error while scanning readings: %v`, err)
 	}
 
 	return list, addTagsForReadings(list)

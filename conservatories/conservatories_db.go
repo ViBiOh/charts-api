@@ -87,7 +87,7 @@ func scanConservatoryRows(rows *sql.Rows, pageSize int64) ([]*conservatory, erro
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &name, &category, &street, &city, &department, &zip, &latitude, &longitude); err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`Error while scanning conservatory line: %v`, err)
 		}
 
 		conservatories = append(conservatories, &conservatory{ID: id, Name: name, Category: category, Street: street, City: city, Department: department, Zip: zip, Latitude: latitude, Longitude: longitude})
@@ -106,7 +106,7 @@ func scanAggregateRows(rows *sql.Rows) (map[string]int64, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&key, &count); err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`Error while scanning aggregate line: %v`, err)
 		}
 
 		aggregate[key] = count
@@ -164,7 +164,7 @@ func searchConservatories(page, pageSize int64, sortKey string, sortAsc bool, se
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`Error while searching conservatories: %v`, err)
 	}
 
 	defer func() {
@@ -176,18 +176,18 @@ func searchConservatories(page, pageSize int64, sortKey string, sortAsc bool, se
 
 func countByDepartment() (map[string]int64, error) {
 	rows, err := chartsDB.Query(conservatoriesByDepartementQuery)
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`Error while counting by department: %v`, err)
 	}
+
 	return scanAggregateRows(rows)
 }
 
 func countByZipOfDepartment(department string) (map[string]int64, error) {
 	rows, err := chartsDB.Query(conservatoriesByZipOfDepartmentQuery, department)
-
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`Error while counting by zip of department: %v`, err)
 	}
+
 	return scanAggregateRows(rows)
 }

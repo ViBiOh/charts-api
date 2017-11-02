@@ -2,6 +2,7 @@ package readings
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/httputils/db"
@@ -49,7 +50,7 @@ func scanTags(rows *sql.Rows) ([]*tag, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &name); err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`Error while scanning tag line: %v`, err)
 		}
 
 		list = append(list, &tag{id: id, Name: name})
@@ -68,7 +69,7 @@ func scanReadingsTagsForTag(rows *sql.Rows) (map[int64][]int64, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&readingID, &tagID); err != nil {
-			return nil, err
+			return nil, fmt.Errorf(`Error while scanning reading-tag line: %v`, err)
 		}
 
 		if _, ok := list[tagID]; ok {
@@ -84,11 +85,11 @@ func scanReadingsTagsForTag(rows *sql.Rows) (map[int64][]int64, error) {
 func listTagsOfUser(user *auth.User) ([]*tag, error) {
 	rows, err := readingsDB.Query(listTagsOfUserQuery, user.Username)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`Error while listing tags of user: %v`, err)
 	}
 
 	defer func() {
-		err = db.RowsClose(`list readings`, rows, err)
+		err = db.RowsClose(`listing tags of user`, rows, err)
 	}()
 
 	return scanTags(rows)
@@ -97,11 +98,11 @@ func listTagsOfUser(user *auth.User) ([]*tag, error) {
 func listTagsByIds(ids []int64) ([]*tag, error) {
 	rows, err := readingsDB.Query(listTagsByidsQuery, pq.Int64Array(ids))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf(`Error while listing tags by ids: %v`, err)
 	}
 
 	defer func() {
-		err = db.RowsClose(`list tags by ids`, rows, err)
+		err = db.RowsClose(`listing tags by ids`, rows, err)
 	}()
 
 	return scanTags(rows)
@@ -119,16 +120,16 @@ func addTagsForReadings(readings []*reading) error {
 
 	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, pq.Int64Array(ids))
 	if err != nil {
-		return err
+		return fmt.Errorf(`Error while listing reading-tag of readings: %v`, err)
 	}
 
 	defer func() {
-		err = db.RowsClose(`list readings-tags of readings`, rows, err)
+		err = db.RowsClose(`listing reading-tag of readings`, rows, err)
 	}()
 
 	tagLinks, err := scanReadingsTagsForTag(rows)
 	if err != nil {
-		return err
+		return fmt.Errorf(`Error while scanning reading-tag of readings: %v`, err)
 	} else if len(tagLinks) == 0 {
 		return nil
 	}
@@ -149,7 +150,7 @@ func addTagsForReadings(readings []*reading) error {
 
 	tags, err := listTagsByIds(tagsIds)
 	if err != nil {
-		return err
+		return fmt.Errorf(`Error while tags for readings: %v`, err)
 	}
 
 	tagsByID := make(map[int64]*tag, 0)
