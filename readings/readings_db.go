@@ -16,7 +16,7 @@ SELECT
 FROM
   readings
 WHERE
-  user = $1
+  username = $1
 `
 
 func scanReadings(rows *sql.Rows) ([]*reading, error) {

@@ -14,7 +14,7 @@ SELECT
 FROM
   tags
 WHERE
-  user = $1
+  username = $1
 `
 
 const listTagsByidsQuery = `
