@@ -32,6 +32,14 @@ func Init() (err error) {
 	return
 }
 
+func listReadings(w http.ResponseWriter, r *http.Request, user *auth.User) {
+	if list, err := listReadingsOfUser(user); err == nil {
+		httputils.ResponseArrayJSON(w, http.StatusOK, list, httputils.IsPretty(r.URL.RawQuery))
+	} else {
+		httputils.InternalServerError(w, err)
+	}
+}
+
 // Handler for Readings request. Should be use with net/http
 func Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -55,7 +63,10 @@ func Handler() http.Handler {
 			return
 		}
 
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		w.Write([]byte(user.Username))
+		if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
+			listReadings(w, r, user)
+		} else {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	})
 }
