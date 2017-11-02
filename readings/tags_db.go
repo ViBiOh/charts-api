@@ -5,6 +5,8 @@ import (
 
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/httputils/db"
+
+	"github.com/lib/pq"
 )
 
 const listTagsOfUserQuery = `
@@ -93,7 +95,7 @@ func listTagsOfUser(user *auth.User) ([]*tag, error) {
 }
 
 func listTagsByIds(ids []int64) ([]*tag, error) {
-	rows, err := readingsDB.Query(listTagsByidsQuery, ids)
+	rows, err := readingsDB.Query(listTagsByidsQuery, pq.Int64Array(ids))
 	if err != nil {
 		return nil, err
 	}
