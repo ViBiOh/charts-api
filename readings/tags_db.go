@@ -117,7 +117,7 @@ func addTagsForReadings(readings []*reading) error {
 		ids = append(ids, reading.id)
 	}
 
-	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, ids)
+	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, pq.Int64Array(ids))
 	if err != nil {
 		return err
 	}
