@@ -17,7 +17,7 @@ SELECT
 FROM
   readings
 WHERE
-  username = $1
+  user_id = $1
 `
 
 func scanReadings(rows *sql.Rows) ([]*reading, error) {
@@ -42,7 +42,7 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 }
 
 func listReadingsOfUser(user *auth.User) ([]*reading, error) {
-	rows, err := readingsDB.Query(listReadingsOfUserQuery, user.Username)
+	rows, err := readingsDB.Query(listReadingsOfUserQuery, user.ID)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while listing readings of user: %v`, err)
 	}

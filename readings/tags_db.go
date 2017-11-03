@@ -2,10 +2,7 @@ package readings
 
 import (
 	"database/sql"
-	"database/sql/driver"
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/httputils/db"
@@ -18,7 +15,7 @@ SELECT
 FROM
   tags
 WHERE
-  username = $1
+  user_id = $1
 `
 
 const listTagsByidsQuery = `
@@ -40,17 +37,6 @@ FROM
 WHERE
   readings_id IN ($1)
 `
-
-type int64slice []int64
-
-func (a int64slice) Value() (driver.Value, error) {
-	ints := make([]string, len(a))
-	for i, v := range a {
-		ints[i] = strconv.FormatInt(v, 10)
-	}
-
-	return strings.Join(ints, ","), nil
-}
 
 func scanTags(rows *sql.Rows) ([]*tag, error) {
 	var (
@@ -95,7 +81,7 @@ func scanReadingsTagsForTag(rows *sql.Rows) (map[int64][]int64, error) {
 }
 
 func listTagsOfUser(user *auth.User) ([]*tag, error) {
-	rows, err := readingsDB.Query(listTagsOfUserQuery, user.Username)
+	rows, err := readingsDB.Query(listTagsOfUserQuery, user.ID)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while listing tags of user: %v`, err)
 	}
@@ -108,7 +94,7 @@ func listTagsOfUser(user *auth.User) ([]*tag, error) {
 }
 
 func listTagsByIds(ids []int64) ([]*tag, error) {
-	rows, err := readingsDB.Query(listTagsByidsQuery, int64slice(ids))
+	rows, err := readingsDB.Query(listTagsByidsQuery, db.WhereInInt64(ids))
 	if err != nil {
 		return nil, fmt.Errorf(`Error while listing tags by ids: %v`, err)
 	}
@@ -130,7 +116,7 @@ func addTagsForReadings(readings []*reading) error {
 		ids = append(ids, reading.id)
 	}
 
-	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, int64slice(ids))
+	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, db.WhereInInt64(ids))
 	if err != nil {
 		return fmt.Errorf(`Error while listing reading-tag of readings: %v`, err)
 	}

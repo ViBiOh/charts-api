@@ -1,12 +1,8 @@
 package readings
 
-import (
-	"github.com/ViBiOh/auth/auth"
-)
-
 type tag struct {
 	id   int64
-	Name string     `json:"name"`
+	Name string `json:"name"`
 }
 
 type reading struct {
