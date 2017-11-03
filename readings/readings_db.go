@@ -35,7 +35,7 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 			return nil, fmt.Errorf(`Error while scanning reading line: %v`, err)
 		}
 
-		list = append(list, &reading{id: id, URL: url, Public: public, Read: read})
+		list = append(list, &reading{ID: id, URL: url, Public: public, Read: read})
 	}
 
 	return list, nil

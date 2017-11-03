@@ -51,7 +51,7 @@ func scanTags(rows *sql.Rows) ([]*tag, error) {
 			return nil, fmt.Errorf(`Error while scanning tag line: %v`, err)
 		}
 
-		list = append(list, &tag{id: id, Name: name})
+		list = append(list, &tag{ID: id, Name: name})
 	}
 
 	return list, nil
@@ -113,7 +113,7 @@ func addTagsForReadings(readings []*reading) error {
 
 	ids := make([]int64, 0)
 	for _, reading := range readings {
-		ids = append(ids, reading.id)
+		ids = append(ids, reading.ID)
 	}
 
 	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, db.WhereInInt64(ids))
@@ -153,11 +153,11 @@ func addTagsForReadings(readings []*reading) error {
 
 	tagsByID := make(map[int64]*tag, 0)
 	for _, tag := range tags {
-		tagsByID[tag.id] = tag
+		tagsByID[tag.ID] = tag
 	}
 
 	for _, reading := range readings {
-		for _, tagID := range tagsByReading[reading.id] {
+		for _, tagID := range tagsByReading[reading.ID] {
 			if reading.Tags == nil {
 				reading.Tags = make([]*tag, 0)
 			}
