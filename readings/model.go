@@ -1,10 +1,15 @@
 package readings
 
-import "sort"
+import (
+	"sort"
+
+	"github.com/ViBiOh/auth/auth"
+)
 
 type tag struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
+	user *auth.User
 }
 
 type tagsSorter struct {

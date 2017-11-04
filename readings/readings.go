@@ -11,6 +11,7 @@ import (
 )
 
 const healthcheckPath = `/health`
+const tagsPath = `/tags`
 
 var authURL string
 var authUsers map[string]*auth.User
@@ -65,6 +66,8 @@ func Handler() http.Handler {
 
 		if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
 			listReadings(w, r, user)
+		} else if r.Method == http.MethodPost && r.URL.Path == tagsPath {
+			createTag(w, r, user)
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}

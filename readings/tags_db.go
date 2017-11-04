@@ -38,6 +38,27 @@ WHERE
   readings_id IN ($1)
 `
 
+const insertTag = `
+INSERT INTO
+  tags
+(
+  name,
+  user_id
+) VALUES (
+  $1,
+  $2
+)
+RETURNING id
+`
+const updateTag = `
+UPDATE
+  tags
+SET
+  name = $2
+WHERE
+  id = $1
+`
+
 func scanTags(rows *sql.Rows) ([]*tag, error) {
 	var (
 		id   int64
@@ -167,4 +188,37 @@ func addTagsForReadings(readings []*reading) error {
 	}
 
 	return nil
+}
+
+func saveTag(tag *tag, tx *sql.Tx) (err error) {
+	if tag == nil {
+		return fmt.Errorf(`Unable to save nil Tag`)
+	}
+
+	var usedTx *sql.Tx
+	if usedTx, err = db.GetTx(readingsDB, `save tag`, tx); err != nil {
+		return
+	}
+
+	if usedTx != tx {
+		defer func() {
+			err = db.EndTx(`save tag`, usedTx, err)
+		}()
+	}
+
+	if tag.ID != 0 {
+		if _, err = usedTx.Exec(updateTag, tag.ID, tag.Name); err != nil {
+			err = fmt.Errorf(`Error while updating tag for user=%s: %v`, tag.user.Username, err)
+		}
+	} else {
+		var newID int64
+
+		if err = usedTx.QueryRow(insertTag, tag.Name, tag.user.ID).Scan(&newID); err != nil {
+			err = fmt.Errorf(`Error while creating tag for user=%s: %v`, tag.user.Username, err)
+		} else {
+			tag.ID = newID
+		}
+	}
+
+	return
 }
