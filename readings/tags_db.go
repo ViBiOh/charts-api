@@ -39,7 +39,7 @@ WHERE
 `
 
 const searchTagsWhereQuery = `
-  AND to_tsvector('french', name) @@ to_tsquery('french', $2)
+  AND to_tsvector('french', name) @@ to_tsquery('french', $INDEX)
 `
 
 const searchTagsCountQuery = `
@@ -242,14 +242,8 @@ func searchTags(page, pageSize int64, sortKey string, sortAsc bool, user *auth.U
 		sortOrder = `DESC`
 	}
 
-	var rows *sql.Rows
-	var err error
-
-	if search != `` {
-		rows, err = readingsDB.Query(fmt.Sprintf(searchTagsQuery, searchTagsWhereQuery, sortKey, sortOrder), pageSize, offset, user.ID, search)
-	} else {
-		rows, err = readingsDB.Query(fmt.Sprintf(searchTagsQuery, ``, sortKey, sortOrder), pageSize, offset, user.ID)
-	}
+	searchQuery, words := db.PrepareFullTextSearch(searchTagsWhereQuery, search, 4)
+	rows, err := readingsDB.Query(fmt.Sprintf(searchTagsQuery, searchQuery, sortKey, sortOrder), pageSize, offset, user.ID, words)
 
 	if err != nil {
 		return nil, fmt.Errorf(`Error while searching tags: %v`, err)
@@ -267,11 +261,8 @@ func countTags(user *auth.User, search string) (count int64, err error) {
 		return 0, fmt.Errorf(`Unable to count tags of nil User`)
 	}
 
-	if search != `` {
-		err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, searchTagsWhereQuery), user.ID, search).Scan(&count)
-	} else {
-		err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, ``), user.ID).Scan(&count)
-	}
+	searchQuery, words := db.PrepareFullTextSearch(searchTagsWhereQuery, search, 2)
+	err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, searchQuery), user.ID, words).Scan(&count)
 
 	if err == sql.ErrNoRows {
 		count = 0
@@ -359,7 +350,7 @@ func deleteTag(o *tag, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if _, err = usedTx.Exec(updateTagQuery, o.ID, o.Name); err != nil {
+	if _, err = usedTx.Exec(deleteTagQuery, o.ID, o.Name); err != nil {
 		err = fmt.Errorf(`Error while deleting tag with ID=%d: %v`, o.ID, err)
 	}
 

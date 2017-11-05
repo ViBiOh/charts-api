@@ -3,7 +3,6 @@ package conservatories
 import (
 	"database/sql"
 	"fmt"
-	"strings"
 
 	"github.com/ViBiOh/httputils/db"
 )
@@ -115,23 +114,8 @@ func scanAggregateRows(rows *sql.Rows) (map[string]int64, error) {
 	return aggregate, nil
 }
 
-func prepareFullTextSearch(search string, index int) (string, string) {
-	if search == `` {
-		return ``, ``
-	}
-
-	words := strings.Split(search, ` `)
-	transformedWords := make([]string, 0, len(words))
-
-	for _, word := range words {
-		transformedWords = append(transformedWords, word+`:*`)
-	}
-
-	return strings.Replace(conservatoriesSearchWhere, `$INDEX`, fmt.Sprintf(`$%d`, index), -1), strings.Join(transformedWords, ` | `)
-}
-
 func countConservatories(search string) (count int64, err error) {
-	where, words := prepareFullTextSearch(search, 1)
+	where, words := db.PrepareFullTextSearch(conservatoriesSearchWhere, search, 1)
 
 	if words != `` {
 		err = chartsDB.QueryRow(fmt.Sprintf(conservatoriesCountQuery, where), words).Scan(&count)
@@ -153,15 +137,8 @@ func searchConservatories(page, pageSize int64, sortKey string, sortAsc bool, se
 		sortOrder = `DESC`
 	}
 
-	where, words := prepareFullTextSearch(search, 3)
-	var rows *sql.Rows
-	var err error
-
-	if words != `` {
-		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset, words)
-	} else {
-		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset)
-	}
+	where, words := db.PrepareFullTextSearch(conservatoriesSearchWhere, search, 3)
+	rows, err := chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset, words)
 
 	if err != nil {
 		return nil, fmt.Errorf(`Error while searching conservatories: %v`, err)
