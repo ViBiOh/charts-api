@@ -4,20 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
-	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/db"
+	"github.com/ViBiOh/httputils/pagination"
 )
 
 const healthcheckPath = `/health`
-const defaultPage = int64(1)
 const defaultPageSize = int64(10)
-const defaultSort = `name`
-const defaultOrder = true
 const maxPageSize = int64(50)
+const defaultSort = `name`
 
 var dbConfig = db.Flags(`chartsDb`)
 var chartsDB *sql.DB
@@ -32,61 +29,15 @@ func Init() (err error) {
 	return
 }
 
-func parsePaginationParams(r *http.Request) (page, pageSize int64, sortKey string, sortAsc bool, err error) {
-	var parsedInt int64
-	var params url.Values
-
-	params, err = url.ParseQuery(r.URL.RawQuery)
-	if err != nil {
-		return
-	}
-
-	page = defaultPage
-	rawPage := params.Get(`page`)
-	if rawPage != `` {
-		parsedInt, err = strconv.ParseInt(rawPage, 10, 64)
-		if err != nil {
-			err = fmt.Errorf(`Error while parsing page param: %v`, err)
-			return
-		}
-
-		page = parsedInt
-	}
-
-	pageSize = defaultPageSize
-	rawPageSize := params.Get(`pageSize`)
-	if rawPageSize != `` {
-		parsedInt, err = strconv.ParseInt(rawPageSize, 10, 64)
-		if err != nil {
-			err = fmt.Errorf(`Error while parsing pageSize param: %v`, err)
-			return
-		} else if parsedInt > maxPageSize {
-			err = fmt.Errorf(`maxPageSize exceeded`)
-			return
-		}
-
-		pageSize = parsedInt
-	}
-
-	sortKey = defaultSort
-	rawSortKey := params.Get(`sort`)
-	if rawSortKey != `` {
-		sortKey = rawSortKey
-	}
-
-	sortAsc = defaultOrder
-	if _, ok := params[`desc`]; ok {
-		sortAsc = false
-	}
-
-	return
-}
-
 func listCrud(w http.ResponseWriter, r *http.Request) {
-	page, pageSize, sort, asc, err := parsePaginationParams(r)
+	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
 	if err != nil {
 		httputils.BadRequest(w, err)
 		return
+	}
+
+	if sort == `` {
+		sort = defaultSort
 	}
 
 	if count, list, err := findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
