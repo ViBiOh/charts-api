@@ -300,6 +300,9 @@ func getTag(id int64, user *auth.User) (*tag, error) {
 	)
 
 	if err := readingsDB.QueryRow(readTagQuery, id, user.ID).Scan(&resultID, &name); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, err
+		}
 		return nil, fmt.Errorf(`Error while reading tag: %v`, err)
 	}
 
