@@ -103,7 +103,7 @@ WHERE
 `
 
 const deleteTagQuery = `
-DELETE
+DELETE FROM
   tags
 WHERE
   id = $1
