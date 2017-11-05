@@ -363,7 +363,7 @@ func deleteTag(o *tag, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if _, err = usedTx.Exec(deleteTagQuery, o.ID, o.Name); err != nil {
+	if _, err = usedTx.Exec(deleteTagQuery, o.ID); err != nil {
 		err = fmt.Errorf(`Error while deleting tag with ID=%d: %v`, o.ID, err)
 	}
 
