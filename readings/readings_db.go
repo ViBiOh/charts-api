@@ -20,6 +20,33 @@ WHERE
   user_id = $1
 `
 
+const insertReading = `
+INSERT INTO
+  readings
+(
+  url,
+  user_id,
+  public,
+  read
+) VALUES (
+  $1,
+  $2,
+  $3,
+  $4
+)
+RETURNING id
+`
+const updateReading = `
+UPDATE
+  tags
+SET
+  url = $2,
+  public = $3,
+  read = $4
+WHERE
+  id = $1
+`
+
 func scanReadings(rows *sql.Rows) ([]*reading, error) {
 	var (
 		id     int64
@@ -57,4 +84,37 @@ func listReadingsOfUser(user *auth.User) ([]*reading, error) {
 	}
 
 	return list, addTagsForReadings(list)
+}
+
+func saveReading(o *reading, tx *sql.Tx) (err error) {
+	if o == nil {
+		return fmt.Errorf(`Unable to save nil reading`)
+	}
+
+	var usedTx *sql.Tx
+	if usedTx, err = db.GetTx(readingsDB, `save reading`, tx); err != nil {
+		return
+	}
+
+	if usedTx != tx {
+		defer func() {
+			err = db.EndTx(`save reading`, usedTx, err)
+		}()
+	}
+
+	if o.ID != 0 {
+		if _, err = usedTx.Exec(updateReading, o.ID, o.URL, o.Public, o.Read); err != nil {
+			err = fmt.Errorf(`Error while updating reading for user=%s: %v`, o.user.Username, err)
+		}
+	} else {
+		var newID int64
+
+		if err = usedTx.QueryRow(insertReading, o.user.ID, o.URL, o.Public, o.Read).Scan(&newID); err != nil {
+			err = fmt.Errorf(`Error while creating reading for user=%s: %v`, o.user.Username, err)
+		} else {
+			o.ID = newID
+		}
+	}
+
+	return
 }

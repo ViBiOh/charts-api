@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/httputils"
@@ -11,7 +12,6 @@ import (
 )
 
 const healthcheckPath = `/health`
-const tagsPath = `/tags`
 
 var authURL string
 var authUsers map[string]*auth.User
@@ -64,10 +64,10 @@ func Handler() http.Handler {
 			return
 		}
 
-		if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
+		if strings.HasPrefix(r.URL.Path, tagsPath) {
+			tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
+		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
 			listReadings(w, r, user)
-		} else if r.Method == http.MethodPost && r.URL.Path == tagsPath {
-			createTag(w, r, user)
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}

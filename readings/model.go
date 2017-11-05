@@ -48,6 +48,7 @@ type reading struct {
 	Public bool   `json:"public"`
 	Read   bool   `json:"read"`
 	Tags   []*tag `json:"tags"`
+	user   *auth.User
 }
 
 type readingsSorter struct {

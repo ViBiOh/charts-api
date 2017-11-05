@@ -38,23 +38,42 @@ WHERE
   readings_id IN ($1)
 `
 
-const insertTag = `
+const readTagQuery = `
+SELECT
+  id,
+  name
+FROM
+  tags
+WHERE
+  id = $1
+  AND user_id = $2
+`
+
+const insertTagQuery = `
 INSERT INTO
   tags
 (
-  name,
-  user_id
+  user_id,
+  name
 ) VALUES (
   $1,
   $2
 )
 RETURNING id
 `
-const updateTag = `
+
+const updateTagQuery = `
 UPDATE
   tags
 SET
   name = $2
+WHERE
+  id = $1
+`
+
+const deleteTagQuery = `
+DELETE
+  tags
 WHERE
   id = $1
 `
@@ -190,9 +209,26 @@ func addTagsForReadings(readings []*reading) error {
 	return nil
 }
 
-func saveTag(tag *tag, tx *sql.Tx) (err error) {
-	if tag == nil {
-		return fmt.Errorf(`Unable to save nil Tag`)
+func getTag(id int64, user *auth.User) (*tag, error) {
+	if user == nil {
+		return nil, fmt.Errorf(`Unable to read tag of nil User`)
+	}
+
+	var (
+		resultID int64
+		name     string
+	)
+
+	if err := readingsDB.QueryRow(readTagQuery, id, user.ID).Scan(&resultID, &name); err != nil {
+		return nil, fmt.Errorf(`Error while reading tag: %v`, err)
+	}
+
+	return &tag{ID: resultID, Name: name, user: user}, nil
+}
+
+func saveTag(o *tag, tx *sql.Tx) (err error) {
+	if o == nil {
+		return fmt.Errorf(`Unable to save nil tag`)
 	}
 
 	var usedTx *sql.Tx
@@ -206,18 +242,41 @@ func saveTag(tag *tag, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if tag.ID != 0 {
-		if _, err = usedTx.Exec(updateTag, tag.ID, tag.Name); err != nil {
-			err = fmt.Errorf(`Error while updating tag for user=%s: %v`, tag.user.Username, err)
+	if o.ID != 0 {
+		if _, err = usedTx.Exec(updateTagQuery, o.ID, o.Name); err != nil {
+			err = fmt.Errorf(`Error while updating tag for user=%s: %v`, o.user.Username, err)
 		}
 	} else {
 		var newID int64
 
-		if err = usedTx.QueryRow(insertTag, tag.Name, tag.user.ID).Scan(&newID); err != nil {
-			err = fmt.Errorf(`Error while creating tag for user=%s: %v`, tag.user.Username, err)
+		if err = usedTx.QueryRow(insertTagQuery, o.user.ID, o.Name).Scan(&newID); err != nil {
+			err = fmt.Errorf(`Error while creating tag for user=%s: %v`, o.user.Username, err)
 		} else {
-			tag.ID = newID
+			o.ID = newID
 		}
+	}
+
+	return
+}
+
+func deleteTag(o *tag, tx *sql.Tx) (err error) {
+	if o == nil || o.ID == 0 {
+		return fmt.Errorf(`Unable to delete nil tag or one without ID`)
+	}
+
+	var usedTx *sql.Tx
+	if usedTx, err = db.GetTx(readingsDB, `delete tag`, tx); err != nil {
+		return
+	}
+
+	if usedTx != tx {
+		defer func() {
+			err = db.EndTx(`delete tag`, usedTx, err)
+		}()
+	}
+
+	if _, err = usedTx.Exec(updateTagQuery, o.ID, o.Name); err != nil {
+		err = fmt.Errorf(`Error while deleting tag with ID=%d: %v`, o.ID, err)
 	}
 
 	return
