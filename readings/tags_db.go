@@ -38,6 +38,37 @@ WHERE
   readings_id IN ($1)
 `
 
+const searchTagsWhereQuery = `
+  to_tsvector('french', name) @@ to_tsquery('french', $4)
+`
+
+const searchTagsCountQuery = `
+SELECT
+  COUNT(id)
+FROM
+  tags
+WHERE
+  user_id = $3
+%s
+`
+
+const searchTagsQuery = `
+SELECT
+  id,
+  name
+FROM
+  tags
+WHERE
+  user_id = $3
+%s
+ORDER BY
+  %s %s
+LIMIT
+  $1
+OFFSET
+  $2
+`
+
 const readTagQuery = `
 SELECT
   id,
@@ -78,13 +109,13 @@ WHERE
   id = $1
 `
 
-func scanTags(rows *sql.Rows) ([]*tag, error) {
+func scanTags(rows *sql.Rows, pageSize int64) ([]*tag, error) {
 	var (
 		id   int64
 		name string
 	)
 
-	list := make([]*tag, 0)
+	list := make([]*tag, pageSize)
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &name); err != nil {
@@ -130,7 +161,7 @@ func listTagsOfUser(user *auth.User) ([]*tag, error) {
 		err = db.RowsClose(`listing tags of user`, rows, err)
 	}()
 
-	return scanTags(rows)
+	return scanTags(rows, 0)
 }
 
 func listTagsByIds(ids []int64) ([]*tag, error) {
@@ -143,7 +174,7 @@ func listTagsByIds(ids []int64) ([]*tag, error) {
 		err = db.RowsClose(`listing tags by ids`, rows, err)
 	}()
 
-	return scanTags(rows)
+	return scanTags(rows, 0)
 }
 
 func addTagsForReadings(readings []*reading) error {
@@ -209,6 +240,64 @@ func addTagsForReadings(readings []*reading) error {
 	return nil
 }
 
+func searchTags(page, pageSize int64, sortKey string, sortAsc bool, user *auth.User, search string) ([]*tag, error) {
+	if user == nil {
+		return nil, fmt.Errorf(`Unable to search tags of nil User`)
+	}
+
+	var offset int64
+	if page > 1 {
+		offset = (page - 1) * pageSize
+	}
+
+	sortOrder := `ASC`
+	if !sortAsc {
+		sortOrder = `DESC`
+	}
+
+	var rows *sql.Rows
+	var err error
+
+	if search != `` {
+		rows, err = readingsDB.Query(fmt.Sprintf(searchTagsQuery, searchTagsWhereQuery, sortKey, sortOrder), pageSize, offset, user.ID, search)
+	} else {
+		rows, err = readingsDB.Query(fmt.Sprintf(searchTagsQuery, ``, sortKey, sortOrder), pageSize, offset, user.ID)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf(`Error while searching tags: %v`, err)
+	}
+
+	defer func() {
+		err = db.RowsClose(`search tag`, rows, err)
+	}()
+
+	return scanTags(rows, pageSize)
+}
+
+func countTags(user *auth.User, search string) (count int64, err error) {
+	if user == nil {
+		return 0, fmt.Errorf(`Unable to count tags of nil User`)
+	}
+
+	if search != `` {
+		err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, searchTagsWhereQuery), user.ID, search).Scan(&count)
+	} else {
+		err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, ``), user.ID).Scan(&count)
+	}
+
+	if err == sql.ErrNoRows {
+		count = 0
+		err = nil
+	}
+
+	if err != nil {
+		err = fmt.Errorf(`Error while counting tags: %v`, err)
+	}
+
+	return
+}
+
 func getTag(id int64, user *auth.User) (*tag, error) {
 	if user == nil {
 		return nil, fmt.Errorf(`Unable to read tag of nil User`)
@@ -229,6 +318,10 @@ func getTag(id int64, user *auth.User) (*tag, error) {
 func saveTag(o *tag, tx *sql.Tx) (err error) {
 	if o == nil {
 		return fmt.Errorf(`Unable to save nil tag`)
+	}
+
+	if o.user == nil || o.user.ID == 0 {
+		return fmt.Errorf(`Unable to save tag of nil User`)
 	}
 
 	var usedTx *sql.Tx
@@ -262,6 +355,10 @@ func saveTag(o *tag, tx *sql.Tx) (err error) {
 func deleteTag(o *tag, tx *sql.Tx) (err error) {
 	if o == nil || o.ID == 0 {
 		return fmt.Errorf(`Unable to delete nil tag or one without ID`)
+	}
+
+	if o.user == nil || o.user.ID == 0 {
+		return fmt.Errorf(`Unable to delete tag of nil User`)
 	}
 
 	var usedTx *sql.Tx

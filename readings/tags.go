@@ -11,9 +11,12 @@ import (
 
 	"github.com/ViBiOh/auth/auth"
 	"github.com/ViBiOh/httputils"
+	"github.com/ViBiOh/httputils/pagination"
 )
 
 const tagsPath = `/tags`
+const defaultPageSize = 50
+const maxPageSize = int64(^uint(0) >> 1)
 
 func getRequestID(path string) (int64, error) {
 	return strconv.ParseInt(strings.TrimPrefix(path, `/`), 10, 64)
@@ -29,6 +32,28 @@ func readTagFromBody(r *http.Request) (*tag, error) {
 	}
 
 	return &requestTag, nil
+}
+
+func listTags(w http.ResponseWriter, r *http.Request, user *auth.User) {
+	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
+	if err != nil {
+		httputils.BadRequest(w, err)
+		return
+	}
+
+	if sort == `` {
+		sort = `name`
+	}
+
+	query := r.URL.Query().Get(`q`)
+
+	if list, err := searchTags(page, pageSize, sort, asc, user, query); err != nil {
+		httputils.InternalServerError(w, err)
+	} else if count, err := countTags(user, query); err != nil {
+		httputils.InternalServerError(w, err)
+	} else {
+		httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery))
+	}
 }
 
 func readTag(w http.ResponseWriter, r *http.Request, user *auth.User, id int64) {
@@ -98,7 +123,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request, user *auth.User, path s
 		if r.Method == http.MethodPost {
 			createTag(w, r, user)
 		} else if r.Method == http.MethodGet {
-			// listTag(w, r, user)
+			listTags(w, r, user)
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
