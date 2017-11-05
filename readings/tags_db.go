@@ -115,7 +115,7 @@ func scanTags(rows *sql.Rows, pageSize int64) ([]*tag, error) {
 		name string
 	)
 
-	list := make([]*tag, pageSize)
+	list := make([]*tag, 0, pageSize)
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &name); err != nil {
@@ -149,19 +149,6 @@ func scanReadingsTagsForTag(rows *sql.Rows) (map[int64][]int64, error) {
 	}
 
 	return list, nil
-}
-
-func listTagsOfUser(user *auth.User) ([]*tag, error) {
-	rows, err := readingsDB.Query(listTagsOfUserQuery, user.ID)
-	if err != nil {
-		return nil, fmt.Errorf(`Error while listing tags of user: %v`, err)
-	}
-
-	defer func() {
-		err = db.RowsClose(`listing tags of user`, rows, err)
-	}()
-
-	return scanTags(rows, 0)
 }
 
 func listTagsByIds(ids []int64) ([]*tag, error) {
