@@ -39,7 +39,7 @@ WHERE
 `
 
 const searchTagsWhereQuery = `
-  to_tsvector('french', name) @@ to_tsquery('french', $2)
+  AND to_tsvector('french', name) @@ to_tsquery('french', $2)
 `
 
 const searchTagsCountQuery = `
