@@ -39,7 +39,7 @@ WHERE
 `
 
 const searchTagsWhereQuery = `
-  to_tsvector('french', name) @@ to_tsquery('french', $4)
+  to_tsvector('french', name) @@ to_tsquery('french', $2)
 `
 
 const searchTagsCountQuery = `
@@ -48,7 +48,7 @@ SELECT
 FROM
   tags
 WHERE
-  user_id = $3
+  user_id = $1
 %s
 `
 
