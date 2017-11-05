@@ -15,8 +15,8 @@ import (
 
 const tagsPath = `/tags`
 
-func getRequestID(r *http.Request) (int64, error) {
-	return strconv.ParseInt(strings.TrimPrefix(r.URL.Path, `/`), 10, 64)
+func getRequestID(path string) (int64, error) {
+	return strconv.ParseInt(strings.TrimPrefix(path, `/`), 10, 64)
 }
 
 func readTagFromBody(r *http.Request) (*tag, error) {
@@ -103,7 +103,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request, user *auth.User, path s
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
 	} else {
-		if id, err := getRequestID(r); err != nil {
+		if id, err := getRequestID(path); err != nil {
 			httputils.BadRequest(w, err)
 		} else if r.Method == http.MethodGet {
 			readTag(w, r, user, id)
