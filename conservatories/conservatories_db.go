@@ -138,7 +138,15 @@ func searchConservatories(page, pageSize int64, sortKey string, sortAsc bool, se
 	}
 
 	where, words := db.PrepareFullTextSearch(conservatoriesSearchWhere, search, 3)
-	rows, err := chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset, words)
+
+	var rows *sql.Rows
+	var err error
+
+	if where != `` {
+		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset, words)
+	} else {
+		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset)
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf(`Error while searching conservatories: %v`, err)

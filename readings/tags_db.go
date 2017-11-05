@@ -242,8 +242,16 @@ func searchTags(page, pageSize int64, sortKey string, sortAsc bool, user *auth.U
 		sortOrder = `DESC`
 	}
 
-	searchQuery, words := db.PrepareFullTextSearch(searchTagsWhereQuery, search, 4)
-	rows, err := readingsDB.Query(fmt.Sprintf(searchTagsQuery, searchQuery, sortKey, sortOrder), pageSize, offset, user.ID, words)
+	where, words := db.PrepareFullTextSearch(searchTagsWhereQuery, search, 4)
+
+	var rows *sql.Rows
+	var err error
+
+	if where != `` {
+		rows, err = readingsDB.Query(fmt.Sprintf(searchTagsQuery, where, sortKey, sortOrder), pageSize, offset, user.ID, words)
+	} else {
+		rows, err = readingsDB.Query(fmt.Sprintf(searchTagsQuery, where, sortKey, sortOrder), pageSize, offset, user.ID)
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf(`Error while searching tags: %v`, err)
@@ -261,8 +269,13 @@ func countTags(user *auth.User, search string) (count int64, err error) {
 		return 0, fmt.Errorf(`Unable to count tags of nil User`)
 	}
 
-	searchQuery, words := db.PrepareFullTextSearch(searchTagsWhereQuery, search, 2)
-	err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, searchQuery), user.ID, words).Scan(&count)
+	where, words := db.PrepareFullTextSearch(searchTagsWhereQuery, search, 2)
+
+	if where != `` {
+		err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, where), user.ID, words).Scan(&count)
+	} else {
+		err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, where), user.ID).Scan(&count)
+	}
 
 	if err == sql.ErrNoRows {
 		count = 0
