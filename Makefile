@@ -10,6 +10,7 @@ deps:
 	go get -u github.com/ViBiOh/httputils/cors
 	go get -u github.com/ViBiOh/httputils/db
 	go get -u github.com/ViBiOh/httputils/owasp
+	go get -u github.com/ViBiOh/httputils/pagination
 	go get -u github.com/ViBiOh/httputils/prometheus
 	go get -u github.com/ViBiOh/httputils/rate
 	go get -u golang.org/x/tools/cmd/goimports
