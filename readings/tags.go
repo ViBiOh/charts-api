@@ -16,10 +16,11 @@ import (
 
 const tagsPath = `/tags`
 const defaultPageSize = 50
-const maxPageSize = int64(^uint(0) >> 1)
+const maxPageSize = uint(^uint(0) >> 1)
 
-func getRequestID(path string) (int64, error) {
-	return strconv.ParseInt(strings.TrimPrefix(path, `/`), 10, 64)
+func getRequestID(path string) (uint, error) {
+	parsed, err := strconv.ParseUint(strings.TrimPrefix(path, `/`), 10, 32)
+	return uint(parsed), err
 }
 
 func readTagFromBody(r *http.Request) (*tag, error) {
@@ -56,7 +57,7 @@ func listTags(w http.ResponseWriter, r *http.Request, user *auth.User) {
 	}
 }
 
-func readTag(w http.ResponseWriter, r *http.Request, user *auth.User, id int64) {
+func readTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
 	if foundTag, err := getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
 			w.WriteHeader(http.StatusNotFound)
@@ -83,7 +84,7 @@ func createTag(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		}
 	}
 }
-func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id int64) {
+func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
 	if bodyTag, err := readTagFromBody(r); err != nil {
 		httputils.BadRequest(w, err)
 	} else if id == 0 {
@@ -102,7 +103,7 @@ func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id int64
 	}
 }
 
-func removeTag(w http.ResponseWriter, r *http.Request, user *auth.User, id int64) {
+func removeTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
 	if foundTag, err := getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
 			w.WriteHeader(http.StatusNotFound)

@@ -69,9 +69,9 @@ GROUP BY
   zip
 `
 
-func scanConservatoryRows(rows *sql.Rows, pageSize int64) ([]*conservatory, error) {
+func scanConservatoryRows(rows *sql.Rows, pageSize uint) ([]*conservatory, error) {
 	var (
-		id         int64
+		id         uint
 		name       string
 		category   string
 		street     string
@@ -95,13 +95,13 @@ func scanConservatoryRows(rows *sql.Rows, pageSize int64) ([]*conservatory, erro
 	return conservatories, nil
 }
 
-func scanAggregateRows(rows *sql.Rows) (map[string]int64, error) {
+func scanAggregateRows(rows *sql.Rows) (map[string]uint, error) {
 	var (
 		key   string
-		count int64
+		count uint
 	)
 
-	aggregate := make(map[string]int64, 0)
+	aggregate := make(map[string]uint, 0)
 
 	for rows.Next() {
 		if err := rows.Scan(&key, &count); err != nil {
@@ -114,7 +114,7 @@ func scanAggregateRows(rows *sql.Rows) (map[string]int64, error) {
 	return aggregate, nil
 }
 
-func countConservatories(search string) (count int64, err error) {
+func countConservatories(search string) (count uint, err error) {
 	where, words := db.PrepareFullTextSearch(conservatoriesSearchWhere, search, 1)
 
 	if words != `` {
@@ -126,8 +126,8 @@ func countConservatories(search string) (count int64, err error) {
 	return
 }
 
-func searchConservatories(page, pageSize int64, sortKey string, sortAsc bool, search string) ([]*conservatory, error) {
-	var offset int64
+func searchConservatories(page, pageSize uint, sortKey string, sortAsc bool, search string) ([]*conservatory, error) {
+	var offset uint
 	if page > 1 {
 		offset = (page - 1) * pageSize
 	}
@@ -159,7 +159,7 @@ func searchConservatories(page, pageSize int64, sortKey string, sortAsc bool, se
 	return scanConservatoryRows(rows, pageSize)
 }
 
-func countByDepartment() (map[string]int64, error) {
+func countByDepartment() (map[string]uint, error) {
 	rows, err := chartsDB.Query(conservatoriesByDepartementQuery)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while counting by department: %v`, err)
@@ -168,7 +168,7 @@ func countByDepartment() (map[string]int64, error) {
 	return scanAggregateRows(rows)
 }
 
-func countByZipOfDepartment(department string) (map[string]int64, error) {
+func countByZipOfDepartment(department string) (map[string]uint, error) {
 	rows, err := chartsDB.Query(conservatoriesByZipOfDepartmentQuery, department)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while counting by zip of department: %v`, err)

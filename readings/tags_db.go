@@ -99,9 +99,9 @@ WHERE
   readings_id IN ($1)
 `
 
-func scanTags(rows *sql.Rows, pageSize int64) ([]*tag, error) {
+func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 	var (
-		id   int64
+		id   uint
 		name string
 	)
 
@@ -118,12 +118,12 @@ func scanTags(rows *sql.Rows, pageSize int64) ([]*tag, error) {
 	return list, nil
 }
 
-func searchTags(page, pageSize int64, sortKey string, sortAsc bool, user *auth.User, search string) ([]*tag, error) {
+func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *auth.User, search string) ([]*tag, error) {
 	if user == nil || user.ID == 0 {
 		return nil, fmt.Errorf(`Unable to search tags of nil User`)
 	}
 
-	var offset int64
+	var offset uint
 	if page > 1 {
 		offset = (page - 1) * pageSize
 	}
@@ -155,7 +155,7 @@ func searchTags(page, pageSize int64, sortKey string, sortAsc bool, user *auth.U
 	return scanTags(rows, pageSize)
 }
 
-func countTags(user *auth.User, search string) (count int64, err error) {
+func countTags(user *auth.User, search string) (count uint, err error) {
 	if user == nil || user.ID == 0 {
 		return 0, fmt.Errorf(`Unable to count tags of nil User`)
 	}
@@ -180,8 +180,8 @@ func countTags(user *auth.User, search string) (count int64, err error) {
 	return
 }
 
-func findTagsByIds(ids []int64) ([]*tag, error) {
-	rows, err := readingsDB.Query(findTagsByidsQuery, db.WhereInInt64(ids))
+func findTagsByIds(ids []uint) ([]*tag, error) {
+	rows, err := readingsDB.Query(findTagsByidsQuery, db.WhereInUint(ids))
 	if err != nil {
 		return nil, fmt.Errorf(`Error while finding tags by ids: %v`, err)
 	}
@@ -190,16 +190,16 @@ func findTagsByIds(ids []int64) ([]*tag, error) {
 		err = db.RowsClose(`finding tags by ids`, rows, err)
 	}()
 
-	return scanTags(rows, int64(len(ids)))
+	return scanTags(rows, uint(len(ids)))
 }
 
-func getTag(id int64, user *auth.User) (*tag, error) {
+func getTag(id uint, user *auth.User) (*tag, error) {
 	if user == nil {
 		return nil, fmt.Errorf(`Unable to read tag of nil User`)
 	}
 
 	var (
-		resultID int64
+		resultID uint
 		name     string
 	)
 
@@ -238,7 +238,7 @@ func saveTag(o *tag, tx *sql.Tx) (err error) {
 			err = fmt.Errorf(`Error while updating tag: %v`, err)
 		}
 	} else {
-		var newID int64
+		var newID uint
 
 		if err = usedTx.QueryRow(insertTagQuery, o.user.ID, o.Name).Scan(&newID); err != nil {
 			err = fmt.Errorf(`Error while creating tag: %v`, err)
@@ -277,13 +277,13 @@ func deleteTag(o *tag, tx *sql.Tx) (err error) {
 	return
 }
 
-func scanReadingsTagsForTag(rows *sql.Rows) (map[int64][]int64, error) {
+func scanReadingsTagsForTag(rows *sql.Rows) (map[uint][]uint, error) {
 	var (
-		readingID int64
-		tagID     int64
+		readingID uint
+		tagID     uint
 	)
 
-	list := make(map[int64][]int64, 0)
+	list := make(map[uint][]uint, 0)
 
 	for rows.Next() {
 		if err := rows.Scan(&readingID, &tagID); err != nil {
@@ -293,7 +293,7 @@ func scanReadingsTagsForTag(rows *sql.Rows) (map[int64][]int64, error) {
 		if _, ok := list[tagID]; ok {
 			list[tagID] = append(list[tagID], readingID)
 		} else {
-			list[tagID] = []int64{readingID}
+			list[tagID] = []uint{readingID}
 		}
 	}
 
@@ -305,12 +305,12 @@ func addTagsForReadings(readings []*reading) error {
 		return nil
 	}
 
-	ids := make([]int64, 0)
+	ids := make([]uint, 0)
 	for _, reading := range readings {
 		ids = append(ids, reading.ID)
 	}
 
-	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, db.WhereInInt64(ids))
+	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, db.WhereInUint(ids))
 	if err != nil {
 		return fmt.Errorf(`Error while listing reading-tag of readings: %v`, err)
 	}
@@ -326,8 +326,8 @@ func addTagsForReadings(readings []*reading) error {
 		return nil
 	}
 
-	tagsIds := make([]int64, 0)
-	tagsByReading := make(map[int64][]int64, 0)
+	tagsIds := make([]uint, 0)
+	tagsByReading := make(map[uint][]uint, 0)
 	for tagID, readingsIds := range tagLinks {
 		tagsIds = append(tagsIds, tagID)
 
@@ -335,7 +335,7 @@ func addTagsForReadings(readings []*reading) error {
 			if _, ok := tagsByReading[readingID]; ok {
 				tagsByReading[readingID] = append(tagsByReading[readingID], tagID)
 			} else {
-				tagsByReading[readingID] = []int64{tagID}
+				tagsByReading[readingID] = []uint{tagID}
 			}
 		}
 	}
@@ -345,7 +345,7 @@ func addTagsForReadings(readings []*reading) error {
 		return fmt.Errorf(`Error while tags for readings: %v`, err)
 	}
 
-	tagsByID := make(map[int64]*tag, 0)
+	tagsByID := make(map[uint]*tag, 0)
 	for _, tag := range tags {
 		tagsByID[tag.ID] = tag
 	}

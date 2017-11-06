@@ -49,7 +49,7 @@ WHERE
 
 func scanReadings(rows *sql.Rows) ([]*reading, error) {
 	var (
-		id     int64
+		id     uint
 		url    string
 		public bool
 		read   bool
@@ -107,7 +107,7 @@ func saveReading(o *reading, tx *sql.Tx) (err error) {
 			err = fmt.Errorf(`Error while updating reading for user=%s: %v`, o.user.Username, err)
 		}
 	} else {
-		var newID int64
+		var newID uint
 
 		if err = usedTx.QueryRow(insertReading, o.user.ID, o.URL, o.Public, o.Read).Scan(&newID); err != nil {
 			err = fmt.Errorf(`Error while creating reading for user=%s: %v`, o.user.Username, err)

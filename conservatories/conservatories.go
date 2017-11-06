@@ -12,8 +12,8 @@ import (
 )
 
 const healthcheckPath = `/health`
-const defaultPageSize = int64(10)
-const maxPageSize = int64(50)
+const defaultPageSize = uint(10)
+const maxPageSize = uint(50)
 const defaultSort = `name`
 
 var dbConfig = db.Flags(`chartsDb`)

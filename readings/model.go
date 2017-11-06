@@ -7,7 +7,7 @@ import (
 )
 
 type tag struct {
-	ID   int64  `json:"id"`
+	ID   uint   `json:"id"`
 	Name string `json:"name"`
 	user *auth.User
 }
@@ -43,7 +43,7 @@ func sortTagByID(o1, o2 *tag) bool {
 }
 
 type reading struct {
-	ID     int64  `json:"id"`
+	ID     uint   `json:"id"`
 	URL    string `json:"url"`
 	Public bool   `json:"public"`
 	Read   bool   `json:"read"`
