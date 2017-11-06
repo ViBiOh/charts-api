@@ -38,7 +38,7 @@ func readTagFromBody(r *http.Request) (*tag, error) {
 func listTags(w http.ResponseWriter, r *http.Request, user *auth.User) {
 	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
 	if err != nil {
-		httputils.BadRequest(w, err)
+		httputils.BadRequest(w, fmt.Errorf(`Error while parsing pagination: %v`, err))
 		return
 	}
 
@@ -49,9 +49,9 @@ func listTags(w http.ResponseWriter, r *http.Request, user *auth.User) {
 	query := r.URL.Query().Get(`q`)
 
 	if list, err := searchTags(page, pageSize, sort, asc, user, query); err != nil {
-		httputils.InternalServerError(w, err)
+		httputils.InternalServerError(w, fmt.Errorf(`Error while searching tags: %v`, err))
 	} else if count, err := countTags(user, query); err != nil {
-		httputils.InternalServerError(w, err)
+		httputils.InternalServerError(w, fmt.Errorf(`Error while counting tags: %v`, err))
 	} else {
 		httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery))
 	}
@@ -60,7 +60,7 @@ func listTags(w http.ResponseWriter, r *http.Request, user *auth.User) {
 func readTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
 	if foundTag, err := getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
-			w.WriteHeader(http.StatusNotFound)
+			httputils.NotFound(w)
 		} else {
 			httputils.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
 		}
@@ -71,14 +71,14 @@ func readTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
 
 func createTag(w http.ResponseWriter, r *http.Request, user *auth.User) {
 	if bodyTag, err := readTagFromBody(r); err != nil {
-		httputils.BadRequest(w, err)
+		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if bodyTag.Name == `` {
 		httputils.BadRequest(w, errors.New(`Name is required`))
 	} else {
 		bodyTag.user = user
 
 		if err := saveTag(bodyTag, nil); err != nil {
-			httputils.InternalServerError(w, err)
+			httputils.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
 		} else {
 			httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery))
 		}
@@ -86,7 +86,7 @@ func createTag(w http.ResponseWriter, r *http.Request, user *auth.User) {
 }
 func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
 	if bodyTag, err := readTagFromBody(r); err != nil {
-		httputils.BadRequest(w, err)
+		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if id == 0 {
 		httputils.BadRequest(w, errors.New(`ID is required in path`))
 	} else if bodyTag.Name == `` {
@@ -96,7 +96,7 @@ func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint)
 		bodyTag.user = user
 
 		if err := saveTag(bodyTag, nil); err != nil {
-			httputils.InternalServerError(w, err)
+			httputils.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
 		} else {
 			httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery))
 		}
@@ -106,9 +106,9 @@ func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint)
 func removeTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
 	if foundTag, err := getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
-			w.WriteHeader(http.StatusNotFound)
+			httputils.NotFound(w)
 		} else {
-			httputils.InternalServerError(w, fmt.Errorf(`Error while getting tag for deletion: %v`, err))
+			httputils.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
 		}
 	} else if err := deleteTag(foundTag, nil); err != nil {
 		httputils.InternalServerError(w, fmt.Errorf(`Error while deleting tag: %v`, err))
@@ -130,7 +130,7 @@ func tagsHandler(w http.ResponseWriter, r *http.Request, user *auth.User, path s
 		}
 	} else {
 		if id, err := getRequestID(path); err != nil {
-			httputils.BadRequest(w, err)
+			httputils.BadRequest(w, fmt.Errorf(`Error while parsing request path: %v`, err))
 		} else if r.Method == http.MethodGet {
 			readTag(w, r, user, id)
 		} else if r.Method == http.MethodPut {

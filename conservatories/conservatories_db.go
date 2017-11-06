@@ -7,7 +7,6 @@ import (
 	"github.com/ViBiOh/httputils/db"
 )
 
-const conservatoriesCountLabel = `conservatoriesCount`
 const conservatoriesCountQuery = `
 SELECT
   COUNT(id)
@@ -16,7 +15,6 @@ FROM
 %s
 `
 
-const conservatoriesLabel = `conservatories`
 const conservatoriesQuery = `
 SELECT
   id,
@@ -46,7 +44,6 @@ WHERE
   OR to_tsvector('french', zip) @@ to_tsquery('french', $INDEX)
 `
 
-const conservatoriesByDepartementLabel = `conservatoriesByDepartement`
 const conservatoriesByDepartementQuery = `
 SELECT
   department,
@@ -76,7 +73,7 @@ func scanConservatoryRows(rows *sql.Rows, pageSize uint) ([]*conservatory, error
 		category   string
 		street     string
 		city       string
-		department int
+		department uint8
 		zip        string
 		latitude   float64
 		longitude  float64
@@ -153,7 +150,7 @@ func searchConservatories(page, pageSize uint, sortKey string, sortAsc bool, sea
 	}
 
 	defer func() {
-		err = db.RowsClose(conservatoriesLabel, rows, err)
+		err = db.RowsClose(rows, err)
 	}()
 
 	return scanConservatoryRows(rows, pageSize)

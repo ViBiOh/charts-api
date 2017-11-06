@@ -75,7 +75,7 @@ func listReadingsOfUser(user *auth.User) ([]*reading, error) {
 	}
 
 	defer func() {
-		err = db.RowsClose(`list readings of user`, rows, err)
+		err = db.RowsClose(rows, err)
 	}()
 
 	list, err := scanReadings(rows)
@@ -92,13 +92,13 @@ func saveReading(o *reading, tx *sql.Tx) (err error) {
 	}
 
 	var usedTx *sql.Tx
-	if usedTx, err = db.GetTx(readingsDB, `save reading`, tx); err != nil {
+	if usedTx, err = db.GetTx(readingsDB, tx); err != nil {
 		return
 	}
 
 	if usedTx != tx {
 		defer func() {
-			err = db.EndTx(`save reading`, usedTx, err)
+			err = db.EndTx(usedTx, err)
 		}()
 	}
 

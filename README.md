@@ -42,7 +42,7 @@ Usage of api:
     	Prometheus metrics endpoint path (default "/metrics")
   -prometheusPrefix string
     	Prometheus prefix (default "http")
-  -rateCount int
+  -rateCount uint
     	Rate IP limit (default 5000)
   -tls
     	Serve TLS content

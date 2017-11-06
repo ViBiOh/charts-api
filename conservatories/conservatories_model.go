@@ -6,7 +6,7 @@ type conservatory struct {
 	Category   string  `json:"category"`
 	Street     string  `json:"street"`
 	City       string  `json:"city"`
-	Department int     `json:"department"`
+	Department uint8   `json:"department"`
 	Zip        string  `json:"zip"`
 	Latitude   float64 `json:"lat"`
 	Longitude  float64 `json:"lng"`
