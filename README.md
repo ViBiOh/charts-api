@@ -10,42 +10,56 @@
 Usage of api:
   -c string
     	URL to check
+  -chartsDbHost string
+    	[database] Host
+  -chartsDbName string
+    	[database] Name
+  -chartsDbPass string
+    	[database] Pass
+  -chartsDbPort string
+    	[database] Port (default "5432")
+  -chartsDbUser string
+    	[database] User
   -corsCredentials
-    	Access-Control-Allow-Credentials
+    	[cors] Access-Control-Allow-Credentials
   -corsExpose string
-    	Access-Control-Expose-Headers
+    	[cors] Access-Control-Expose-Headers
   -corsHeaders string
-    	Access-Control-Allow-Headers (default "Content-Type")
+    	[cors] Access-Control-Allow-Headers (default "Content-Type")
   -corsMethods string
-    	Access-Control-Allow-Methods (default "GET")
+    	[cors] Access-Control-Allow-Methods (default "GET")
   -corsOrigin string
-    	Access-Control-Allow-Origin (default "*")
+    	[cors] Access-Control-Allow-Origin (default "*")
   -csp string
-    	Content-Security-Policy (default "default-src 'self'")
-  -dbHost string
-    	Database Host
-  -dbName string
-    	Database Name
-  -dbPass string
-    	Database Pass
-  -dbPort string
-    	Database Port (default "5432")
-  -dbUser string
-    	Database User
+    	[owasp] Content-Security-Policy (default "default-src 'self'")
   -hsts
-    	Indicate Strict Transport Security (default true)
+    	[owasp] Indicate Strict Transport Security (default true)
   -port string
     	Listen port (default "1080")
   -prometheusMetricsHost string
-    	Prometheus allowed hostname to call metrics endpoint (default "localhost")
+    	[prometheus] Allowed hostname to call metrics endpoint (default "localhost")
   -prometheusMetricsPath string
-    	Prometheus metrics endpoint path (default "/metrics")
+    	[prometheus] Metrics endpoint path (default "/metrics")
   -prometheusPrefix string
-    	Prometheus prefix (default "http")
+    	[prometheus] Prefix (default "http")
   -rateCount uint
-    	Rate IP limit (default 5000)
+    	[rate] IP limit (default 5000)
+  -readingsAuthUrl string
+    	[auth] Auth URL
+  -readingsAuthUsers string
+    	[auth] List of allowed users and profiles (e.g. user:profile1|profile2,user2:profile3)
+  -readingsDbHost string
+    	[database] Host
+  -readingsDbName string
+    	[database] Name
+  -readingsDbPass string
+    	[database] Pass
+  -readingsDbPort string
+    	[database] Port (default "5432")
+  -readingsDbUser string
+    	[database] User
   -tls
-    	Serve TLS content
+    	Serve TLS content (default true)
   -tlscert string
     	TLS PEM Certificate file
   -tlshosts string
