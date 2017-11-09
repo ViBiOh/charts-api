@@ -3,8 +3,6 @@ version: '2.1'
 services:
   charts_db:
     image: postgres:10-alpine
-    command:
-    - --user=postgres
     labels:
       traefik.enable: 'false'
     environment:
@@ -15,6 +13,7 @@ services:
     - ${CHARTS_DATABASE_DIR}:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
+    user: postgres
     logging:
       driver: json-file
       options:
@@ -27,8 +26,6 @@ services:
 
   readings_db:
     image: postgres:10-alpine
-    command:
-    - --user=postgres
     labels:
       traefik.enable: 'false'
     environment:
@@ -39,6 +36,7 @@ services:
     - ${READINGS_DATABASE_DIR}:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
+    user: postgres
     logging:
       driver: json-file
       options:
