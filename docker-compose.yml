@@ -2,7 +2,10 @@ version: '2'
 
 services:
   charts_db:
-    image: vibioh/postgres
+    image: postgres:10-alpine
+    command:
+    - --user
+    - postgres
     labels:
       traefik.enable: 'false'
     environment:
@@ -22,7 +25,10 @@ services:
     - no-new-privileges
 
   readings_db:
-    image: vibioh/postgres
+    image: postgres:10-alpine
+    command:
+    - --user
+    - postgres
     labels:
       traefik.enable: 'false'
     environment:
