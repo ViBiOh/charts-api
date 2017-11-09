@@ -1,11 +1,10 @@
-version: '2'
+version: '2.1'
 
 services:
   charts_db:
     image: postgres:10-alpine
     command:
-    - --user
-    - postgres
+    - --user=postgres
     labels:
       traefik.enable: 'false'
     environment:
@@ -14,6 +13,8 @@ services:
       POSTGRES_PASSWORD: '${CHARTS_DATABASE_PASS}'
     volumes:
     - ${CHARTS_DATABASE_DIR}:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
     logging:
       driver: json-file
       options:
@@ -27,8 +28,7 @@ services:
   readings_db:
     image: postgres:10-alpine
     command:
-    - --user
-    - postgres
+    - --user=postgres
     labels:
       traefik.enable: 'false'
     environment:
@@ -37,6 +37,8 @@ services:
       POSTGRES_PASSWORD: '${READINGS_DATABASE_PASS}'
     volumes:
     - ${READINGS_DATABASE_DIR}:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
     logging:
       driver: json-file
       options:
