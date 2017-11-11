@@ -89,16 +89,6 @@ WHERE
   id = $1
 `
 
-const listReadingsTagsOfReadingsQuery = `
-SELECT
-  readings_id,
-  tags_id
-FROM
-  readings_tags
-WHERE
-  readings_id IN ($1)
-`
-
 func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 	var (
 		id   uint
@@ -275,90 +265,4 @@ func deleteTag(o *tag, tx *sql.Tx) (err error) {
 	}
 
 	return
-}
-
-func scanReadingsTagsForTag(rows *sql.Rows) (map[uint][]uint, error) {
-	var (
-		readingID uint
-		tagID     uint
-	)
-
-	list := make(map[uint][]uint, 0)
-
-	for rows.Next() {
-		if err := rows.Scan(&readingID, &tagID); err != nil {
-			return nil, fmt.Errorf(`Error while scanning line: %v`, err)
-		}
-
-		if _, ok := list[tagID]; ok {
-			list[tagID] = append(list[tagID], readingID)
-		} else {
-			list[tagID] = []uint{readingID}
-		}
-	}
-
-	return list, nil
-}
-
-func addTagsForReadings(readings []*reading) error {
-	if len(readings) == 0 {
-		return nil
-	}
-
-	ids := make([]uint, 0)
-	for _, reading := range readings {
-		ids = append(ids, reading.ID)
-	}
-
-	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, db.WhereInUint(ids))
-	if err != nil {
-		return fmt.Errorf(`Error while querying: %v`, err)
-	}
-
-	defer func() {
-		err = db.RowsClose(rows, err)
-	}()
-
-	tagLinks, err := scanReadingsTagsForTag(rows)
-	if err != nil {
-		return fmt.Errorf(`Error while scanning reading-tag of readings: %v`, err)
-	} else if len(tagLinks) == 0 {
-		return nil
-	}
-
-	tagsIds := make([]uint, 0)
-	tagsByReading := make(map[uint][]uint, 0)
-	for tagID, readingsIds := range tagLinks {
-		tagsIds = append(tagsIds, tagID)
-
-		for _, readingID := range readingsIds {
-			if _, ok := tagsByReading[readingID]; ok {
-				tagsByReading[readingID] = append(tagsByReading[readingID], tagID)
-			} else {
-				tagsByReading[readingID] = []uint{tagID}
-			}
-		}
-	}
-
-	tags, err := findTagsByIds(tagsIds)
-	if err != nil {
-		return fmt.Errorf(`Error while finding tags: %v`, err)
-	}
-
-	tagsByID := make(map[uint]*tag, 0)
-	for _, tag := range tags {
-		tagsByID[tag.ID] = tag
-	}
-
-	for _, reading := range readings {
-		for _, tagID := range tagsByReading[reading.ID] {
-			if reading.Tags == nil {
-				reading.Tags = make([]*tag, 0)
-			}
-
-			reading.Tags = append(reading.Tags, tagsByID[tagID])
-		}
-	}
-
-	return nil
 }
