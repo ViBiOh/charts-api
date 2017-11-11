@@ -44,19 +44,17 @@ func handler() http.Handler {
 }
 
 func main() {
-	url := flag.String(`c`, ``, `URL to check`)
 	port := flag.String(`port`, `1080`, `Listen port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
+	alcotestConfig := alcotest.Flags(``)
+	tlsConfig := cert.Flags(`tls`)
 	prometheusConfig := prometheus.Flags(`prometheus`)
 	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
 	flag.Parse()
 
-	if *url != `` {
-		alcotest.Do(url)
-		return
-	}
+	alcotest.DoAndExit(alcotestConfig)
 
 	log.Printf(`Starting server on port %s`, *port)
 
@@ -80,7 +78,7 @@ func main() {
 		defer close(serveError)
 		if *tls {
 			log.Print(`Listening with TLS enabled`)
-			serveError <- cert.ListenAndServeTLS(server)
+			serveError <- cert.ListenAndServeTLS(tlsConfig, server)
 		} else {
 			log.Print(`⚠ api is running without secure connection ⚠`)
 			serveError <- server.ListenAndServe()

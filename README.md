@@ -9,7 +9,7 @@
 ```
 Usage of api:
   -c string
-    	URL to check
+    	[health] URL to check
   -chartsDbHost string
     	[database] Host
   -chartsDbName string
@@ -60,12 +60,12 @@ Usage of api:
     	[database] User
   -tls
     	Serve TLS content (default true)
-  -tlscert string
-    	TLS PEM Certificate file
-  -tlshosts string
-    	TLS Self-signed certificate hosts, comma separated (default "localhost")
-  -tlskey string
-    	TLS PEM Key file
+  -tlsCert string
+    	[tls] PEM Certificate file
+  -tlsHosts string
+    	[tls] Self-signed certificate hosts, comma separated (default "localhost")
+  -tlsKey string
+    	[tls] PEM Key file
 ```
 
 ## Postgres installation
