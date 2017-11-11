@@ -83,7 +83,7 @@ func listReadingsOfUser(user *auth.User) ([]*reading, error) {
 		return nil, fmt.Errorf(`Error while scanning readings: %v`, err)
 	}
 
-	return list, nil
+	return enrichReadingsWithTags(list)
 }
 
 func saveReading(o *reading, tx *sql.Tx) (err error) {

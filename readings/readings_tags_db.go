@@ -55,3 +55,55 @@ func findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
 
 	return scanReadingsTags(rows, uint(len(ids)))
 }
+
+func enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
+	readingsID := make([]uint, len(readings))
+	for i, reading := range readings {
+		readingsID[i] = reading.ID
+	}
+
+	tagsLink, err := findReadingsTagsByIds(readingsID)
+	if err != nil {
+		return nil, fmt.Errorf(`Error while finding readings tags: %v`, err)
+	}
+
+	tagsID := make([]uint, len(tagsLink))
+	tagsByReading := make(map[uint][]uint, 0)
+	for i, link := range tagsLink {
+		tagsID[i] = link.tagID
+
+		if e, ok := tagsByReading[link.readingID]; ok {
+			tagsByReading[link.readingID] = append(e, link.tagID)
+		} else {
+			tagsByReading[link.readingID] = []uint{link.tagID}
+		}
+	}
+
+	tags, err := findTagsByIds(tagsID)
+	if err != nil {
+		return nil, fmt.Errorf(`Error while finding tags: %v`, err)
+	}
+
+	tagsByID := make(map[uint]*tag, 0)
+	for _, tagObj := range tags {
+		if _, ok := tagsByID[tagObj.ID]; !ok {
+			tagsByID[tagObj.ID] = tagObj
+		}
+	}
+
+	for _, reading := range readings {
+		if tagsID, ok := tagsByReading[reading.ID]; ok {
+			for _, tagID := range tagsID {
+				if tagObj, ok := tagsByID[tagID]; ok {
+					if reading.Tags == nil {
+						reading.Tags = []*tag{tagObj}
+					} else {
+						reading.Tags = append(reading.Tags, tagObj)
+					}
+				}
+			}
+		}
+	}
+
+	return readings, nil
+}
