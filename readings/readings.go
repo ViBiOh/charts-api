@@ -13,18 +13,12 @@ import (
 
 const healthcheckPath = `/health`
 
-var authURL string
-var authUsers map[string]*auth.User
-
 var authConfig = auth.Flags(`readingsAuth`)
 var dbConfig = db.Flags(`readingsDb`)
 var readingsDB *sql.DB
 
 // Init readings API
 func Init() (err error) {
-	authURL = *authConfig[`url`]
-	authUsers = auth.LoadUsersProfiles(*authConfig[`users`])
-
 	readingsDB, err = db.GetDB(dbConfig)
 	if err != nil {
 		err = fmt.Errorf(`Error while initializing database: %v`, err)
@@ -43,6 +37,16 @@ func listReadings(w http.ResponseWriter, r *http.Request, user *auth.User) {
 
 // Handler for Readings request. Should be use with net/http
 func Handler() http.Handler {
+	authHandler := auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
+		if strings.HasPrefix(r.URL.Path, tagsPath) {
+			tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
+		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
+			listReadings(w, r, user)
+		} else {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
+	})
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
@@ -58,18 +62,6 @@ func Handler() http.Handler {
 			return
 		}
 
-		user, err := auth.IsAuthenticated(authURL, authUsers, r)
-		if err != nil {
-			httputils.Unauthorized(w, err)
-			return
-		}
-
-		if strings.HasPrefix(r.URL.Path, tagsPath) {
-			tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
-		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
-			listReadings(w, r, user)
-		} else {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-		}
+		authHandler.ServeHTTP(w, r)
 	})
 }
