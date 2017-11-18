@@ -1,6 +1,10 @@
-default: deps dev
+default: go docker
+
+go: deps dev
 
 dev: format lint tst bench build
+
+docker: docker-deps docker-build
 
 deps:
 	go get -u github.com/golang/lint/golint
@@ -33,3 +37,14 @@ bench:
 
 build:
 	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o bin/api api.go
+
+docker-deps:
+	curl -s -o cacert.pem https://curl.haxx.se/ca/cacert.pem
+	./blueprint.sh
+
+docker-build:
+	docker build -t ${DOCKER_USER}/eponae-api .
+
+docker-push:
+	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+	docker push ${DOCKER_USER}/eponae-api

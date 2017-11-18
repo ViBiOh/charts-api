@@ -3,16 +3,10 @@ sudo: required
 services:
 - docker
 go: 1.9
-install: make
-script: |
-  DOCKER_IMAGE_NAME=${DOCKER_USER}/eponae-api
-  curl -o cacert.pem https://curl.haxx.se/ca/cacert.pem &&
-  ./blueprint.sh &&
-  docker build -t ${DOCKER_IMAGE_NAME} .
 after_success: |
   if [ "${TRAVIS_BRANCH}" == "master" ]; then
-    bash <(curl -s https://codecov.io/bash) &&
-    docker login -u ${DOCKER_USER} -p ${DOCKER_PASS} && docker push ${DOCKER_IMAGE_NAME}
+    bash <(curl -s https://codecov.io/bash)
+    make docker-push
 
     sed \
       -e "s|\${CHARTS_DATABASE_PASS}|${CHARTS_DATABASE_PASS}|g" \
