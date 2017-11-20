@@ -2,6 +2,7 @@ package readings
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/ViBiOh/auth/auth"
@@ -89,6 +90,9 @@ WHERE
   id = $1
 `
 
+var errNilUser = errors.New(`Unable to request with nil User`)
+var errNilTag = errors.New(`Unable to save nil Tag`)
+
 func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 	var (
 		id   uint
@@ -110,7 +114,7 @@ func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 
 func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *auth.User, search string) ([]*tag, error) {
 	if user == nil || user.ID == 0 {
-		return nil, fmt.Errorf(`Unable to search tags of nil User`)
+		return nil, errNilUser
 	}
 
 	var offset uint
@@ -147,7 +151,7 @@ func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *auth.Us
 
 func countTags(user *auth.User, search string) (count uint, err error) {
 	if user == nil || user.ID == 0 {
-		return 0, fmt.Errorf(`Unable to count tags of nil User`)
+		return 0, errNilUser
 	}
 
 	where, words := db.PrepareFullTextSearch(searchTagsWhereQuery, search, 2)
@@ -185,7 +189,7 @@ func findTagsByIds(ids []uint) ([]*tag, error) {
 
 func getTag(id uint, user *auth.User) (*tag, error) {
 	if user == nil {
-		return nil, fmt.Errorf(`Unable to read tag of nil User`)
+		return nil, errNilUser
 	}
 
 	var (
@@ -205,11 +209,11 @@ func getTag(id uint, user *auth.User) (*tag, error) {
 
 func saveTag(o *tag, tx *sql.Tx) (err error) {
 	if o == nil {
-		return fmt.Errorf(`Unable to save nil tag`)
+		return errNilTag
 	}
 
 	if o.user == nil || o.user.ID == 0 {
-		return fmt.Errorf(`Unable to save tag of nil User`)
+		return errNilUser
 	}
 
 	var usedTx *sql.Tx
@@ -242,11 +246,11 @@ func saveTag(o *tag, tx *sql.Tx) (err error) {
 
 func deleteTag(o *tag, tx *sql.Tx) (err error) {
 	if o == nil || o.ID == 0 {
-		return fmt.Errorf(`Unable to delete nil tag or one without ID`)
+		return errNilTag
 	}
 
 	if o.user == nil || o.user.ID == 0 {
-		return fmt.Errorf(`Unable to delete tag of nil User`)
+		return errNilUser
 	}
 
 	var usedTx *sql.Tx

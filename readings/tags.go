@@ -18,6 +18,9 @@ const tagsPath = `/tags`
 const defaultPageSize = 50
 const maxPageSize = uint(^uint(0) >> 1)
 
+var errNameRequired = errors.New(`Name is required`)
+var errIDRequired = errors.New(`ID is required in path`)
+
 func getRequestID(path string) (uint, error) {
 	parsed, err := strconv.ParseUint(strings.TrimPrefix(path, `/`), 10, 32)
 	return uint(parsed), err
@@ -73,7 +76,7 @@ func createTag(w http.ResponseWriter, r *http.Request, user *auth.User) {
 	if bodyTag, err := readTagFromBody(r); err != nil {
 		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if bodyTag.Name == `` {
-		httputils.BadRequest(w, errors.New(`Name is required`))
+		httputils.BadRequest(w, errNameRequired)
 	} else {
 		bodyTag.user = user
 
@@ -88,9 +91,9 @@ func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint)
 	if bodyTag, err := readTagFromBody(r); err != nil {
 		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if id == 0 {
-		httputils.BadRequest(w, errors.New(`ID is required in path`))
+		httputils.BadRequest(w, errIDRequired)
 	} else if bodyTag.Name == `` {
-		httputils.BadRequest(w, errors.New(`Name is required`))
+		httputils.BadRequest(w, errNameRequired)
 	} else {
 		bodyTag.ID = id
 		bodyTag.user = user

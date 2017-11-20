@@ -2,6 +2,7 @@ package readings
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/ViBiOh/auth/auth"
@@ -47,6 +48,8 @@ WHERE
   id = $1
 `
 
+var errNilReading = errors.New(`Unable to save nil reading`)
+
 func scanReadings(rows *sql.Rows) ([]*reading, error) {
 	var (
 		id     uint
@@ -88,7 +91,7 @@ func listReadingsOfUser(user *auth.User) ([]*reading, error) {
 
 func saveReading(o *reading, tx *sql.Tx) (err error) {
 	if o == nil {
-		return fmt.Errorf(`Unable to save nil reading`)
+		return errNilReading
 	}
 
 	var usedTx *sql.Tx
