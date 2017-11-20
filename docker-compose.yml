@@ -50,11 +50,13 @@ services:
   auth:
     image: vibioh/auth
     command:
+    - -prometheusMetricsHost
+    - eponae-auth:1080
     - -corsHeaders
     - Authorization
     - -corsCredentials
-    - -prometheusMetricsHost
-    - eponae-auth:1080
+    - -rateCount
+    - '60'
     - -basicUsers
     - 1:eponae:$$2a$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
     labels:
