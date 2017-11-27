@@ -1,8 +1,12 @@
-# Go binary
+# Golang
 bin/
-coverage.txt
-debug*
-snowboard
-doc/*
+vendor/
+coverage.*
+
+# Docker
 cacert.pem
 data_*/
+
+# Documentation
+snowboard
+doc/*
