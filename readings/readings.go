@@ -13,9 +13,11 @@ import (
 
 const healthcheckPath = `/health`
 
-var authConfig = auth.Flags(`readingsAuth`)
-var dbConfig = db.Flags(`readingsDb`)
-var readingsDB *sql.DB
+var (
+	authConfig = auth.Flags(`readingsAuth`)
+	dbConfig   = db.Flags(`readingsDb`)
+	readingsDB *sql.DB
+)
 
 // Init readings API
 func Init() (err error) {
@@ -37,7 +39,7 @@ func listReadings(w http.ResponseWriter, r *http.Request, user *auth.User) {
 
 // Handler for Readings request. Should be use with net/http
 func Handler() http.Handler {
-	authHandler := auth.Handler(*authConfig[`url`], auth.LoadUsersProfiles(*authConfig[`users`]), func(w http.ResponseWriter, r *http.Request, user *auth.User) {
+	authHandler := auth.Handler(authConfig, func(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		if strings.HasPrefix(r.URL.Path, tagsPath) {
 			tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
 		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
