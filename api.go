@@ -62,6 +62,10 @@ func main() {
 
 	log.Printf(`Starting server on port %d`, *port)
 
+	conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatories.Handler())
+	readingsHandler = http.StripPrefix(readingsPath, readings.Handler())
+	healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
+
 	if err := conservatories.Init(); err != nil {
 		log.Printf(`[conservatories] Error while initializing: %v`, err)
 	}
@@ -71,10 +75,6 @@ func main() {
 	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: conservatoriesHandler, `/readings`: readingsHandler}); err != nil {
 		log.Printf(`[healthcheck] Error while initializing: %v`, err)
 	}
-
-	conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatories.Handler())
-	readingsHandler = http.StripPrefix(readingsPath, readings.Handler())
-	healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(`:%d`, *port),
