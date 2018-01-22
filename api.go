@@ -24,9 +24,11 @@ const healthcheckPath = `/health`
 const conservatoriesPath = `/conservatories`
 const readingsPath = `/readings`
 
-var conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatories.Handler())
-var readingsHandler = http.StripPrefix(readingsPath, readings.Handler())
-var healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
+var (
+	conservatoriesHandler http.Handler
+	readingsHandler       http.Handler
+	healthcheckHandler    http.Handler
+)
 
 func handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +55,7 @@ func main() {
 	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
+
 	flag.Parse()
 
 	alcotest.DoAndExit(alcotestConfig)
@@ -68,6 +71,10 @@ func main() {
 	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: conservatoriesHandler, `/readings`: readingsHandler}); err != nil {
 		log.Printf(`[healthcheck] Error while initializing: %v`, err)
 	}
+
+	conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatories.Handler())
+	readingsHandler = http.StripPrefix(readingsPath, readings.Handler())
+	healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(`:%d`, *port),

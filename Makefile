@@ -39,3 +39,12 @@ docker-build:
 docker-push:
 	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
 	docker push ${DOCKER_USER}/eponae-api
+
+start-deps:
+	go get -u github.com/ViBiOh/auth/bcrypt
+
+start-api:
+	go run api.go \
+		-tls=false \
+		-readingsAuthUsers admin:admin \
+		-readingsBasicUsers 1:admin:`bcrypt password`
