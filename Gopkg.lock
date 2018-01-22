@@ -27,7 +27,7 @@
     "provider/github",
     "service"
   ]
-  revision = "444a0422bb9092ab12a3694d966ca074b4276e85"
+  revision = "ea5eb11988da69b77019d09525efedc7790637b1"
 
 [[projects]]
   branch = "master"
