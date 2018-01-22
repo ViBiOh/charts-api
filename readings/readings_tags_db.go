@@ -57,6 +57,10 @@ func findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
 }
 
 func enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
+	if len(readings) == 0 {
+		return readings, nil
+	}
+
 	readingsID := make([]uint, len(readings))
 	for i, reading := range readings {
 		readingsID[i] = reading.ID
