@@ -22,7 +22,10 @@
   packages = [
     "auth",
     "cookie",
-    "provider"
+    "provider",
+    "provider/basic",
+    "provider/github",
+    "service"
   ]
   revision = "444a0422bb9092ab12a3694d966ca074b4276e85"
 
@@ -39,6 +42,7 @@
     "prometheus",
     "rate",
     "tools",
+    "uuid",
     "writer"
   ]
   revision = "d9e777753ee5ba376805fcc97fe07d1d76d22dad"
@@ -130,9 +134,51 @@
   revision = "639f6272aec6b52094db77b9ec488214b0b4b1a1"
   version = "v2.3.2"
 
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = [
+    "bcrypt",
+    "blowfish"
+  ]
+  revision = "39efaea5da11abd5e2b90a435b1f338cdb94619c"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "context",
+    "context/ctxhttp"
+  ]
+  revision = "5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/oauth2"
+  packages = [
+    ".",
+    "github",
+    "internal"
+  ]
+  revision = "b28fcf2b08a19742b43084fb40ab78ac6c3d8067"
+
+[[projects]]
+  name = "google.golang.org/appengine"
+  packages = [
+    "internal",
+    "internal/base",
+    "internal/datastore",
+    "internal/log",
+    "internal/remote_api",
+    "internal/urlfetch",
+    "urlfetch"
+  ]
+  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
+  version = "v1.0.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "8d4ba91cab12363f3385a5da2a6fbe71ade242f352bf933610ae67c93c1e8ccf"
+  inputs-digest = "e4cd02a1beb5ecfcf6f954ed511bca577482417d23561254673d1cfead5a6984"
   solver-name = "gps-cdcl"
   solver-version = 1
