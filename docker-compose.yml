@@ -47,34 +47,6 @@ services:
     security_opt:
     - no-new-privileges
 
-  auth:
-    image: vibioh/auth
-    command:
-    - -prometheusMetricsHost
-    - eponae-auth:1080
-    - -corsHeaders
-    - Authorization
-    - -corsCredentials
-    - -rateCount
-    - '60'
-    - -basicUsers
-    - 1:eponae:$$2a$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
-    labels:
-      traefik.frontend.passHostHeader: 'true'
-      traefik.frontend.rule: 'Host: auth.eponae.fr'
-      traefik.protocol: 'https'
-      traefik.port: '1080'
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
-    restart: on-failure:5
-    read_only: true
-    cpu_shares: 128
-    mem_limit: 67108864
-    security_opt:
-    - no-new-privileges
-
   api:
     image: vibioh/eponae-api
     command:
@@ -90,8 +62,6 @@ services:
     - ${CHARTS_DATABASE_PASS}
     - -chartsDbName
     - charts
-    - -readingsAuthUsers
-    - eponae:admin
     - -readingsDbHost
     - readings_db
     - -readingsDbUser
@@ -100,8 +70,10 @@ services:
     - ${READINGS_DATABASE_PASS}
     - -readingsDbName
     - readings
-    - -readingsAuthUrl
-    - https://auth.eponae.fr
+    - -readingsAuthUsers
+    - eponae:admin
+    - -readingsBasicUsers
+    - 1:eponae:$$2a$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: api.eponae.fr'

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ViBiOh/auth/auth"
+	authProvider "github.com/ViBiOh/auth/provider"
 	"github.com/ViBiOh/httputils/db"
 )
 
@@ -71,7 +71,7 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 	return list, nil
 }
 
-func listReadingsOfUser(user *auth.User) ([]*reading, error) {
+func listReadingsOfUser(user *authProvider.User) ([]*reading, error) {
 	rows, err := readingsDB.Query(listReadingsOfUserQuery, user.ID)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while listing readings of user: %v`, err)

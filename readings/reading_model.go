@@ -1,7 +1,7 @@
 package readings
 
 import (
-	"github.com/ViBiOh/auth/auth"
+	authProvider "github.com/ViBiOh/auth/provider"
 )
 
 type reading struct {
@@ -10,5 +10,5 @@ type reading struct {
 	Public bool   `json:"public"`
 	Read   bool   `json:"read"`
 	Tags   []*tag `json:"tags"`
-	user   *auth.User
+	user   *authProvider.User
 }

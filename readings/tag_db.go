@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/ViBiOh/auth/auth"
+	authProvider "github.com/ViBiOh/auth/provider"
 	"github.com/ViBiOh/httputils/db"
 )
 
@@ -112,7 +112,7 @@ func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 	return list, nil
 }
 
-func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *auth.User, search string) ([]*tag, error) {
+func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *authProvider.User, search string) ([]*tag, error) {
 	if user == nil || user.ID == 0 {
 		return nil, errNilUser
 	}
@@ -149,7 +149,7 @@ func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *auth.Us
 	return scanTags(rows, pageSize)
 }
 
-func countTags(user *auth.User, search string) (count uint, err error) {
+func countTags(user *authProvider.User, search string) (count uint, err error) {
 	if user == nil || user.ID == 0 {
 		return 0, errNilUser
 	}
@@ -187,7 +187,7 @@ func findTagsByIds(ids []uint) ([]*tag, error) {
 	return scanTags(rows, uint(len(ids)))
 }
 
-func getTag(id uint, user *auth.User) (*tag, error) {
+func getTag(id uint, user *authProvider.User) (*tag, error) {
 	if user == nil {
 		return nil, errNilUser
 	}

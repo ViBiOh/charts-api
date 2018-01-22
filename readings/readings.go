@@ -7,6 +7,9 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/auth/auth"
+	authProvider "github.com/ViBiOh/auth/provider"
+	"github.com/ViBiOh/auth/provider/basic"
+	authService "github.com/ViBiOh/auth/service"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/db"
 )
@@ -14,7 +17,10 @@ import (
 const healthcheckPath = `/health`
 
 var (
-	authConfig = auth.Flags(`readingsAuth`)
+	authConfig        = auth.Flags(`readingsAuth`)
+	authServiceConfig = authService.Flags(`readings`)
+	authBasicConfig   = basic.Flags(`readingsBasic`)
+
 	dbConfig   = db.Flags(`readingsDb`)
 	readingsDB *sql.DB
 )
@@ -29,7 +35,7 @@ func Init() (err error) {
 	return
 }
 
-func listReadings(w http.ResponseWriter, r *http.Request, user *auth.User) {
+func listReadings(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 	if list, err := listReadingsOfUser(user); err == nil {
 		httputils.ResponseArrayJSON(w, http.StatusOK, list, httputils.IsPretty(r.URL.RawQuery))
 	} else {
@@ -39,7 +45,9 @@ func listReadings(w http.ResponseWriter, r *http.Request, user *auth.User) {
 
 // Handler for Readings request. Should be use with net/http
 func Handler() http.Handler {
-	authHandler := auth.Handler(authConfig, func(w http.ResponseWriter, r *http.Request, user *auth.User) {
+	authApp := auth.NewApp(authConfig, authService.NewApp(authServiceConfig, authBasicConfig, nil))
+
+	authHandler := authApp.Handler(func(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 		if strings.HasPrefix(r.URL.Path, tagsPath) {
 			tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
 		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {

@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ViBiOh/auth/auth"
+	authProvider "github.com/ViBiOh/auth/provider"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/pagination"
 )
@@ -38,7 +38,7 @@ func readTagFromBody(r *http.Request) (*tag, error) {
 	return &requestTag, nil
 }
 
-func listTags(w http.ResponseWriter, r *http.Request, user *auth.User) {
+func listTags(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
 	if err != nil {
 		httputils.BadRequest(w, fmt.Errorf(`Error while parsing pagination: %v`, err))
@@ -60,7 +60,7 @@ func listTags(w http.ResponseWriter, r *http.Request, user *auth.User) {
 	}
 }
 
-func readTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
+func readTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
 	if foundTag, err := getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
 			httputils.NotFound(w)
@@ -72,7 +72,7 @@ func readTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
 	}
 }
 
-func createTag(w http.ResponseWriter, r *http.Request, user *auth.User) {
+func createTag(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 	if bodyTag, err := readTagFromBody(r); err != nil {
 		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if bodyTag.Name == `` {
@@ -87,7 +87,7 @@ func createTag(w http.ResponseWriter, r *http.Request, user *auth.User) {
 		}
 	}
 }
-func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
+func updateTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
 	if bodyTag, err := readTagFromBody(r); err != nil {
 		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if id == 0 {
@@ -106,7 +106,7 @@ func updateTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint)
 	}
 }
 
-func removeTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint) {
+func removeTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
 	if foundTag, err := getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
 			httputils.NotFound(w)
@@ -120,7 +120,7 @@ func removeTag(w http.ResponseWriter, r *http.Request, user *auth.User, id uint)
 	}
 }
 
-func tagsHandler(w http.ResponseWriter, r *http.Request, user *auth.User, path string) {
+func tagsHandler(w http.ResponseWriter, r *http.Request, user *authProvider.User, path string) {
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusNoContent)
 	} else if path == `/` || path == `` {

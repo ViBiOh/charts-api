@@ -21,9 +21,10 @@
   name = "github.com/ViBiOh/auth"
   packages = [
     "auth",
-    "cookie"
+    "cookie",
+    "provider"
   ]
-  revision = "eaa068aebe20a4feedfb4de5f33f0a20034d3719"
+  revision = "444a0422bb9092ab12a3694d966ca074b4276e85"
 
 [[projects]]
   branch = "master"
@@ -40,7 +41,7 @@
     "tools",
     "writer"
   ]
-  revision = "78483570250a7c785bf6b15b68238e5cc3527dff"
+  revision = "d9e777753ee5ba376805fcc97fe07d1d76d22dad"
 
 [[projects]]
   branch = "master"
@@ -61,7 +62,7 @@
     ".",
     "oid"
   ]
-  revision = "83612a56d3dd153a94a629cd64925371c9adad78"
+  revision = "27ea5d92de30060e7121ddd543fe14e9a327e0cc"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -76,7 +77,7 @@
     "prometheus",
     "prometheus/promhttp"
   ]
-  revision = "180b8fdc22b4ea7750bcb43c925277654a1ea2f3"
+  revision = "06bc6e01f4baf4ee783ffcd23abfcb0b0f9dfada"
 
 [[projects]]
   branch = "master"
@@ -92,7 +93,7 @@
     "internal/bitbucket.org/ww/goautoneg",
     "model"
   ]
-  revision = "2e54d0b93cba2fd133edc32211dcc32c06ef72ca"
+  revision = "89604d197083d4781071d3c65855d24ecfb0a563"
 
 [[projects]]
   branch = "master"

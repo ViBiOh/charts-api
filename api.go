@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -44,7 +45,7 @@ func handler() http.Handler {
 }
 
 func main() {
-	port := flag.String(`port`, `1080`, `Listen port`)
+	port := flag.Int(`port`, 1080, `Listen port`)
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
 	alcotestConfig := alcotest.Flags(``)
 	tlsConfig := cert.Flags(`tls`)
@@ -56,7 +57,7 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	log.Printf(`Starting server on port %s`, *port)
+	log.Printf(`Starting server on port %d`, *port)
 
 	if err := conservatories.Init(); err != nil {
 		log.Printf(`[conservatories] Error while initializing: %v`, err)
@@ -69,7 +70,7 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:    `:` + *port,
+		Addr:    fmt.Sprintf(`:%d`, *port),
 		Handler: prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler()))))),
 	}
 
