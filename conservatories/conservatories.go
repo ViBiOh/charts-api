@@ -2,7 +2,6 @@ package conservatories
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -18,22 +17,19 @@ const (
 	defaultSort     = `name`
 )
 
-var (
-	dbConfig = db.Flags(`chartsDb`)
-	chartsDB *sql.DB
-)
-
-// Init charts handler
-func Init() (err error) {
-	chartsDB, err = db.GetDB(dbConfig)
-	if err != nil {
-		err = fmt.Errorf(`Error while initializing database: %v`, err)
-	}
-
-	return
+// App stores informations and secret of API
+type App struct {
+	db *sql.DB
 }
 
-func listCrud(w http.ResponseWriter, r *http.Request) {
+// NewApp creates new App from Flags' config
+func NewApp(db *sql.DB) *App {
+	return &App{
+		db: db,
+	}
+}
+
+func (a *App) listCrud(w http.ResponseWriter, r *http.Request) {
 	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
 	if err != nil {
 		httputils.BadRequest(w, err)
@@ -44,31 +40,31 @@ func listCrud(w http.ResponseWriter, r *http.Request) {
 		sort = defaultSort
 	}
 
-	if count, list, err := findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
+	if count, list, err := a.findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
 		httputils.InternalServerError(w, err)
 	} else {
 		httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery))
 	}
 }
 
-func aggregate(w http.ResponseWriter, r *http.Request) {
-	if count, err := countByDepartment(); err != nil {
+func (a *App) aggregate(w http.ResponseWriter, r *http.Request) {
+	if count, err := a.countByDepartment(); err != nil {
 		httputils.InternalServerError(w, err)
 	} else {
 		httputils.ResponseJSON(w, 200, count, httputils.IsPretty(r.URL.RawQuery))
 	}
 }
 
-func aggregateByDepartment(w http.ResponseWriter, r *http.Request, path string) {
-	if count, err := countByZipOfDepartment(strings.TrimPrefix(path, `/`)); err != nil {
+func (a *App) aggregateByDepartment(w http.ResponseWriter, r *http.Request, path string) {
+	if count, err := a.countByZipOfDepartment(strings.TrimPrefix(path, `/`)); err != nil {
 		httputils.InternalServerError(w, err)
 	} else {
 		httputils.ResponseJSON(w, 200, count, httputils.IsPretty(r.URL.RawQuery))
 	}
 }
 
-// Handler for Charts request. Should be use with net/http
-func Handler() http.Handler {
+// Handler for Conservatories request. Should be use with net/http
+func (a *App) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
@@ -76,7 +72,7 @@ func Handler() http.Handler {
 		}
 
 		if r.Method == http.MethodGet && r.URL.Path == healthcheckPath {
-			if db.Ping(chartsDB) {
+			if db.Ping(a.db) {
 				w.WriteHeader(http.StatusOK)
 			} else {
 				w.WriteHeader(http.StatusServiceUnavailable)
@@ -85,11 +81,11 @@ func Handler() http.Handler {
 		}
 
 		if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
-			listCrud(w, r)
+			a.listCrud(w, r)
 		} else if r.Method == http.MethodGet && r.URL.Path == `/aggregate` {
-			aggregate(w, r)
+			a.aggregate(w, r)
 		} else if r.Method == http.MethodGet && strings.HasPrefix(r.URL.Path, `/aggregate/department`) {
-			aggregateByDepartment(w, r, strings.TrimPrefix(r.URL.Path, `/aggregate/department`))
+			a.aggregateByDepartment(w, r, strings.TrimPrefix(r.URL.Path, `/aggregate/department`))
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}

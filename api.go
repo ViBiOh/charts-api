@@ -60,6 +60,8 @@ func main() {
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
 
+	conservatoriesDbConfig := db.Flags(`conservatoriesDb`)
+
 	readingsDbConfig := db.Flags(`readingsDb`)
 	readingsAuthConfig := auth.Flags(`readingsAuth`)
 	readingsAuthBasicConfig := basic.Flags(`readingsBasic`)
@@ -70,8 +72,12 @@ func main() {
 
 	log.Printf(`Starting server on port %d`, *port)
 
-	conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatories.Handler())
-	healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
+	conservatoriesDB, err := db.GetDB(conservatoriesDbConfig)
+	if err != nil {
+		err = fmt.Errorf(`Error while initializing conservatories database: %v`, err)
+	}
+	conservatoriesApp := conservatories.NewApp(conservatoriesDB)
+	conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatoriesApp.Handler())
 
 	readingsDB, err := db.GetDB(readingsDbConfig)
 	if err != nil {
@@ -81,12 +87,11 @@ func main() {
 	readingsApp := readings.NewApp(readingsDB, readingsAuthApp)
 	readingsHandler = http.StripPrefix(readingsPath, readingsApp.Handler())
 
-	if err := conservatories.Init(); err != nil {
-		log.Printf(`[conservatories] Error while initializing: %v`, err)
-	}
-	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: conservatoriesHandler, `/readings`: readingsHandler}); err != nil {
-		log.Printf(`[healthcheck] Error while initializing: %v`, err)
-	}
+	healthcheckApp := healthcheck.NewApp(map[string]http.Handler{
+		conservatoriesPath: conservatoriesHandler,
+		readingsPath:       readingsHandler,
+	})
+	healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheckApp.Handler())
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(`:%d`, *port),

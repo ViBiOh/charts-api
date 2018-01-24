@@ -11,15 +11,3 @@ type conservatory struct {
 	Latitude   float64 `json:"lat"`
 	Longitude  float64 `json:"lng"`
 }
-
-func findConservatories(page, pageSize uint, sortKey string, ascending bool, query string) (uint, []*conservatory, error) {
-	count, err := countConservatories(query)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	list, err := searchConservatories(page, pageSize, sortKey, ascending, query)
-
-	return count, list, err
-
-}

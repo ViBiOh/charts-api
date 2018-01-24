@@ -1,16 +1,16 @@
 version: '2.1'
 
 services:
-  charts_db:
+  conservatories_db:
     image: postgres:10-alpine
     labels:
       traefik.enable: 'false'
     environment:
-      POSTGRES_DB: 'charts'
-      POSTGRES_USER: 'charts'
-      POSTGRES_PASSWORD: '${CHARTS_DATABASE_PASS}'
+      POSTGRES_DB: 'conservatories'
+      POSTGRES_USER: 'conservatories'
+      POSTGRES_PASSWORD: '${CONSERVATORIES_DATABASE_PASS}'
     volumes:
-    - ${CHARTS_DATABASE_DIR}:/var/lib/postgresql/data
+    - ${CONSERVATORIES_DATABASE_DIR}:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
     user: postgres
@@ -54,14 +54,14 @@ services:
     - eponae-api:1080
     - -csp
     - "default-src 'self'; script-src 'unsafe-inline' ajax.googleapis.com cdnjs.cloudflare.com; style-src 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; font-src data: fonts.gstatic.com cdnjs.cloudflare.com; img-src data:"
-    - -chartsDbHost
-    - charts_db
-    - -chartsDbUser
-    - charts
-    - -chartsDbPass
-    - ${CHARTS_DATABASE_PASS}
-    - -chartsDbName
-    - charts
+    - -conservatoriesDbHost
+    - conservatories_db
+    - -conservatoriesDbUser
+    - conservatories
+    - -conservatoriesDbPass
+    - ${CONSERVATORIES_DATABASE_PASS}
+    - -conservatoriesDbName
+    - conservatories
     - -readingsDbHost
     - readings_db
     - -readingsDbUser

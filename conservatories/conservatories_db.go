@@ -111,19 +111,31 @@ func scanAggregateRows(rows *sql.Rows) (map[string]uint, error) {
 	return aggregate, nil
 }
 
-func countConservatories(search string) (count uint, err error) {
+func (a *App) findConservatories(page, pageSize uint, sortKey string, ascending bool, query string) (uint, []*conservatory, error) {
+	count, err := a.countConservatories(query)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	list, err := a.searchConservatories(page, pageSize, sortKey, ascending, query)
+
+	return count, list, err
+
+}
+
+func (a *App) countConservatories(search string) (count uint, err error) {
 	where, words := db.PrepareFullTextSearch(conservatoriesSearchWhere, search, 1)
 
 	if words != `` {
-		err = chartsDB.QueryRow(fmt.Sprintf(conservatoriesCountQuery, where), words).Scan(&count)
+		err = a.db.QueryRow(fmt.Sprintf(conservatoriesCountQuery, where), words).Scan(&count)
 	} else {
-		err = chartsDB.QueryRow(fmt.Sprintf(conservatoriesCountQuery, where)).Scan(&count)
+		err = a.db.QueryRow(fmt.Sprintf(conservatoriesCountQuery, where)).Scan(&count)
 	}
 
 	return
 }
 
-func searchConservatories(page, pageSize uint, sortKey string, sortAsc bool, search string) ([]*conservatory, error) {
+func (a *App) searchConservatories(page, pageSize uint, sortKey string, sortAsc bool, search string) ([]*conservatory, error) {
 	var offset uint
 	if page > 1 {
 		offset = (page - 1) * pageSize
@@ -140,9 +152,9 @@ func searchConservatories(page, pageSize uint, sortKey string, sortAsc bool, sea
 	var err error
 
 	if where != `` {
-		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset, words)
+		rows, err = a.db.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset, words)
 	} else {
-		rows, err = chartsDB.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset)
+		rows, err = a.db.Query(fmt.Sprintf(conservatoriesQuery, where, sortKey, sortOrder), pageSize, offset)
 	}
 
 	if err != nil {
@@ -156,8 +168,8 @@ func searchConservatories(page, pageSize uint, sortKey string, sortAsc bool, sea
 	return scanConservatoryRows(rows, pageSize)
 }
 
-func countByDepartment() (map[string]uint, error) {
-	rows, err := chartsDB.Query(conservatoriesByDepartementQuery)
+func (a *App) countByDepartment() (map[string]uint, error) {
+	rows, err := a.db.Query(conservatoriesByDepartementQuery)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while counting by department: %v`, err)
 	}
@@ -165,8 +177,8 @@ func countByDepartment() (map[string]uint, error) {
 	return scanAggregateRows(rows)
 }
 
-func countByZipOfDepartment(department string) (map[string]uint, error) {
-	rows, err := chartsDB.Query(conservatoriesByZipOfDepartmentQuery, department)
+func (a *App) countByZipOfDepartment(department string) (map[string]uint, error) {
+	rows, err := a.db.Query(conservatoriesByZipOfDepartmentQuery, department)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while counting by zip of department: %v`, err)
 	}
