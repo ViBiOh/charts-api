@@ -112,7 +112,7 @@ func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 	return list, nil
 }
 
-func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *authProvider.User, search string) ([]*tag, error) {
+func (a *App) searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *authProvider.User, search string) ([]*tag, error) {
 	if user == nil || user.ID == 0 {
 		return nil, errNilUser
 	}
@@ -133,9 +133,9 @@ func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *authPro
 	var err error
 
 	if where != `` {
-		rows, err = readingsDB.Query(fmt.Sprintf(searchTagsQuery, where, sortKey, sortOrder), pageSize, offset, user.ID, words)
+		rows, err = a.db.Query(fmt.Sprintf(searchTagsQuery, where, sortKey, sortOrder), pageSize, offset, user.ID, words)
 	} else {
-		rows, err = readingsDB.Query(fmt.Sprintf(searchTagsQuery, where, sortKey, sortOrder), pageSize, offset, user.ID)
+		rows, err = a.db.Query(fmt.Sprintf(searchTagsQuery, where, sortKey, sortOrder), pageSize, offset, user.ID)
 	}
 
 	if err != nil {
@@ -149,7 +149,7 @@ func searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *authPro
 	return scanTags(rows, pageSize)
 }
 
-func countTags(user *authProvider.User, search string) (count uint, err error) {
+func (a *App) countTags(user *authProvider.User, search string) (count uint, err error) {
 	if user == nil || user.ID == 0 {
 		return 0, errNilUser
 	}
@@ -157,9 +157,9 @@ func countTags(user *authProvider.User, search string) (count uint, err error) {
 	where, words := db.PrepareFullTextSearch(searchTagsWhereQuery, search, 2)
 
 	if where != `` {
-		err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, where), user.ID, words).Scan(&count)
+		err = a.db.QueryRow(fmt.Sprintf(searchTagsCountQuery, where), user.ID, words).Scan(&count)
 	} else {
-		err = readingsDB.QueryRow(fmt.Sprintf(searchTagsCountQuery, where), user.ID).Scan(&count)
+		err = a.db.QueryRow(fmt.Sprintf(searchTagsCountQuery, where), user.ID).Scan(&count)
 	}
 
 	if err == sql.ErrNoRows {
@@ -174,8 +174,8 @@ func countTags(user *authProvider.User, search string) (count uint, err error) {
 	return
 }
 
-func findTagsByIds(ids []uint) ([]*tag, error) {
-	rows, err := readingsDB.Query(findTagsByidsQuery, db.WhereInUint(ids))
+func (a *App) findTagsByIds(ids []uint) ([]*tag, error) {
+	rows, err := a.db.Query(findTagsByidsQuery, db.WhereInUint(ids))
 	if err != nil {
 		return nil, fmt.Errorf(`Error while querying: %v`, err)
 	}
@@ -187,7 +187,7 @@ func findTagsByIds(ids []uint) ([]*tag, error) {
 	return scanTags(rows, uint(len(ids)))
 }
 
-func getTag(id uint, user *authProvider.User) (*tag, error) {
+func (a *App) getTag(id uint, user *authProvider.User) (*tag, error) {
 	if user == nil {
 		return nil, errNilUser
 	}
@@ -197,7 +197,7 @@ func getTag(id uint, user *authProvider.User) (*tag, error) {
 		name     string
 	)
 
-	if err := readingsDB.QueryRow(readTagQuery, id, user.ID).Scan(&resultID, &name); err != nil {
+	if err := a.db.QueryRow(readTagQuery, id, user.ID).Scan(&resultID, &name); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, err
 		}
@@ -207,7 +207,7 @@ func getTag(id uint, user *authProvider.User) (*tag, error) {
 	return &tag{ID: resultID, Name: name, user: user}, nil
 }
 
-func saveTag(o *tag, tx *sql.Tx) (err error) {
+func (a *App) saveTag(o *tag, tx *sql.Tx) (err error) {
 	if o == nil {
 		return errNilTag
 	}
@@ -217,7 +217,7 @@ func saveTag(o *tag, tx *sql.Tx) (err error) {
 	}
 
 	var usedTx *sql.Tx
-	if usedTx, err = db.GetTx(readingsDB, tx); err != nil {
+	if usedTx, err = db.GetTx(a.db, tx); err != nil {
 		return
 	}
 
@@ -244,7 +244,7 @@ func saveTag(o *tag, tx *sql.Tx) (err error) {
 	return
 }
 
-func deleteTag(o *tag, tx *sql.Tx) (err error) {
+func (a *App) deleteTag(o *tag, tx *sql.Tx) (err error) {
 	if o == nil || o.ID == 0 {
 		return errNilTag
 	}
@@ -254,7 +254,7 @@ func deleteTag(o *tag, tx *sql.Tx) (err error) {
 	}
 
 	var usedTx *sql.Tx
-	if usedTx, err = db.GetTx(readingsDB, tx); err != nil {
+	if usedTx, err = db.GetTx(a.db, tx); err != nil {
 		return
 	}
 

@@ -23,7 +23,7 @@ func Handler() http.Handler {
 		if r.Method == http.MethodGet {
 			for url, handler := range handlers {
 				fakeWriter := writer.ResponseWriter{}
-				request, err := http.NewRequest(http.MethodGet, url+`/health`, nil)
+				request, err := http.NewRequest(http.MethodGet, fmt.Sprintf(`%s/health`, url), nil)
 				if err != nil {
 					httputils.InternalServerError(w, fmt.Errorf(`Error while creating health request: %v`, err))
 					return

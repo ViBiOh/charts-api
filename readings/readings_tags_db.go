@@ -24,7 +24,7 @@ type readingsTags struct {
 	tagID     uint
 }
 
-func scanReadingsTags(rows *sql.Rows, pageSize uint) ([]*readingsTags, error) {
+func (a *App) scanReadingsTags(rows *sql.Rows, pageSize uint) ([]*readingsTags, error) {
 	var (
 		readingID uint
 		tagID     uint
@@ -43,8 +43,8 @@ func scanReadingsTags(rows *sql.Rows, pageSize uint) ([]*readingsTags, error) {
 	return list, nil
 }
 
-func findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
-	rows, err := readingsDB.Query(listReadingsTagsOfReadingsQuery, db.WhereInUint(ids))
+func (a *App) findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
+	rows, err := a.db.Query(listReadingsTagsOfReadingsQuery, db.WhereInUint(ids))
 	if err != nil {
 		return nil, fmt.Errorf(`Error while querying: %v`, err)
 	}
@@ -53,10 +53,10 @@ func findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
 		err = db.RowsClose(rows, err)
 	}()
 
-	return scanReadingsTags(rows, uint(len(ids)))
+	return a.scanReadingsTags(rows, uint(len(ids)))
 }
 
-func enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
+func (a *App) enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
 	if len(readings) == 0 {
 		return readings, nil
 	}
@@ -66,7 +66,7 @@ func enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
 		readingsID[i] = reading.ID
 	}
 
-	tagsLink, err := findReadingsTagsByIds(readingsID)
+	tagsLink, err := a.findReadingsTagsByIds(readingsID)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while finding readings tags: %v`, err)
 	}
@@ -83,7 +83,7 @@ func enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
 		}
 	}
 
-	tags, err := findTagsByIds(tagsID)
+	tags, err := a.findTagsByIds(tagsID)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while finding tags: %v`, err)
 	}

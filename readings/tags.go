@@ -26,7 +26,7 @@ func getRequestID(path string) (uint, error) {
 	return uint(parsed), err
 }
 
-func readTagFromBody(r *http.Request) (*tag, error) {
+func (a *App) readTagFromBody(r *http.Request) (*tag, error) {
 	var requestTag tag
 
 	if bodyBytes, err := httputils.ReadBody(r.Body); err != nil {
@@ -38,7 +38,7 @@ func readTagFromBody(r *http.Request) (*tag, error) {
 	return &requestTag, nil
 }
 
-func listTags(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
+func (a *App) listTags(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
 	if err != nil {
 		httputils.BadRequest(w, fmt.Errorf(`Error while parsing pagination: %v`, err))
@@ -51,17 +51,17 @@ func listTags(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 
 	query := r.URL.Query().Get(`q`)
 
-	if list, err := searchTags(page, pageSize, sort, asc, user, query); err != nil {
+	if list, err := a.searchTags(page, pageSize, sort, asc, user, query); err != nil {
 		httputils.InternalServerError(w, fmt.Errorf(`Error while searching tags: %v`, err))
-	} else if count, err := countTags(user, query); err != nil {
+	} else if count, err := a.countTags(user, query); err != nil {
 		httputils.InternalServerError(w, fmt.Errorf(`Error while counting tags: %v`, err))
 	} else {
 		httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery))
 	}
 }
 
-func readTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
-	if foundTag, err := getTag(id, user); err != nil {
+func (a *App) readTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
+	if foundTag, err := a.getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
 			httputils.NotFound(w)
 		} else {
@@ -72,23 +72,23 @@ func readTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id
 	}
 }
 
-func createTag(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
-	if bodyTag, err := readTagFromBody(r); err != nil {
+func (a *App) createTag(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
+	if bodyTag, err := a.readTagFromBody(r); err != nil {
 		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if bodyTag.Name == `` {
 		httputils.BadRequest(w, errNameRequired)
 	} else {
 		bodyTag.user = user
 
-		if err := saveTag(bodyTag, nil); err != nil {
+		if err := a.saveTag(bodyTag, nil); err != nil {
 			httputils.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
 		} else {
 			httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery))
 		}
 	}
 }
-func updateTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
-	if bodyTag, err := readTagFromBody(r); err != nil {
+func (a *App) updateTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
+	if bodyTag, err := a.readTagFromBody(r); err != nil {
 		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if id == 0 {
 		httputils.BadRequest(w, errIDRequired)
@@ -98,7 +98,7 @@ func updateTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, 
 		bodyTag.ID = id
 		bodyTag.user = user
 
-		if err := saveTag(bodyTag, nil); err != nil {
+		if err := a.saveTag(bodyTag, nil); err != nil {
 			httputils.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
 		} else {
 			httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery))
@@ -106,28 +106,28 @@ func updateTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, 
 	}
 }
 
-func removeTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
-	if foundTag, err := getTag(id, user); err != nil {
+func (a *App) removeTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
+	if foundTag, err := a.getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
 			httputils.NotFound(w)
 		} else {
 			httputils.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
 		}
-	} else if err := deleteTag(foundTag, nil); err != nil {
+	} else if err := a.deleteTag(foundTag, nil); err != nil {
 		httputils.InternalServerError(w, fmt.Errorf(`Error while deleting tag: %v`, err))
 	} else {
 		w.WriteHeader(http.StatusNoContent)
 	}
 }
 
-func tagsHandler(w http.ResponseWriter, r *http.Request, user *authProvider.User, path string) {
+func (a *App) tagsHandler(w http.ResponseWriter, r *http.Request, user *authProvider.User, path string) {
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusNoContent)
 	} else if path == `/` || path == `` {
 		if r.Method == http.MethodPost {
-			createTag(w, r, user)
+			a.createTag(w, r, user)
 		} else if r.Method == http.MethodGet {
-			listTags(w, r, user)
+			a.listTags(w, r, user)
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
@@ -135,11 +135,11 @@ func tagsHandler(w http.ResponseWriter, r *http.Request, user *authProvider.User
 		if id, err := getRequestID(path); err != nil {
 			httputils.BadRequest(w, fmt.Errorf(`Error while parsing request path: %v`, err))
 		} else if r.Method == http.MethodGet {
-			readTag(w, r, user, id)
+			a.readTag(w, r, user, id)
 		} else if r.Method == http.MethodPut {
-			updateTag(w, r, user, id)
+			a.updateTag(w, r, user, id)
 		} else if r.Method == http.MethodDelete {
-			removeTag(w, r, user, id)
+			a.removeTag(w, r, user, id)
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}

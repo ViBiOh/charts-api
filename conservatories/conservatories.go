@@ -11,13 +11,17 @@ import (
 	"github.com/ViBiOh/httputils/pagination"
 )
 
-const healthcheckPath = `/health`
-const defaultPageSize = uint(10)
-const maxPageSize = uint(50)
-const defaultSort = `name`
+const (
+	healthcheckPath = `/health`
+	defaultPageSize = uint(10)
+	maxPageSize     = uint(50)
+	defaultSort     = `name`
+)
 
-var dbConfig = db.Flags(`chartsDb`)
-var chartsDB *sql.DB
+var (
+	dbConfig = db.Flags(`chartsDb`)
+	chartsDB *sql.DB
+)
 
 // Init charts handler
 func Init() (err error) {

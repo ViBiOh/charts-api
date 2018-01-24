@@ -9,12 +9,16 @@ import (
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/alcotest/alcotest"
+	"github.com/ViBiOh/auth/auth"
+	"github.com/ViBiOh/auth/provider/basic"
+	authService "github.com/ViBiOh/auth/service"
 	"github.com/ViBiOh/eponae-api/conservatories"
 	"github.com/ViBiOh/eponae-api/healthcheck"
 	"github.com/ViBiOh/eponae-api/readings"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/cert"
 	"github.com/ViBiOh/httputils/cors"
+	"github.com/ViBiOh/httputils/db"
 	"github.com/ViBiOh/httputils/owasp"
 	"github.com/ViBiOh/httputils/prometheus"
 	"github.com/ViBiOh/httputils/rate"
@@ -56,6 +60,10 @@ func main() {
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
 
+	readingsDbConfig := db.Flags(`readingsDb`)
+	readingsAuthConfig := auth.Flags(`readingsAuth`)
+	readingsAuthBasicConfig := basic.Flags(`readingsBasic`)
+
 	flag.Parse()
 
 	alcotest.DoAndExit(alcotestConfig)
@@ -63,18 +71,23 @@ func main() {
 	log.Printf(`Starting server on port %d`, *port)
 
 	conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatories.Handler())
-	readingsHandler = http.StripPrefix(readingsPath, readings.Handler())
 	healthcheckHandler = http.StripPrefix(healthcheckPath, healthcheck.Handler())
+
+	readingsDB, err := db.GetDB(readingsDbConfig)
+	if err != nil {
+		err = fmt.Errorf(`Error while initializing readings database: %v`, err)
+	}
+	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))
+	readingsApp := readings.NewApp(readingsDB, readingsAuthApp)
 
 	if err := conservatories.Init(); err != nil {
 		log.Printf(`[conservatories] Error while initializing: %v`, err)
 	}
-	if err := readings.Init(); err != nil {
-		log.Printf(`[readings] Error while initializing: %v`, err)
-	}
 	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: conservatoriesHandler, `/readings`: readingsHandler}); err != nil {
 		log.Printf(`[healthcheck] Error while initializing: %v`, err)
 	}
+
+	readingsHandler = http.StripPrefix(readingsPath, readingsApp.Handler())
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(`:%d`, *port),

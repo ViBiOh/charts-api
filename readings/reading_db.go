@@ -71,8 +71,8 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 	return list, nil
 }
 
-func listReadingsOfUser(user *authProvider.User) ([]*reading, error) {
-	rows, err := readingsDB.Query(listReadingsOfUserQuery, user.ID)
+func (a *App) listReadingsOfUser(user *authProvider.User) ([]*reading, error) {
+	rows, err := a.db.Query(listReadingsOfUserQuery, user.ID)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while listing readings of user: %v`, err)
 	}
@@ -86,16 +86,16 @@ func listReadingsOfUser(user *authProvider.User) ([]*reading, error) {
 		return nil, fmt.Errorf(`Error while scanning readings: %v`, err)
 	}
 
-	return enrichReadingsWithTags(list)
+	return a.enrichReadingsWithTags(list)
 }
 
-func saveReading(o *reading, tx *sql.Tx) (err error) {
+func (a *App) saveReading(o *reading, tx *sql.Tx) (err error) {
 	if o == nil {
 		return errNilReading
 	}
 
 	var usedTx *sql.Tx
-	if usedTx, err = db.GetTx(readingsDB, tx); err != nil {
+	if usedTx, err = db.GetTx(a.db, tx); err != nil {
 		return
 	}
 

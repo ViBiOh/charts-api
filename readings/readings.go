@@ -2,41 +2,38 @@ package readings
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/ViBiOh/auth/auth"
 	authProvider "github.com/ViBiOh/auth/provider"
-	"github.com/ViBiOh/auth/provider/basic"
-	authService "github.com/ViBiOh/auth/service"
 	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/db"
 )
 
 const healthcheckPath = `/health`
 
-var (
-	authConfig        = auth.Flags(`readingsAuth`)
-	authServiceConfig = authService.Flags(`readings`)
-	authBasicConfig   = basic.Flags(`readingsBasic`)
-
-	dbConfig   = db.Flags(`readingsDb`)
-	readingsDB *sql.DB
-)
-
-// Init readings API
-func Init() (err error) {
-	readingsDB, err = db.GetDB(dbConfig)
-	if err != nil {
-		err = fmt.Errorf(`Error while initializing database: %v`, err)
-	}
-
-	return
+// App stores informations and secret of API
+type App struct {
+	db      *sql.DB
+	authApp *auth.App
 }
 
-func listReadings(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
-	if list, err := listReadingsOfUser(user); err == nil {
+// NewApp creates new App from Flags' config
+func NewApp(db *sql.DB, authApp *auth.App) *App {
+	return &App{
+		db:      db,
+		authApp: authApp,
+	}
+}
+
+// Flags add flags for given prefix
+func Flags(prefix string) map[string]*string {
+	return nil
+}
+
+func (a *App) listReadings(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
+	if list, err := a.listReadingsOfUser(user); err == nil {
 		httputils.ResponseArrayJSON(w, http.StatusOK, list, httputils.IsPretty(r.URL.RawQuery))
 	} else {
 		httputils.InternalServerError(w, err)
@@ -44,14 +41,12 @@ func listReadings(w http.ResponseWriter, r *http.Request, user *authProvider.Use
 }
 
 // Handler for Readings request. Should be use with net/http
-func Handler() http.Handler {
-	authApp := auth.NewApp(authConfig, authService.NewApp(authServiceConfig, authBasicConfig, nil))
-
-	authHandler := authApp.Handler(func(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
+func (a *App) Handler() http.Handler {
+	authHandler := a.authApp.Handler(func(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 		if strings.HasPrefix(r.URL.Path, tagsPath) {
-			tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
+			a.tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
 		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
-			listReadings(w, r, user)
+			a.listReadings(w, r, user)
 		} else {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
@@ -64,7 +59,7 @@ func Handler() http.Handler {
 		}
 
 		if r.Method == http.MethodGet && r.URL.Path == healthcheckPath {
-			if db.Ping(readingsDB) {
+			if db.Ping(a.db) {
 				w.WriteHeader(http.StatusOK)
 			} else {
 				w.WriteHeader(http.StatusServiceUnavailable)
