@@ -79,6 +79,7 @@ func main() {
 	}
 	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))
 	readingsApp := readings.NewApp(readingsDB, readingsAuthApp)
+	readingsHandler = http.StripPrefix(readingsPath, readingsApp.Handler())
 
 	if err := conservatories.Init(); err != nil {
 		log.Printf(`[conservatories] Error while initializing: %v`, err)
@@ -86,8 +87,6 @@ func main() {
 	if err := healthcheck.Init(map[string]http.Handler{`/conservatories`: conservatoriesHandler, `/readings`: readingsHandler}); err != nil {
 		log.Printf(`[healthcheck] Error while initializing: %v`, err)
 	}
-
-	readingsHandler = http.StripPrefix(readingsPath, readingsApp.Handler())
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(`:%d`, *port),
