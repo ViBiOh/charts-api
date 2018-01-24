@@ -35,7 +35,7 @@ func (a *App) Handler() http.Handler {
 				handler.ServeHTTP(&fakeWriter, request)
 
 				if status := fakeWriter.Status(); status != http.StatusOK {
-					w.WriteHeader(status)
+					http.Error(w, fmt.Sprintf(`Bad status while pinging endpoint %s`, url), status)
 					return
 				}
 			}
