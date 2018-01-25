@@ -55,8 +55,8 @@ func (a *App) listTags(w http.ResponseWriter, r *http.Request, user *authProvide
 		httputils.InternalServerError(w, fmt.Errorf(`Error while searching tags: %v`, err))
 	} else if count, err := a.countTags(user, query); err != nil {
 		httputils.InternalServerError(w, fmt.Errorf(`Error while counting tags: %v`, err))
-	} else {
-		httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery))
+	} else if err := httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery)); err != nil {
+		httputils.InternalServerError(w, err)
 	}
 }
 
@@ -67,8 +67,8 @@ func (a *App) readTag(w http.ResponseWriter, r *http.Request, user *authProvider
 		} else {
 			httputils.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
 		}
-	} else {
-		httputils.ResponseJSON(w, http.StatusOK, foundTag, httputils.IsPretty(r.URL.RawQuery))
+	} else if err := httputils.ResponseJSON(w, http.StatusOK, foundTag, httputils.IsPretty(r.URL.RawQuery)); err != nil {
+		httputils.InternalServerError(w, err)
 	}
 }
 
@@ -82,8 +82,8 @@ func (a *App) createTag(w http.ResponseWriter, r *http.Request, user *authProvid
 
 		if err := a.saveTag(bodyTag, nil); err != nil {
 			httputils.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
-		} else {
-			httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery))
+		} else if err := httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery)); err != nil {
+			httputils.InternalServerError(w, err)
 		}
 	}
 }
@@ -100,8 +100,8 @@ func (a *App) updateTag(w http.ResponseWriter, r *http.Request, user *authProvid
 
 		if err := a.saveTag(bodyTag, nil); err != nil {
 			httputils.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
-		} else {
-			httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery))
+		} else if err := httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery)); err != nil {
+			httputils.InternalServerError(w, err)
 		}
 	}
 }

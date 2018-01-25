@@ -34,7 +34,9 @@ func Flags(prefix string) map[string]*string {
 
 func (a *App) listReadings(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 	if list, err := a.listReadingsOfUser(user); err == nil {
-		httputils.ResponseArrayJSON(w, http.StatusOK, list, httputils.IsPretty(r.URL.RawQuery))
+		if err := httputils.ResponseArrayJSON(w, http.StatusOK, list, httputils.IsPretty(r.URL.RawQuery)); err != nil {
+			httputils.InternalServerError(w, err)
+		}
 	} else {
 		httputils.InternalServerError(w, err)
 	}
