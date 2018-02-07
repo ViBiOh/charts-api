@@ -20,8 +20,6 @@ import (
 	"github.com/ViBiOh/httputils/cors"
 	"github.com/ViBiOh/httputils/db"
 	"github.com/ViBiOh/httputils/owasp"
-	"github.com/ViBiOh/httputils/prometheus"
-	"github.com/ViBiOh/httputils/rate"
 )
 
 const healthcheckPath = `/health`
@@ -55,8 +53,6 @@ func main() {
 	tls := flag.Bool(`tls`, true, `Serve TLS content`)
 	alcotestConfig := alcotest.Flags(``)
 	tlsConfig := cert.Flags(`tls`)
-	prometheusConfig := prometheus.Flags(`prometheus`)
-	rateConfig := rate.Flags(`rate`)
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
 
@@ -95,7 +91,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf(`:%d`, *port),
-		Handler: prometheus.Handler(prometheusConfig, rate.Handler(rateConfig, gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler()))))),
+		Handler: gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler()))),
 	}
 
 	var serveError = make(chan error)
