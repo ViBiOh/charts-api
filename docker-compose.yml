@@ -17,7 +17,7 @@ services:
     - -readingsAuthUsers
     - eponae:admin
     - -readingsBasicUsers
-    - 1:eponae:$$2a$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
+    - 1:eponae:$$2a$$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: api.eponae.fr'

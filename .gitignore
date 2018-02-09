@@ -5,7 +5,7 @@ coverage.*
 
 # Docker
 cacert.pem
-data_*/
+data/
 
 # Documentation
 snowboard
