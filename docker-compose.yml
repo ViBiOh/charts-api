@@ -1,73 +1,19 @@
 version: '2.1'
 
 services:
-  conservatories_db:
-    image: postgres:10-alpine
-    labels:
-      traefik.enable: 'false'
-    environment:
-      POSTGRES_DB: 'conservatories'
-      POSTGRES_USER: 'conservatories'
-      POSTGRES_PASSWORD: '${CONSERVATORIES_DATABASE_PASS}'
-    volumes:
-    - ${CONSERVATORIES_DATABASE_DIR}:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
-    user: postgres
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
-    restart: on-failure:5
-    cpu_shares: 256
-    mem_limit: 134217728
-    security_opt:
-    - no-new-privileges
-
-  readings_db:
-    image: postgres:10-alpine
-    labels:
-      traefik.enable: 'false'
-    environment:
-      POSTGRES_DB: 'readings'
-      POSTGRES_USER: 'readings'
-      POSTGRES_PASSWORD: '${READINGS_DATABASE_PASS}'
-    volumes:
-    - ${READINGS_DATABASE_DIR}:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
-    user: postgres
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
-    restart: on-failure:5
-    cpu_shares: 256
-    mem_limit: 134217728
-    security_opt:
-    - no-new-privileges
-
   api:
     image: vibioh/eponae-api
     command:
     - -csp
     - "default-src 'self'; script-src 'unsafe-inline' ajax.googleapis.com cdnjs.cloudflare.com; style-src 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; font-src data: fonts.gstatic.com cdnjs.cloudflare.com; img-src data:"
-    - -conservatoriesDbHost
-    - conservatories_db
-    - -conservatoriesDbUser
-    - conservatories
-    - -conservatoriesDbPass
-    - ${CONSERVATORIES_DATABASE_PASS}
-    - -conservatoriesDbName
-    - conservatories
-    - -readingsDbHost
-    - readings_db
-    - -readingsDbUser
-    - readings
-    - -readingsDbPass
-    - ${READINGS_DATABASE_PASS}
-    - -readingsDbName
-    - readings
+    - -eponaeDbHost
+    - eponae_db
+    - -eponaeDbUser
+    - eponae
+    - -eponaeDbPass
+    - ${EPONAE_DATABASE_PASS}
+    - -eponaeDbName
+    - eponae
     - -readingsAuthUsers
     - eponae:admin
     - -readingsBasicUsers
@@ -83,6 +29,8 @@ services:
       traefik.frontend.rateLimit.rateSet.first.period: '60s'
       traefik.frontend.rateLimit.rateSet.first.average: '100'
       traefik.frontend.rateLimit.rateSet.first.burst: '200'
+    external_links:
+    - eponae_db_1:eponae_db
     logging:
       driver: json-file
       options:

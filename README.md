@@ -67,10 +67,18 @@ Usage of api:
 ## Postgres installation
 
 ```bash
-export CONSERVATORIES_DATABASE_DIR=`realpath ./data_conservatories`
-export READINGS_DATABASE_DIR=`realpath ./data_readings`
-mkdir ${CONSERVATORIES_DATABASE_DIR}
-mkdir ${READINGS_DATABASE_DIR}
-sudo chown -R 70:70 ${CONSERVATORIES_DATABASE_DIR}
-sudo chown -R 70:70 ${READINGS_DATABASE_DIR}
+export EPONAE_DATABASE_DIR=`realpath ./data`
+export EPONAE_DATABASE_PASS=password
+
+mkdir ${EPONAE_DATABASE_DIR}
+
+sudo chown -R 70:70 ${EPONAE_DATABASE_DIR}
+
+docker-compose -p eponae -f docker-compose.db.yml up -d
+```
+
+## Postgres configuration
+
+```bash
+docker exec -it eponae_db_1 psql
 ```

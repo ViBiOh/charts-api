@@ -56,9 +56,8 @@ func main() {
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
 
-	conservatoriesDbConfig := db.Flags(`conservatoriesDb`)
+	eponaeDbConfig := db.Flags(`eponaeDb`)
 
-	readingsDbConfig := db.Flags(`readingsDb`)
 	readingsAuthConfig := auth.Flags(`readingsAuth`)
 	readingsAuthBasicConfig := basic.Flags(`readingsBasic`)
 
@@ -68,19 +67,16 @@ func main() {
 
 	log.Printf(`Starting server on port %d`, *port)
 
-	conservatoriesDB, err := db.GetDB(conservatoriesDbConfig)
+	eponaeDB, err := db.GetDB(eponaeDbConfig)
 	if err != nil {
-		err = fmt.Errorf(`Error while initializing conservatories database: %v`, err)
+		err = fmt.Errorf(`Error while initializing database: %v`, err)
 	}
-	conservatoriesApp := conservatories.NewApp(conservatoriesDB)
+
+	conservatoriesApp := conservatories.NewApp(eponaeDB)
 	conservatoriesHandler = http.StripPrefix(conservatoriesPath, conservatoriesApp.Handler())
 
-	readingsDB, err := db.GetDB(readingsDbConfig)
-	if err != nil {
-		err = fmt.Errorf(`Error while initializing readings database: %v`, err)
-	}
 	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))
-	readingsApp := readings.NewApp(readingsDB, readingsAuthApp)
+	readingsApp := readings.NewApp(eponaeDB, readingsAuthApp)
 	readingsHandler = http.StripPrefix(readingsPath, readingsApp.Handler())
 
 	healthcheckApp := healthcheck.NewApp(map[string]http.Handler{

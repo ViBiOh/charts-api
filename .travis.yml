@@ -11,10 +11,7 @@ after_success: |
     curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/eponae-api
 
     sed \
-      -e "s|\${CONSERVATORIES_DATABASE_PASS}|${CONSERVATORIES_DATABASE_PASS}|g" \
-      -e "s|\${CONSERVATORIES_DATABASE_DIR}|${CONSERVATORIES_DATABASE_DIR}|g" \
-      -e "s|\${READINGS_DATABASE_PASS}|${READINGS_DATABASE_PASS}|g" \
-      -e "s|\${READINGS_DATABASE_DIR}|${READINGS_DATABASE_DIR}|g" \
+      -e "s|\${EPONAE_DATABASE_PASS}|${EPONAE_DATABASE_PASS}|g" \
       docker-compose.yml > docker-compose-env.yml
   fi
 notifications:
