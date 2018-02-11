@@ -7,13 +7,13 @@ services:
     - -csp
     - "default-src 'self'; script-src 'unsafe-inline' ajax.googleapis.com cdnjs.cloudflare.com; style-src 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; font-src data: fonts.gstatic.com cdnjs.cloudflare.com; img-src data:"
     - -eponaeDbHost
-    - eponae_db
+    - ${EPONAE_DATABASE_HOST}
     - -eponaeDbUser
-    - eponae
+    - ${EPONAE_DATABASE_USER}
     - -eponaeDbPass
     - ${EPONAE_DATABASE_PASS}
     - -eponaeDbName
-    - eponae
+    - ${EPONAE_DATABASE_NAME}
     - -readingsAuthUsers
     - eponae:admin
     - -readingsBasicUsers
@@ -27,8 +27,6 @@ services:
       traefik.frontend.rateLimit.rateSet.first.period: '60s'
       traefik.frontend.rateLimit.rateSet.first.average: '100'
       traefik.frontend.rateLimit.rateSet.first.burst: '200'
-    external_links:
-    - eponae_db_1:eponae_db
     logging:
       driver: json-file
       options:
