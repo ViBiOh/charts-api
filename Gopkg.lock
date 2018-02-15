@@ -14,7 +14,7 @@
     "alcotest",
     "httpclient"
   ]
-  revision = "10d38c99a86257c343dd2abaf4f6a6192e7aa3f8"
+  revision = "7820b5444e1a46e9edefbc45d504df7723bb0ca8"
 
 [[projects]]
   branch = "master"
@@ -27,7 +27,7 @@
     "provider/github",
     "service"
   ]
-  revision = "0e8ef8b2a9ef9f823836f455152aebba8350a5d8"
+  revision = "717a6cf0e4772948926c5c93806a0cf7fedffab2"
 
 [[projects]]
   branch = "master"
@@ -39,25 +39,17 @@
     "db",
     "owasp",
     "pagination",
-    "prometheus",
-    "rate",
     "tools",
     "uuid",
     "writer"
   ]
-  revision = "481900a491a7bcf17a366e01f47b39c0828a0daf"
+  revision = "ea8da0656b64e1b5d610eaf6b7dc08f8a69eeb81"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/beorn7/perks"
-  packages = ["quantile"]
-  revision = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9"
-
-[[projects]]
-  branch = "master"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
-  revision = "c65a0412e71e8b9b3bfd22925720d23c0f054237"
+  revision = "925541529c1fa6821df4e44ce2723319eb2be768"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -66,49 +58,7 @@
     ".",
     "oid"
   ]
-  revision = "19c8e9ad00952ce0c64489b60e8df88bb16dd514"
-
-[[projects]]
-  name = "github.com/matttproud/golang_protobuf_extensions"
-  packages = ["pbutil"]
-  revision = "3247c84500bff8d9fb6d579d800f20b3e091582c"
-  version = "v1.0.0"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/prometheus/client_golang"
-  packages = [
-    "prometheus",
-    "prometheus/promhttp"
-  ]
-  revision = "06bc6e01f4baf4ee783ffcd23abfcb0b0f9dfada"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/prometheus/client_model"
-  packages = ["go"]
-  revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/prometheus/common"
-  packages = [
-    "expfmt",
-    "internal/bitbucket.org/ww/goautoneg",
-    "model"
-  ]
-  revision = "89604d197083d4781071d3c65855d24ecfb0a563"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/prometheus/procfs"
-  packages = [
-    ".",
-    "internal/util",
-    "nfs",
-    "xfs"
-  ]
-  revision = "cb4147076ac75738c9a7d279075a253c0cc5acbd"
+  revision = "88edab0803230a3898347e77b474f8c1820a1f20"
 
 [[projects]]
   name = "github.com/tdewolff/minify"
@@ -143,7 +93,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "3d37316aaa6bd9929127ac9a527abf408178ea7b"
+  revision = "650f4a345ab4e5b245a3034b110ebc7299e68186"
 
 [[projects]]
   branch = "master"
@@ -152,7 +102,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "0ed95abb35c445290478a5348a7b38bb154135fd"
+  revision = "f5dfe339be1d06f81b22525fe34671ee7d2c8904"
 
 [[projects]]
   branch = "master"
@@ -162,7 +112,7 @@
     "github",
     "internal"
   ]
-  revision = "b28fcf2b08a19742b43084fb40ab78ac6c3d8067"
+  revision = "543e37812f10c46c622c9575afd7ad22f22a12ba"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -181,6 +131,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e4cd02a1beb5ecfcf6f954ed511bca577482417d23561254673d1cfead5a6984"
+  inputs-digest = "938ed6463443c7822eef4eaf550a7d678fd9ab7434b4aa6826de4bfc31ba859a"
   solver-name = "gps-cdcl"
   solver-version = 1
