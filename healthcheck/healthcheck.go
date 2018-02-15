@@ -23,26 +23,27 @@ func NewApp(handlers map[string]http.Handler) *App {
 // Handler for Health request. Should be use with net/http
 func (a *App) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodGet {
-			for url, handler := range a.handlers {
-				fakeWriter := writer.ResponseWriter{}
-				request, err := http.NewRequest(http.MethodGet, fmt.Sprintf(`%s/health`, url), nil)
-				if err != nil {
-					httputils.InternalServerError(w, fmt.Errorf(`Error while creating health request: %v`, err))
-					return
-				}
-
-				handler.ServeHTTP(&fakeWriter, request)
-
-				if status := fakeWriter.Status(); status != http.StatusOK {
-					http.Error(w, fmt.Sprintf(`Bad status while pinging endpoint %s`, url), status)
-					return
-				}
-			}
-
-			w.WriteHeader(http.StatusOK)
-		} else {
+		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 		}
+
+		for url, handler := range a.handlers {
+			fakeWriter := writer.ResponseWriter{}
+			request, err := http.NewRequest(http.MethodGet, fmt.Sprintf(`%s/health`, url), nil)
+			if err != nil {
+				httputils.InternalServerError(w, fmt.Errorf(`Error while creating health request: %v`, err))
+				return
+			}
+
+			handler.ServeHTTP(&fakeWriter, request)
+
+			if status := fakeWriter.Status(); status != http.StatusOK {
+				http.Error(w, fmt.Sprintf(`Bad status while pinging endpoint %s`, url), status)
+				return
+			}
+		}
+
+		w.WriteHeader(http.StatusOK)
+
 	})
 }
