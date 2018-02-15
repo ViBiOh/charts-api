@@ -1,7 +1,7 @@
 version: '2.1'
 
 services:
-  db:
+  eponae_db:
     image: postgres:10-alpine
     labels:
       traefik.enable: 'false'
@@ -11,6 +11,8 @@ services:
       POSTGRES_PASSWORD: '${EPONAE_DATABASE_PASS}'
     volumes:
     - ${EPONAE_DATABASE_DIR}:/var/lib/postgresql/data
+    ports:
+    - ${EPONAE_DATABASE_PORT}:5432/tcp
     healthcheck:
       test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
     user: postgres

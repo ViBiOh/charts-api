@@ -67,11 +67,14 @@ Usage of api:
 ## Postgres installation
 
 ```bash
+read -p "EPONAE_DATABASE_PASS=" EPONAE_DATABASE_PASS
+read -p "EPONAE_DATABASE_PORT=" EPONAE_DATABASE_PORT
+
 export EPONAE_DATABASE_DIR=`realpath ./data`
-export EPONAE_DATABASE_PASS=password
+export EPONAE_DATABASE_PASS=${EPONAE_DATABASE_PASS}
+export EPONAE_DATABASE_PORT=${EPONAE_DATABASE_PORT}
 
 mkdir ${EPONAE_DATABASE_DIR}
-
 sudo chown -R 70:70 ${EPONAE_DATABASE_DIR}
 
 docker-compose -p eponae -f docker-compose.db.yml up -d
