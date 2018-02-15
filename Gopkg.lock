@@ -2,10 +2,10 @@
 
 
 [[projects]]
-  branch = "master"
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
-  revision = "289a3b81f5aedc99f8d6eb0f67827c142f1310d8"
+  revision = "d6f46609c7629af3a02d791a4666866eed3cbd3e"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -43,7 +43,7 @@
     "uuid",
     "writer"
   ]
-  revision = "ea8da0656b64e1b5d610eaf6b7dc08f8a69eeb81"
+  revision = "288533be2fefec40812d7805b6b5abf603ac283b"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -131,6 +131,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "938ed6463443c7822eef4eaf550a7d678fd9ab7434b4aa6826de4bfc31ba859a"
+  inputs-digest = "dde3a45103f6aa703d93d8c0162499178b145a53b46e2a77480d5a3058082b91"
   solver-name = "gps-cdcl"
   solver-version = 1
