@@ -7,8 +7,9 @@ import (
 
 	"github.com/ViBiOh/auth/auth"
 	authProvider "github.com/ViBiOh/auth/provider"
-	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/db"
+	"github.com/ViBiOh/httputils/httperror"
+	"github.com/ViBiOh/httputils/json"
 )
 
 const healthcheckPath = `/health`
@@ -34,11 +35,11 @@ func Flags(prefix string) map[string]*string {
 
 func (a *App) listReadings(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 	if list, err := a.listReadingsOfUser(user); err == nil {
-		if err := httputils.ResponseArrayJSON(w, http.StatusOK, list, httputils.IsPretty(r.URL.RawQuery)); err != nil {
-			httputils.InternalServerError(w, err)
+		if err := json.ResponseArrayJSON(w, http.StatusOK, list, json.IsPretty(r.URL.RawQuery)); err != nil {
+			httperror.InternalServerError(w, err)
 		}
 	} else {
-		httputils.InternalServerError(w, err)
+		httperror.InternalServerError(w, err)
 	}
 }
 

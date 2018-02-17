@@ -10,8 +10,10 @@ import (
 	"strings"
 
 	authProvider "github.com/ViBiOh/auth/provider"
-	"github.com/ViBiOh/httputils"
+	"github.com/ViBiOh/httputils/httperror"
+	httpjson "github.com/ViBiOh/httputils/json"
 	"github.com/ViBiOh/httputils/pagination"
+	"github.com/ViBiOh/httputils/request"
 )
 
 const tagsPath = `/tags`
@@ -29,7 +31,7 @@ func getRequestID(path string) (uint, error) {
 func (a *App) readTagFromBody(r *http.Request) (*tag, error) {
 	var requestTag tag
 
-	if bodyBytes, err := httputils.ReadBody(r.Body); err != nil {
+	if bodyBytes, err := request.ReadBody(r.Body); err != nil {
 		return nil, fmt.Errorf(`Error while reading body: %v`, err)
 	} else if err := json.Unmarshal(bodyBytes, &requestTag); err != nil {
 		return nil, fmt.Errorf(`Error while unmarshalling body: %v`, err)
@@ -41,7 +43,7 @@ func (a *App) readTagFromBody(r *http.Request) (*tag, error) {
 func (a *App) listTags(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
 	if err != nil {
-		httputils.BadRequest(w, fmt.Errorf(`Error while parsing pagination: %v`, err))
+		httperror.BadRequest(w, fmt.Errorf(`Error while parsing pagination: %v`, err))
 		return
 	}
 
@@ -52,56 +54,56 @@ func (a *App) listTags(w http.ResponseWriter, r *http.Request, user *authProvide
 	query := r.URL.Query().Get(`q`)
 
 	if list, err := a.searchTags(page, pageSize, sort, asc, user, query); err != nil {
-		httputils.InternalServerError(w, fmt.Errorf(`Error while searching tags: %v`, err))
+		httperror.InternalServerError(w, fmt.Errorf(`Error while searching tags: %v`, err))
 	} else if count, err := a.countTags(user, query); err != nil {
-		httputils.InternalServerError(w, fmt.Errorf(`Error while counting tags: %v`, err))
-	} else if err := httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery)); err != nil {
-		httputils.InternalServerError(w, err)
+		httperror.InternalServerError(w, fmt.Errorf(`Error while counting tags: %v`, err))
+	} else if err := httpjson.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+		httperror.InternalServerError(w, err)
 	}
 }
 
 func (a *App) readTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
 	if foundTag, err := a.getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
-			httputils.NotFound(w)
+			httperror.NotFound(w)
 		} else {
-			httputils.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
+			httperror.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
 		}
-	} else if err := httputils.ResponseJSON(w, http.StatusOK, foundTag, httputils.IsPretty(r.URL.RawQuery)); err != nil {
-		httputils.InternalServerError(w, err)
+	} else if err := httpjson.ResponseJSON(w, http.StatusOK, foundTag, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+		httperror.InternalServerError(w, err)
 	}
 }
 
 func (a *App) createTag(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
 	if bodyTag, err := a.readTagFromBody(r); err != nil {
-		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
+		httperror.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if bodyTag.Name == `` {
-		httputils.BadRequest(w, errNameRequired)
+		httperror.BadRequest(w, errNameRequired)
 	} else {
 		bodyTag.user = user
 
 		if err := a.saveTag(bodyTag, nil); err != nil {
-			httputils.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
-		} else if err := httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery)); err != nil {
-			httputils.InternalServerError(w, err)
+			httperror.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
+		} else if err := httpjson.ResponseJSON(w, http.StatusCreated, bodyTag, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+			httperror.InternalServerError(w, err)
 		}
 	}
 }
 func (a *App) updateTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
 	if bodyTag, err := a.readTagFromBody(r); err != nil {
-		httputils.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
+		httperror.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if id == 0 {
-		httputils.BadRequest(w, errIDRequired)
+		httperror.BadRequest(w, errIDRequired)
 	} else if bodyTag.Name == `` {
-		httputils.BadRequest(w, errNameRequired)
+		httperror.BadRequest(w, errNameRequired)
 	} else {
 		bodyTag.ID = id
 		bodyTag.user = user
 
 		if err := a.saveTag(bodyTag, nil); err != nil {
-			httputils.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
-		} else if err := httputils.ResponseJSON(w, http.StatusCreated, bodyTag, httputils.IsPretty(r.URL.RawQuery)); err != nil {
-			httputils.InternalServerError(w, err)
+			httperror.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
+		} else if err := httpjson.ResponseJSON(w, http.StatusCreated, bodyTag, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+			httperror.InternalServerError(w, err)
 		}
 	}
 }
@@ -109,12 +111,12 @@ func (a *App) updateTag(w http.ResponseWriter, r *http.Request, user *authProvid
 func (a *App) removeTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
 	if foundTag, err := a.getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
-			httputils.NotFound(w)
+			httperror.NotFound(w)
 		} else {
-			httputils.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
+			httperror.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
 		}
 	} else if err := a.deleteTag(foundTag, nil); err != nil {
-		httputils.InternalServerError(w, fmt.Errorf(`Error while deleting tag: %v`, err))
+		httperror.InternalServerError(w, fmt.Errorf(`Error while deleting tag: %v`, err))
 	} else {
 		w.WriteHeader(http.StatusNoContent)
 	}
@@ -133,7 +135,7 @@ func (a *App) tagsHandler(w http.ResponseWriter, r *http.Request, user *authProv
 		}
 	} else {
 		if id, err := getRequestID(path); err != nil {
-			httputils.BadRequest(w, fmt.Errorf(`Error while parsing request path: %v`, err))
+			httperror.BadRequest(w, fmt.Errorf(`Error while parsing request path: %v`, err))
 		} else if r.Method == http.MethodGet {
 			a.readTag(w, r, user, id)
 		} else if r.Method == http.MethodPut {

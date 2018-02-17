@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ViBiOh/httputils"
 	"github.com/ViBiOh/httputils/db"
+	"github.com/ViBiOh/httputils/httperror"
+	"github.com/ViBiOh/httputils/json"
 	"github.com/ViBiOh/httputils/pagination"
 )
 
@@ -32,7 +33,7 @@ func NewApp(db *sql.DB) *App {
 func (a *App) listCrud(w http.ResponseWriter, r *http.Request) {
 	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
 	if err != nil {
-		httputils.BadRequest(w, err)
+		httperror.BadRequest(w, err)
 		return
 	}
 
@@ -41,25 +42,25 @@ func (a *App) listCrud(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if count, list, err := a.findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
-		httputils.InternalServerError(w, err)
-	} else if err := httputils.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httputils.IsPretty(r.URL.RawQuery)); err != nil {
-		httputils.InternalServerError(w, err)
+		httperror.InternalServerError(w, err)
+	} else if err := json.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, json.IsPretty(r.URL.RawQuery)); err != nil {
+		httperror.InternalServerError(w, err)
 	}
 }
 
 func (a *App) aggregate(w http.ResponseWriter, r *http.Request) {
 	if count, err := a.countByDepartment(); err != nil {
-		httputils.InternalServerError(w, err)
-	} else if err := httputils.ResponseJSON(w, 200, count, httputils.IsPretty(r.URL.RawQuery)); err != nil {
-		httputils.InternalServerError(w, err)
+		httperror.InternalServerError(w, err)
+	} else if err := json.ResponseJSON(w, 200, count, json.IsPretty(r.URL.RawQuery)); err != nil {
+		httperror.InternalServerError(w, err)
 	}
 }
 
 func (a *App) aggregateByDepartment(w http.ResponseWriter, r *http.Request, path string) {
 	if count, err := a.countByZipOfDepartment(strings.TrimPrefix(path, `/`)); err != nil {
-		httputils.InternalServerError(w, err)
-	} else if err := httputils.ResponseJSON(w, 200, count, httputils.IsPretty(r.URL.RawQuery)); err != nil {
-		httputils.InternalServerError(w, err)
+		httperror.InternalServerError(w, err)
+	} else if err := json.ResponseJSON(w, 200, count, json.IsPretty(r.URL.RawQuery)); err != nil {
+		httperror.InternalServerError(w, err)
 	}
 }
 
