@@ -8,60 +8,50 @@
 
 ```
 Usage of api:
-  -c string
-        [health] URL to check
-  -conservatoriesDbHost string
-        [database] Host
-  -conservatoriesDbName string
-        [database] Name
-  -conservatoriesDbPass string
-        [database] Pass
-  -conservatoriesDbPort string
-        [database] Port (default "5432")
-  -conservatoriesDbUser string
-        [database] User
   -corsCredentials
-        [cors] Access-Control-Allow-Credentials
+      [cors] Access-Control-Allow-Credentials
   -corsExpose string
-        [cors] Access-Control-Expose-Headers
+      [cors] Access-Control-Expose-Headers
   -corsHeaders string
-        [cors] Access-Control-Allow-Headers (default "Content-Type")
+      [cors] Access-Control-Allow-Headers (default "Content-Type")
   -corsMethods string
-        [cors] Access-Control-Allow-Methods (default "GET")
+      [cors] Access-Control-Allow-Methods (default "GET")
   -corsOrigin string
-        [cors] Access-Control-Allow-Origin (default "*")
+      [cors] Access-Control-Allow-Origin (default "*")
   -csp string
-        [owasp] Content-Security-Policy (default "default-src 'self'")
+      [owasp] Content-Security-Policy (default "default-src 'self'")
+  -eponaeDbHost string
+      [database] Host
+  -eponaeDbName string
+      [database] Name
+  -eponaeDbPass string
+      [database] Pass
+  -eponaeDbPort string
+      [database] Port (default "5432")
+  -eponaeDbUser string
+      [database] User
   -frameOptions string
-        [owasp] X-Frame-Options (default "deny")
+      [owasp] X-Frame-Options (default "deny")
   -hsts
-        [owasp] Indicate Strict Transport Security (default true)
-  -port int
-        Listen port (default 1080)
+      [owasp] Indicate Strict Transport Security (default true)
+  -port string
+      Listen port (default "1080")
   -readingsAuthUrl string
-        [auth] Auth URL, if remote
+      [auth] Auth URL, if remote
   -readingsAuthUsers string
-        [auth] List of allowed users and profiles (e.g. user:profile1|profile2,user2:profile3)
+      [auth] List of allowed users and profiles (e.g. user:profile1|profile2,user2:profile3)
   -readingsBasicUsers string
-        [Basic] Users in the form "id:username:password,id2:username2:password2"
-  -readingsDbHost string
-        [database] Host
-  -readingsDbName string
-        [database] Name
-  -readingsDbPass string
-        [database] Pass
-  -readingsDbPort string
-        [database] Port (default "5432")
-  -readingsDbUser string
-        [database] User
+      [Basic] Users in the form "id:username:password,id2:username2:password2"
   -tls
-        Serve TLS content (default true)
+      Serve TLS content
   -tlsCert string
-        [tls] PEM Certificate file
+      [tls] PEM Certificate file
   -tlsHosts string
-        [tls] Self-signed certificate hosts, comma separated (default "localhost")
+      [tls] Self-signed certificate hosts, comma separated (default "localhost")
   -tlsKey string
-        [tls] PEM Key file
+      [tls] PEM Key file
+  -url string
+      [health] URL to check
 ```
 
 ## Postgres installation

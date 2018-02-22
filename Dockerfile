@@ -1,10 +1,10 @@
 FROM scratch
 
-HEALTHCHECK --retries=10 CMD https://localhost:1080/health
+HEALTHCHECK --retries=10 CMD [ "/api", "-url", "https://localhost:1080/health" ]
 
-ENTRYPOINT [ "/bin/sh" ]
+ENTRYPOINT [ "/api" ]
 EXPOSE 1080
 
-COPY bin/api /bin/sh
-COPY doc/api.html /doc/api.html
 COPY cacert.pem /etc/ssl/certs/ca-certificates.crt
+COPY doc/api.html /doc/api.html
+COPY bin/api /api
