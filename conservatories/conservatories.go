@@ -7,7 +7,7 @@ import (
 
 	"github.com/ViBiOh/httputils/db"
 	"github.com/ViBiOh/httputils/httperror"
-	"github.com/ViBiOh/httputils/json"
+	"github.com/ViBiOh/httputils/httpjson"
 	"github.com/ViBiOh/httputils/pagination"
 )
 
@@ -43,7 +43,7 @@ func (a *App) listCrud(w http.ResponseWriter, r *http.Request) {
 
 	if count, list, err := a.findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
 		httperror.InternalServerError(w, err)
-	} else if err := json.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, json.IsPretty(r.URL.RawQuery)); err != nil {
+	} else if err := httpjson.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
@@ -51,7 +51,7 @@ func (a *App) listCrud(w http.ResponseWriter, r *http.Request) {
 func (a *App) aggregate(w http.ResponseWriter, r *http.Request) {
 	if count, err := a.countByDepartment(); err != nil {
 		httperror.InternalServerError(w, err)
-	} else if err := json.ResponseJSON(w, 200, count, json.IsPretty(r.URL.RawQuery)); err != nil {
+	} else if err := httpjson.ResponseJSON(w, 200, count, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
@@ -59,7 +59,7 @@ func (a *App) aggregate(w http.ResponseWriter, r *http.Request) {
 func (a *App) aggregateByDepartment(w http.ResponseWriter, r *http.Request, path string) {
 	if count, err := a.countByZipOfDepartment(strings.TrimPrefix(path, `/`)); err != nil {
 		httperror.InternalServerError(w, err)
-	} else if err := json.ResponseJSON(w, 200, count, json.IsPretty(r.URL.RawQuery)); err != nil {
+	} else if err := httpjson.ResponseJSON(w, 200, count, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
