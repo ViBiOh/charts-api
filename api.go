@@ -31,7 +31,7 @@ func main() {
 	readingsAuthConfig := auth.Flags(`readingsAuth`)
 	readingsAuthBasicConfig := basic.Flags(`readingsBasic`)
 
-	httputils.StartMainServer(func() http.Handler {
+	httputils.NewApp(httputils.Flags(``), func() http.Handler {
 		eponaeDB, err := db.GetDB(eponaeDbConfig)
 		if err != nil {
 			err = fmt.Errorf(`Error while initializing database: %v`, err)
@@ -65,5 +65,5 @@ func main() {
 		})
 
 		return gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler)))
-	}, nil)
+	}, nil).ListenAndServe()
 }
