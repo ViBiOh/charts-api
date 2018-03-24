@@ -36,11 +36,11 @@ docker-deps:
 	./blueprint.sh
 
 docker-build:
-	docker build -t ${DOCKER_USER}/eponae-api .
+	docker build -t $(DOCKER_USER)/eponae-api .
 
 docker-push:
-	docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
-	docker push ${DOCKER_USER}/eponae-api
+	echo $(DOCKER_PASS) | docker login -u $(DOCKER_USER) --password-stdin
+	docker push $(DOCKER_USER)/eponae-api
 
 start-deps:
 	go get -u github.com/ViBiOh/auth/bcrypt
