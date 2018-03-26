@@ -7,9 +7,6 @@ jobs:
     services:
     - docker
     go : '1.10'
-    script: |
-      npm run build && \
-      docker build -t ${DOCKER_USER}/eponae-api .
     after_success: |
       if [ "${TRAVIS_BRANCH}" == "master" ]; then
         bash <(curl -s https://codecov.io/bash)
