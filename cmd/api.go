@@ -6,16 +6,16 @@ import (
 	"strings"
 
 	"github.com/NYTimes/gziphandler"
-	"github.com/ViBiOh/auth/auth"
-	"github.com/ViBiOh/auth/provider/basic"
-	authService "github.com/ViBiOh/auth/service"
-	"github.com/ViBiOh/eponae-api/conservatories"
-	"github.com/ViBiOh/eponae-api/healthcheck"
-	"github.com/ViBiOh/eponae-api/readings"
-	"github.com/ViBiOh/httputils"
-	"github.com/ViBiOh/httputils/cors"
-	"github.com/ViBiOh/httputils/db"
-	"github.com/ViBiOh/httputils/owasp"
+	"github.com/ViBiOh/auth/pkg/auth"
+	"github.com/ViBiOh/auth/pkg/provider/basic"
+	authService "github.com/ViBiOh/auth/pkg/service"
+	"github.com/ViBiOh/eponae-api/pkg/conservatories"
+	"github.com/ViBiOh/eponae-api/pkg/healthcheck"
+	"github.com/ViBiOh/eponae-api/pkg/readings"
+	"github.com/ViBiOh/httputils/pkg"
+	"github.com/ViBiOh/httputils/pkg/cors"
+	"github.com/ViBiOh/httputils/pkg/db"
+	"github.com/ViBiOh/httputils/pkg/owasp"
 )
 
 const (

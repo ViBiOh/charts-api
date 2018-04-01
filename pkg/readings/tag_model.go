@@ -1,7 +1,7 @@
 package readings
 
 import (
-	authProvider "github.com/ViBiOh/auth/provider"
+	authProvider "github.com/ViBiOh/auth/pkg/provider"
 )
 
 type tag struct {

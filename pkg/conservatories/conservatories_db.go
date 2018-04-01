@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/ViBiOh/httputils/db"
+	"github.com/ViBiOh/httputils/pkg/db"
 )
 
 const conservatoriesCountQuery = `

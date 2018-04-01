@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	authProvider "github.com/ViBiOh/auth/provider"
-	"github.com/ViBiOh/httputils/db"
+	authProvider "github.com/ViBiOh/auth/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/db"
 )
 
 const listReadingsOfUserQuery = `

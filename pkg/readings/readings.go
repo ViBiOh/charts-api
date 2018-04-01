@@ -5,11 +5,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ViBiOh/auth/auth"
-	authProvider "github.com/ViBiOh/auth/provider"
-	"github.com/ViBiOh/httputils/db"
-	"github.com/ViBiOh/httputils/httperror"
-	"github.com/ViBiOh/httputils/httpjson"
+	"github.com/ViBiOh/auth/pkg/auth"
+	authProvider "github.com/ViBiOh/auth/pkg/provider"
+	"github.com/ViBiOh/httputils/pkg/db"
+	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/httpjson"
 )
 
 const healthcheckPath = `/health`

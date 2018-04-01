@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ViBiOh/httputils/httperror"
-	"github.com/ViBiOh/httputils/writer"
+	"github.com/ViBiOh/httputils/pkg/httperror"
+	"github.com/ViBiOh/httputils/pkg/writer"
 )
 
 // App stores informations and secret of API
