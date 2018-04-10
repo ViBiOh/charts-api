@@ -19,7 +19,7 @@
     "pkg/provider/twitter",
     "pkg/service"
   ]
-  revision = "2e321a28bb6732c741faf7af2501c9228edb6009"
+  revision = "007a1d6b864f319619f34b7546711e4cbf523ff4"
 
 [[projects]]
   branch = "master"
@@ -40,7 +40,7 @@
     "pkg/uuid",
     "pkg/writer"
   ]
-  revision = "fe606d9cdfe10039ae176d5ef70cc5c7015bb0a3"
+  revision = "6e5a7d80a67ed46f5c0be6e632ac5d0c5e20a74b"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -64,7 +64,7 @@
     "bcrypt",
     "blowfish"
   ]
-  revision = "12892e8c234f4fe6f6803f052061de9057903bb2"
+  revision = "f70185d77e8278766928032ee1355e3da47e7181"
 
 [[projects]]
   branch = "master"
@@ -73,7 +73,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "b68f30494add4df6bd8ef5e82803f308e7f7c59c"
+  revision = "61147c48b25b599e5b561d2e9c4f3e1ef489ca41"
 
 [[projects]]
   branch = "master"
@@ -83,7 +83,7 @@
     "github",
     "internal"
   ]
-  revision = "fdc9e635145ae97e6c2cb777c48305600cf515cb"
+  revision = "921ae394b9430ed4fb549668d7b087601bd60a81"
 
 [[projects]]
   name = "google.golang.org/appengine"

@@ -65,7 +65,6 @@ mkdir ${EPONAE_DATABASE_DIR}
 sudo chown -R 70:70 ${EPONAE_DATABASE_DIR}
 
 docker-compose -p eponae -f docker-compose.db.yml up -d
-docker exec -it eponae_db_1 psql
 ```
 
 ### Postgres configuration
