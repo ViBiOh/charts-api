@@ -50,3 +50,5 @@ start-api:
 		-tls=false \
 		-readingsAuthUsers admin:admin \
 		-readingsBasicUsers 1:admin:`bcrypt password`
+
+.PHONY: go dev docker deps format lint tst bench build docker-deps docker-build docker-push start-deps start-api
