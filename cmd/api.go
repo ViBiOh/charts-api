@@ -14,6 +14,7 @@ import (
 	"github.com/ViBiOh/eponae-api/pkg/readings"
 	"github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/cors"
+	"github.com/ViBiOh/httputils/pkg/datadog"
 	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/owasp"
 )
@@ -30,6 +31,7 @@ func main() {
 	eponaeDbConfig := db.Flags(`eponaeDb`)
 	readingsAuthConfig := auth.Flags(`readingsAuth`)
 	readingsAuthBasicConfig := basic.Flags(`readingsBasic`)
+	datadogConfig := datadog.Flags(`datadog`)
 
 	httputils.NewApp(httputils.Flags(``), func() http.Handler {
 		eponaeDB, err := db.GetDB(eponaeDbConfig)
@@ -64,6 +66,6 @@ func main() {
 			}
 		})
 
-		return gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler)))
+		return datadog.NewApp(datadogConfig).Handler(gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler))))
 	}, nil).ListenAndServe()
 }

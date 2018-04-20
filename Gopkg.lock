@@ -2,6 +2,16 @@
 
 
 [[projects]]
+  name = "github.com/DataDog/dd-trace-go"
+  packages = [
+    "contrib/net/http",
+    "tracer",
+    "tracer/ext"
+  ]
+  revision = "27617015d45e6cd550b9a7ac7715c37cc2f7d020"
+  version = "v0.6.1"
+
+[[projects]]
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
   revision = "2600fb119af974220d3916a5916d6e31176aac1b"
@@ -19,7 +29,7 @@
     "pkg/provider/twitter",
     "pkg/service"
   ]
-  revision = "007a1d6b864f319619f34b7546711e4cbf523ff4"
+  revision = "984a9a3c6526efd48f1756b6b8af7a54bccf1c66"
 
 [[projects]]
   branch = "master"
@@ -29,6 +39,7 @@
     "pkg/alcotest",
     "pkg/cert",
     "pkg/cors",
+    "pkg/datadog",
     "pkg/db",
     "pkg/httperror",
     "pkg/httpjson",
@@ -40,7 +51,7 @@
     "pkg/uuid",
     "pkg/writer"
   ]
-  revision = "6e5a7d80a67ed46f5c0be6e632ac5d0c5e20a74b"
+  revision = "7c234234484f8af3ff790763c9e8e13f926e59a8"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -58,13 +69,18 @@
   revision = "d34b9ff171c21ad295489235aec8b6626023cd04"
 
 [[projects]]
+  name = "github.com/ugorji/go"
+  packages = ["codec"]
+  revision = "9c7f9b7a2bc3a520f7c7b30b34b7f85f47fe27b6"
+
+[[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = [
     "bcrypt",
     "blowfish"
   ]
-  revision = "f70185d77e8278766928032ee1355e3da47e7181"
+  revision = "e73bf333ef8920dbb52ad18d4bd38ad9d9bc76d7"
 
 [[projects]]
   branch = "master"
@@ -73,7 +89,7 @@
     "context",
     "context/ctxhttp"
   ]
-  revision = "61147c48b25b599e5b561d2e9c4f3e1ef489ca41"
+  revision = "5f9ae10d9af5b1c89ae6904293b14b064d4ada23"
 
 [[projects]]
   branch = "master"
@@ -83,7 +99,13 @@
     "github",
     "internal"
   ]
-  revision = "921ae394b9430ed4fb549668d7b087601bd60a81"
+  revision = "6881fee410a5daf86371371f9ad451b95e168b71"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/sys"
+  packages = ["windows"]
+  revision = "79b0c6888797020a994db17c8510466c72fe75d9"
 
 [[projects]]
   name = "google.golang.org/appengine"
@@ -102,6 +124,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a5bbca25c92cea4bdcad7b52949d66fbf0c3a5bc9ac588ad528f93a07f691ac1"
+  inputs-digest = "415f6a4aac1ae2a051a7dadb8645e4987b6ba04905777211ce02cfe8fe396370"
   solver-name = "gps-cdcl"
   solver-version = 1
