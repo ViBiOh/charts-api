@@ -1,8 +1,8 @@
-default: go docker
+default: api docker
 
-go: deps dev
+api: deps go
 
-dev: format lint tst bench build
+go: format lint tst bench build
 
 docker: docker-deps docker-build
 

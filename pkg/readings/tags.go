@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	authProvider "github.com/ViBiOh/auth/pkg/provider"
+	"github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/httpjson"
 	"github.com/ViBiOh/httputils/pkg/pagination"
@@ -40,7 +40,7 @@ func (a *App) readTagFromBody(r *http.Request) (*tag, error) {
 	return &requestTag, nil
 }
 
-func (a *App) listTags(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
+func (a *App) listTags(w http.ResponseWriter, r *http.Request, user *model.User) {
 	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
 	if err != nil {
 		httperror.BadRequest(w, fmt.Errorf(`Error while parsing pagination: %v`, err))
@@ -62,7 +62,7 @@ func (a *App) listTags(w http.ResponseWriter, r *http.Request, user *authProvide
 	}
 }
 
-func (a *App) readTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
+func (a *App) readTag(w http.ResponseWriter, r *http.Request, user *model.User, id uint) {
 	if foundTag, err := a.getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
 			httperror.NotFound(w)
@@ -74,7 +74,7 @@ func (a *App) readTag(w http.ResponseWriter, r *http.Request, user *authProvider
 	}
 }
 
-func (a *App) createTag(w http.ResponseWriter, r *http.Request, user *authProvider.User) {
+func (a *App) createTag(w http.ResponseWriter, r *http.Request, user *model.User) {
 	if bodyTag, err := a.readTagFromBody(r); err != nil {
 		httperror.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if bodyTag.Name == `` {
@@ -89,7 +89,7 @@ func (a *App) createTag(w http.ResponseWriter, r *http.Request, user *authProvid
 		}
 	}
 }
-func (a *App) updateTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
+func (a *App) updateTag(w http.ResponseWriter, r *http.Request, user *model.User, id uint) {
 	if bodyTag, err := a.readTagFromBody(r); err != nil {
 		httperror.BadRequest(w, fmt.Errorf(`Error while parsing body: %v`, err))
 	} else if id == 0 {
@@ -108,7 +108,7 @@ func (a *App) updateTag(w http.ResponseWriter, r *http.Request, user *authProvid
 	}
 }
 
-func (a *App) removeTag(w http.ResponseWriter, r *http.Request, user *authProvider.User, id uint) {
+func (a *App) removeTag(w http.ResponseWriter, r *http.Request, user *model.User, id uint) {
 	if foundTag, err := a.getTag(id, user); err != nil {
 		if err == sql.ErrNoRows {
 			httperror.NotFound(w)
@@ -122,7 +122,7 @@ func (a *App) removeTag(w http.ResponseWriter, r *http.Request, user *authProvid
 	}
 }
 
-func (a *App) tagsHandler(w http.ResponseWriter, r *http.Request, user *authProvider.User, path string) {
+func (a *App) tagsHandler(w http.ResponseWriter, r *http.Request, user *model.User, path string) {
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusNoContent)
 	} else if path == `/` || path == `` {

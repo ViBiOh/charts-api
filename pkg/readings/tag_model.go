@@ -1,11 +1,11 @@
 package readings
 
 import (
-	authProvider "github.com/ViBiOh/auth/pkg/provider"
+	"github.com/ViBiOh/auth/pkg/model"
 )
 
 type tag struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`
-	user *authProvider.User
+	user *model.User
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/cors"
 	"github.com/ViBiOh/httputils/pkg/db"
+	httpHealthcheck "github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/owasp"
 )
 
@@ -31,6 +32,8 @@ func main() {
 	readingsAuthConfig := auth.Flags(`readingsAuth`)
 	readingsAuthBasicConfig := basic.Flags(`readingsBasic`)
 
+	healthcheckApp := httpHealthcheck.NewApp()
+
 	httputils.NewApp(httputils.Flags(``), func() http.Handler {
 		eponaeDB, err := db.GetDB(eponaeDbConfig)
 		if err != nil {
@@ -44,11 +47,10 @@ func main() {
 		readingsApp := readings.NewApp(eponaeDB, readingsAuthApp)
 		readingsHandler := http.StripPrefix(readingsPath, readingsApp.Handler())
 
-		healthcheckApp := healthcheck.NewApp(map[string]http.Handler{
+		healthcheckHandler := http.StripPrefix(healthcheckPath, healthcheckApp.Handler(healthcheck.NewApp(map[string]http.Handler{
 			conservatoriesPath: conservatoriesHandler,
 			readingsPath:       readingsHandler,
-		})
-		healthcheckHandler := http.StripPrefix(healthcheckPath, healthcheckApp.Handler())
+		}).Handler()))
 
 		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, healthcheckPath) {
@@ -65,5 +67,5 @@ func main() {
 		})
 
 		return gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler)))
-	}, nil).ListenAndServe()
+	}, nil, healthcheckApp).ListenAndServe()
 }

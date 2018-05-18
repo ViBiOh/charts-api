@@ -1,8 +1,6 @@
 package readings
 
-import (
-	authProvider "github.com/ViBiOh/auth/pkg/provider"
-)
+import "github.com/ViBiOh/auth/pkg/model"
 
 type reading struct {
 	ID     uint   `json:"id"`
@@ -10,5 +8,5 @@ type reading struct {
 	Public bool   `json:"public"`
 	Read   bool   `json:"read"`
 	Tags   []*tag `json:"tags"`
-	user   *authProvider.User
+	user   *model.User
 }
