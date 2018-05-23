@@ -46,7 +46,7 @@ start-deps:
 	go get -u github.com/ViBiOh/auth/cmd/bcrypt
 
 start-api:
-	go run cmd/api.go \
+	go run -race cmd/api.go \
 		-tls=false \
 		-readingsAuthUsers admin:admin \
 		-readingsBasicUsers 1:admin:`bcrypt password`
