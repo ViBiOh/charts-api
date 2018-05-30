@@ -1,22 +1,26 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/NYTimes/gziphandler"
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/auth/pkg/provider/basic"
 	authService "github.com/ViBiOh/auth/pkg/service"
 	"github.com/ViBiOh/eponae-api/pkg/conservatories"
-	"github.com/ViBiOh/eponae-api/pkg/healthcheck"
+	apiHealthcheck "github.com/ViBiOh/eponae-api/pkg/healthcheck"
 	"github.com/ViBiOh/eponae-api/pkg/readings"
 	"github.com/ViBiOh/httputils/pkg"
+	"github.com/ViBiOh/httputils/pkg/alcotest"
 	"github.com/ViBiOh/httputils/pkg/cors"
 	"github.com/ViBiOh/httputils/pkg/db"
-	httpHealthcheck "github.com/ViBiOh/httputils/pkg/healthcheck"
+	"github.com/ViBiOh/httputils/pkg/gzip"
+	"github.com/ViBiOh/httputils/pkg/healthcheck"
+	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
+	"github.com/ViBiOh/httputils/pkg/server"
 )
 
 const (
@@ -26,46 +30,56 @@ const (
 )
 
 func main() {
+	serverConfig := httputils.Flags(``)
+	alcotestConfig := alcotest.Flags(``)
+	opentracingConfig := opentracing.Flags(`tracing`)
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
+
 	eponaeDbConfig := db.Flags(`eponaeDb`)
 	readingsAuthConfig := auth.Flags(`readingsAuth`)
 	readingsAuthBasicConfig := basic.Flags(`readingsBasic`)
 
-	healthcheckApp := httpHealthcheck.NewApp()
+	flag.Parse()
 
-	httputils.NewApp(httputils.Flags(``), func() http.Handler {
-		eponaeDB, err := db.GetDB(eponaeDbConfig)
-		if err != nil {
-			err = fmt.Errorf(`Error while initializing database: %v`, err)
+	alcotest.DoAndExit(alcotestConfig)
+
+	serverApp := httputils.NewApp(serverConfig)
+	healthcheckApp := healthcheck.NewApp()
+	opentracingApp := opentracing.NewApp(opentracingConfig)
+	owaspApp := owasp.NewApp(owaspConfig)
+	corsApp := cors.NewApp(corsConfig)
+	gzipApp := gzip.NewApp()
+
+	eponaeDB, err := db.GetDB(eponaeDbConfig)
+	if err != nil {
+		err = fmt.Errorf(`Error while initializing database: %v`, err)
+	}
+	conservatoriesApp := conservatories.NewApp(eponaeDB)
+	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))
+	readingsApp := readings.NewApp(eponaeDB, readingsAuthApp)
+
+	conservatoriesHandler := http.StripPrefix(conservatoriesPath, conservatoriesApp.Handler())
+	readingsHandler := http.StripPrefix(readingsPath, readingsApp.Handler())
+
+	healthcheckApp.NextHealthcheck(http.StripPrefix(healthcheckPath, apiHealthcheck.NewApp(map[string]http.Handler{
+		conservatoriesPath: conservatoriesHandler,
+		readingsPath:       readingsHandler,
+	}).Handler()))
+
+	apihandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, conservatoriesPath) {
+			conservatoriesHandler.ServeHTTP(w, r)
+		} else if strings.HasPrefix(r.URL.Path, readingsPath) {
+			readingsHandler.ServeHTTP(w, r)
+		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
+			http.ServeFile(w, r, `doc/api.html`)
+		} else {
+			w.WriteHeader(http.StatusNotFound)
 		}
+	})
 
-		conservatoriesApp := conservatories.NewApp(eponaeDB)
-		conservatoriesHandler := http.StripPrefix(conservatoriesPath, conservatoriesApp.Handler())
+	handler := server.ChainMiddlewares(apihandler, opentracingApp, gzipApp, owaspApp, corsApp)
 
-		readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))
-		readingsApp := readings.NewApp(eponaeDB, readingsAuthApp)
-		readingsHandler := http.StripPrefix(readingsPath, readingsApp.Handler())
-
-		healthcheckHandler := http.StripPrefix(healthcheckPath, healthcheckApp.Handler(healthcheck.NewApp(map[string]http.Handler{
-			conservatoriesPath: conservatoriesHandler,
-			readingsPath:       readingsHandler,
-		}).Handler()))
-
-		handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if strings.HasPrefix(r.URL.Path, healthcheckPath) {
-				healthcheckHandler.ServeHTTP(w, r)
-			} else if strings.HasPrefix(r.URL.Path, conservatoriesPath) {
-				conservatoriesHandler.ServeHTTP(w, r)
-			} else if strings.HasPrefix(r.URL.Path, readingsPath) {
-				readingsHandler.ServeHTTP(w, r)
-			} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
-				http.ServeFile(w, r, `doc/api.html`)
-			} else {
-				w.WriteHeader(http.StatusNotFound)
-			}
-		})
-
-		return gziphandler.GzipHandler(owasp.Handler(owaspConfig, cors.Handler(corsConfig, handler)))
-	}, nil, healthcheckApp).ListenAndServe()
+	serverApp.ListenAndServe(handler, nil, healthcheckApp)
 }
