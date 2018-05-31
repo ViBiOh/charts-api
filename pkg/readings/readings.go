@@ -33,7 +33,7 @@ func Flags(prefix string) map[string]*string {
 	return nil
 }
 
-func (a *App) listReadings(w http.ResponseWriter, r *http.Request, user *model.User) {
+func (a App) listReadings(w http.ResponseWriter, r *http.Request, user *model.User) {
 	if list, err := a.listReadingsOfUser(user); err == nil {
 		if err := httpjson.ResponseArrayJSON(w, http.StatusOK, list, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
 			httperror.InternalServerError(w, err)
@@ -44,7 +44,7 @@ func (a *App) listReadings(w http.ResponseWriter, r *http.Request, user *model.U
 }
 
 // Handler for Readings request. Should be use with net/http
-func (a *App) Handler() http.Handler {
+func (a App) Handler() http.Handler {
 	authHandler := a.authApp.Handler(func(w http.ResponseWriter, r *http.Request, user *model.User) {
 		if strings.HasPrefix(r.URL.Path, tagsPath) {
 			a.tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))

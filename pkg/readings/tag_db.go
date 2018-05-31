@@ -112,7 +112,7 @@ func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 	return list, nil
 }
 
-func (a *App) searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *model.User, search string) ([]*tag, error) {
+func (a App) searchTags(page, pageSize uint, sortKey string, sortAsc bool, user *model.User, search string) ([]*tag, error) {
 	if user == nil || user.ID == 0 {
 		return nil, errNilUser
 	}
@@ -149,7 +149,7 @@ func (a *App) searchTags(page, pageSize uint, sortKey string, sortAsc bool, user
 	return scanTags(rows, pageSize)
 }
 
-func (a *App) countTags(user *model.User, search string) (count uint, err error) {
+func (a App) countTags(user *model.User, search string) (count uint, err error) {
 	if user == nil || user.ID == 0 {
 		return 0, errNilUser
 	}
@@ -174,7 +174,7 @@ func (a *App) countTags(user *model.User, search string) (count uint, err error)
 	return
 }
 
-func (a *App) findTagsByIds(ids []uint) ([]*tag, error) {
+func (a App) findTagsByIds(ids []uint) ([]*tag, error) {
 	rows, err := a.db.Query(findTagsByidsQuery, db.WhereInUint(ids))
 	if err != nil {
 		return nil, fmt.Errorf(`Error while querying: %v`, err)
@@ -187,7 +187,7 @@ func (a *App) findTagsByIds(ids []uint) ([]*tag, error) {
 	return scanTags(rows, uint(len(ids)))
 }
 
-func (a *App) getTag(id uint, user *model.User) (*tag, error) {
+func (a App) getTag(id uint, user *model.User) (*tag, error) {
 	if user == nil {
 		return nil, errNilUser
 	}
@@ -207,7 +207,7 @@ func (a *App) getTag(id uint, user *model.User) (*tag, error) {
 	return &tag{ID: resultID, Name: name, user: user}, nil
 }
 
-func (a *App) saveTag(o *tag, tx *sql.Tx) (err error) {
+func (a App) saveTag(o *tag, tx *sql.Tx) (err error) {
 	if o == nil {
 		return errNilTag
 	}
@@ -244,7 +244,7 @@ func (a *App) saveTag(o *tag, tx *sql.Tx) (err error) {
 	return
 }
 
-func (a *App) deleteTag(o *tag, tx *sql.Tx) (err error) {
+func (a App) deleteTag(o *tag, tx *sql.Tx) (err error) {
 	if o == nil || o.ID == 0 {
 		return errNilTag
 	}

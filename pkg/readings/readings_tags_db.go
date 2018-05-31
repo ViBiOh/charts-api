@@ -24,7 +24,7 @@ type readingsTags struct {
 	tagID     uint
 }
 
-func (a *App) scanReadingsTags(rows *sql.Rows, pageSize uint) ([]*readingsTags, error) {
+func (a App) scanReadingsTags(rows *sql.Rows, pageSize uint) ([]*readingsTags, error) {
 	var (
 		readingID uint
 		tagID     uint
@@ -43,7 +43,7 @@ func (a *App) scanReadingsTags(rows *sql.Rows, pageSize uint) ([]*readingsTags, 
 	return list, nil
 }
 
-func (a *App) findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
+func (a App) findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
 	rows, err := a.db.Query(listReadingsTagsOfReadingsQuery, db.WhereInUint(ids))
 	if err != nil {
 		return nil, fmt.Errorf(`Error while querying: %v`, err)
@@ -56,7 +56,7 @@ func (a *App) findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
 	return a.scanReadingsTags(rows, uint(len(ids)))
 }
 
-func (a *App) enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
+func (a App) enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
 	if len(readings) == 0 {
 		return readings, nil
 	}

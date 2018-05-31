@@ -21,7 +21,7 @@ func NewApp(handlers map[string]http.Handler) *App {
 }
 
 // Handler for Health request. Should be use with net/http
-func (a *App) Handler() http.Handler {
+func (a App) Handler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)

@@ -111,7 +111,7 @@ func scanAggregateRows(rows *sql.Rows) (map[string]uint, error) {
 	return aggregate, nil
 }
 
-func (a *App) findConservatories(page, pageSize uint, sortKey string, ascending bool, query string) (uint, []*conservatory, error) {
+func (a App) findConservatories(page, pageSize uint, sortKey string, ascending bool, query string) (uint, []*conservatory, error) {
 	count, err := a.countConservatories(query)
 	if err != nil {
 		return 0, nil, err
@@ -123,7 +123,7 @@ func (a *App) findConservatories(page, pageSize uint, sortKey string, ascending 
 
 }
 
-func (a *App) countConservatories(search string) (count uint, err error) {
+func (a App) countConservatories(search string) (count uint, err error) {
 	where, words := db.PrepareFullTextSearch(conservatoriesSearchWhere, search, 1)
 
 	if words != `` {
@@ -135,7 +135,7 @@ func (a *App) countConservatories(search string) (count uint, err error) {
 	return
 }
 
-func (a *App) searchConservatories(page, pageSize uint, sortKey string, sortAsc bool, search string) ([]*conservatory, error) {
+func (a App) searchConservatories(page, pageSize uint, sortKey string, sortAsc bool, search string) ([]*conservatory, error) {
 	var offset uint
 	if page > 1 {
 		offset = (page - 1) * pageSize
@@ -168,7 +168,7 @@ func (a *App) searchConservatories(page, pageSize uint, sortKey string, sortAsc 
 	return scanConservatoryRows(rows, pageSize)
 }
 
-func (a *App) countByDepartment() (map[string]uint, error) {
+func (a App) countByDepartment() (map[string]uint, error) {
 	rows, err := a.db.Query(conservatoriesByDepartementQuery)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while counting by department: %v`, err)
@@ -177,7 +177,7 @@ func (a *App) countByDepartment() (map[string]uint, error) {
 	return scanAggregateRows(rows)
 }
 
-func (a *App) countByZipOfDepartment(department string) (map[string]uint, error) {
+func (a App) countByZipOfDepartment(department string) (map[string]uint, error) {
 	rows, err := a.db.Query(conservatoriesByZipOfDepartmentQuery, department)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while counting by zip of department: %v`, err)

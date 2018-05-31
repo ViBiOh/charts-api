@@ -71,7 +71,7 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 	return list, nil
 }
 
-func (a *App) listReadingsOfUser(user *model.User) ([]*reading, error) {
+func (a App) listReadingsOfUser(user *model.User) ([]*reading, error) {
 	rows, err := a.db.Query(listReadingsOfUserQuery, user.ID)
 	if err != nil {
 		return nil, fmt.Errorf(`Error while listing readings of user: %v`, err)
@@ -89,7 +89,7 @@ func (a *App) listReadingsOfUser(user *model.User) ([]*reading, error) {
 	return a.enrichReadingsWithTags(list)
 }
 
-func (a *App) saveReading(o *reading, tx *sql.Tx) (err error) {
+func (a App) saveReading(o *reading, tx *sql.Tx) (err error) {
 	if o == nil {
 		return errNilReading
 	}
