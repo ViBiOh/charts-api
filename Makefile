@@ -7,10 +7,10 @@ go: format lint tst bench build
 docker: docker-deps docker-build
 
 deps:
-	go get -u github.com/golang/dep/cmd/dep
-	go get -u github.com/golang/lint/golint
-	go get -u github.com/kisielk/errcheck
-	go get -u golang.org/x/tools/cmd/goimports
+	go get github.com/golang/dep/cmd/dep
+	go get github.com/golang/lint/golint
+	go get github.com/kisielk/errcheck
+	go get golang.org/x/tools/cmd/goimports
 	dep ensure
 
 format:
@@ -43,7 +43,7 @@ docker-push:
 	docker push $(DOCKER_USER)/eponae-api
 
 start-deps:
-	go get -u github.com/ViBiOh/auth/cmd/bcrypt
+	go get github.com/ViBiOh/auth/cmd/bcrypt
 
 start-api:
 	go run -race cmd/api.go \
