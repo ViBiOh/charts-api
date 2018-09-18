@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1e9fd6c3d87a4d486bdcff0247bd0d92edcf670583546d2dd03da528aa50b1ee"
+  digest = "1:017300dd6192cc23ced99b26683d99df5b917a6cec49ef5d9c798e8691598102"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -20,19 +20,19 @@
     "pkg/provider",
     "pkg/provider/basic",
     "pkg/provider/github",
-    "pkg/provider/twitter",
     "pkg/service",
   ]
   pruneopts = "UT"
-  revision = "92ab1ff6003fd02a3b925d531109a27fe1364e3d"
+  revision = "4b3e81b3ef2f00c7288165f3becbb0d76795a4c9"
 
 [[projects]]
   branch = "master"
-  digest = "1:b49e8cf35f71c62aca8873447d10e24a2c151784197e22b4e3524b65fbb8556e"
+  digest = "1:f3e2603d178947b5c5014dee72505d7542778c0b61b91382f5aac8192783ae47"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
     "pkg/alcotest",
+    "pkg/cache",
     "pkg/cert",
     "pkg/cors",
     "pkg/db",
@@ -40,17 +40,20 @@
     "pkg/healthcheck",
     "pkg/httperror",
     "pkg/httpjson",
+    "pkg/model",
     "pkg/opentracing",
     "pkg/owasp",
     "pkg/pagination",
+    "pkg/query",
     "pkg/request",
+    "pkg/rollbar",
     "pkg/server",
     "pkg/tools",
     "pkg/uuid",
     "pkg/writer",
   ]
   pruneopts = "UT"
-  revision = "9f9961492345a8306528feb1283c6b76fc6d7e3e"
+  revision = "462fc2b0349c2706e4aaa2f3ae86c1be3d2c83fe"
 
 [[projects]]
   branch = "master"
@@ -69,23 +72,23 @@
   revision = "3a0bb77429bd3a61596f5e8a3172445844342120"
 
 [[projects]]
-  digest = "1:15042ad3498153684d09f393bbaec6b216c8eec6d61f63dff711de7d64ed8861"
+  digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = "UT"
-  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
-  version = "v1.1.0"
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:37ce7d7d80531b227023331002c0d42b4b4b291a96798c82a049d03a54ba79e4"
+  digest = "1:8ef506fc2bb9ced9b151dafa592d4046063d744c646c1bbe801982ce87e4bc24"
   name = "github.com/lib/pq"
   packages = [
     ".",
     "oid",
   ]
   pruneopts = "UT"
-  revision = "90697d60dd844d5ef6ff15135d0203f65d2f53b8"
+  revision = "4ded0e9383f75c197b3a2aaa6d590ac52df6fd79"
 
 [[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
@@ -97,11 +100,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f0157668c753bf20253dc027a7698d170c8c65253c0ffcbdf8e310ee14184a7b"
+  digest = "1:264f2848854a41b03a6525ea6c1e858762caa34964a63dde898dc4bba339e50f"
   name = "github.com/opentracing-contrib/go-stdlib"
   packages = ["nethttp"]
   pruneopts = "UT"
-  revision = "36723135187404d2f4002f4f189938565e64cc5c"
+  revision = "07a764486eb10927e8cf38337918a40d430524ee"
 
 [[projects]]
   digest = "1:450b7623b185031f3a456801155c8320209f75d0d4c4e633c6b1e59d44d6e392"
@@ -136,15 +139,15 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:32d10bdfa8f09ecf13598324dba86ab891f11db3c538b6a34d1c3b5b99d7c36b"
+  digest = "1:2d5cd61daa5565187e1d96bae64dbbc6080dacf741448e9629c64fd93203b0d4"
   name = "github.com/prometheus/client_model"
   packages = ["go"]
   pruneopts = "UT"
-  revision = "99fa1f4be8e564e8a6b613da7fa6f46c9edafc6c"
+  revision = "5c3871d89910bfb32f5fcab2aa4b9ec68e65a99f"
 
 [[projects]]
   branch = "master"
-  digest = "1:e469cd65badf7694aeb44874518606d93c1d59e7735d3754ad442782437d3cc3"
+  digest = "1:63b68062b8968092eb86bedc4e68894bd096ea6b24920faca8b9dcf451f54bb5"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -152,11 +155,11 @@
     "model",
   ]
   pruneopts = "UT"
-  revision = "7600349dcfe1abd18d72d3a1770870d9800a7801"
+  revision = "c7de2306084e37d54b8be01f3541a8464345e9a5"
 
 [[projects]]
   branch = "master"
-  digest = "1:570784e0ddbf67f14087c6d8cfb7b999b9c55e75518a755e88cb202566ea8a17"
+  digest = "1:8c49953a1414305f2ff5465147ee576dd705487c35b15918fcd4efdc0cb7a290"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -165,7 +168,15 @@
     "xfs",
   ]
   pruneopts = "UT"
-  revision = "fe93d378a6b03758a2c1b65e86cf630bf78681c0"
+  revision = "05ee40e3a273f7245e8777337fc7b46e533a9a92"
+
+[[projects]]
+  digest = "1:8b6db3b490230af0836cd57f2da94e092ac0c2837fe24e762458006531749b53"
+  name = "github.com/rollbar/rollbar-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5f41889d7c6a59e4add07998cf776b1d335d287f"
+  version = "v1.0.1"
 
 [[projects]]
   digest = "1:104a2d7446f4628e4663d7c029b18da1aad4313735de775f37b6e7720b1d0aa7"
@@ -209,7 +220,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "ab813273cd59e1333f7ae7bff5d027d4aadf528c"
+  revision = "0e37d006457bf46f9e6692014ba72ef82c33022c"
 
 [[projects]]
   branch = "master"
@@ -220,11 +231,11 @@
     "context/ctxhttp",
   ]
   pruneopts = "UT"
-  revision = "75944861c7512f64725d687546cfbc757626151f"
+  revision = "26e67e76b6c3f6ce91f7c52def5af501b4e0f3a2"
 
 [[projects]]
   branch = "master"
-  digest = "1:6a75f0cb137db5e76b59f32565fafb384077c57e91d9bf76fcf4763dd6bc0de8"
+  digest = "1:ada838e8c6151b19b06f90199f5da9771b50fbfd74838d461ad58b96cbf98015"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
@@ -232,10 +243,10 @@
     "internal",
   ]
   pruneopts = "UT"
-  revision = "ec22f46f877b4505e0117eeaab541714644fdd28"
+  revision = "d2e6202438beef2727060aa7cabdd924d92ebfd9"
 
 [[projects]]
-  digest = "1:9cf45e754ab2dff5f53a553e6948b994ff738e4d1092ca608dcada945d8be0ef"
+  digest = "1:328b5e4f197d928c444a51a75385f4b978915c0e75521f0ad6a3db976c97a7d3"
   name = "google.golang.org/appengine"
   packages = [
     "internal",
@@ -247,8 +258,8 @@
     "urlfetch",
   ]
   pruneopts = "UT"
-  revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
-  version = "v1.0.0"
+  revision = "b1f26356af11148e710935ed1ac8a7f5702c7612"
+  version = "v1.1.0"
 
 [solve-meta]
   analyzer-name = "dep"

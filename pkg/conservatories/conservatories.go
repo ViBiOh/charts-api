@@ -31,7 +31,7 @@ func NewApp(db *sql.DB) *App {
 }
 
 func (a App) listCrud(w http.ResponseWriter, r *http.Request) {
-	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
+	page, pageSize, sort, asc, err := pagination.ParseParams(r, 1, defaultPageSize, maxPageSize)
 	if err != nil {
 		httperror.BadRequest(w, err)
 		return
@@ -43,7 +43,7 @@ func (a App) listCrud(w http.ResponseWriter, r *http.Request) {
 
 	if count, list, err := a.findConservatories(page, pageSize, sort, asc, r.URL.Query().Get(`q`)); err != nil {
 		httperror.InternalServerError(w, err)
-	} else if err := httpjson.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+	} else if err := httpjson.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httpjson.IsPretty(r)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
@@ -51,7 +51,7 @@ func (a App) listCrud(w http.ResponseWriter, r *http.Request) {
 func (a App) aggregate(w http.ResponseWriter, r *http.Request) {
 	if count, err := a.countByDepartment(); err != nil {
 		httperror.InternalServerError(w, err)
-	} else if err := httpjson.ResponseJSON(w, 200, count, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+	} else if err := httpjson.ResponseJSON(w, 200, count, httpjson.IsPretty(r)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
@@ -59,7 +59,7 @@ func (a App) aggregate(w http.ResponseWriter, r *http.Request) {
 func (a App) aggregateByDepartment(w http.ResponseWriter, r *http.Request, path string) {
 	if count, err := a.countByZipOfDepartment(strings.TrimPrefix(path, `/`)); err != nil {
 		httperror.InternalServerError(w, err)
-	} else if err := httpjson.ResponseJSON(w, 200, count, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+	} else if err := httpjson.ResponseJSON(w, 200, count, httpjson.IsPretty(r)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }

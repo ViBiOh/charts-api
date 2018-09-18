@@ -2,18 +2,28 @@ jobs:
   include:
   - stage: Build
 
-    language: go
     sudo: required
     services:
     - docker
-    go : '1.10'
+    script: |
+      make doc
+      docker build -t vibioh/`make name`:`make version` .
     after_success: |
-      if [ "${TRAVIS_BRANCH}" == "master" ]; then
-        bash <(curl -s https://codecov.io/bash)
-        curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/eponae-api
+      echo ${DOCKER_PASS} | docker login -u vibioh --password-stdin
+      docker push vibioh/`make name`:`make version`
 
-        make docker-push
-      fi
+  - stage: Publish
+
+    sudo: required
+    services:
+    - docker
+    script: |
+      echo ${DOCKER_PASS} | docker login -u vibioh --password-stdin
+      docker pull vibioh/`make name`:`make version`
+      docker tag vibioh/`make name`:`make version` vibioh/`make name`:latest
+      docker push vibioh/`make name`:latest
+    after_success: |
+      curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/eponae-api
 
   # - stage: Deploy
 
@@ -31,6 +41,7 @@ jobs:
 
 stages:
   - Build
+  - Publish
   # - name: Deploy
   #   if: branch = master
 

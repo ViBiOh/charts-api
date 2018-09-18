@@ -31,7 +31,7 @@ func getRequestID(path string) (uint, error) {
 func (a App) readTagFromBody(r *http.Request) (*tag, error) {
 	var requestTag tag
 
-	if bodyBytes, err := request.ReadBody(r.Body); err != nil {
+	if bodyBytes, err := request.ReadBodyRequest(r); err != nil {
 		return nil, fmt.Errorf(`Error while reading body: %v`, err)
 	} else if err := json.Unmarshal(bodyBytes, &requestTag); err != nil {
 		return nil, fmt.Errorf(`Error while unmarshalling body: %v`, err)
@@ -41,7 +41,7 @@ func (a App) readTagFromBody(r *http.Request) (*tag, error) {
 }
 
 func (a App) listTags(w http.ResponseWriter, r *http.Request, user *model.User) {
-	page, pageSize, sort, asc, err := pagination.ParsePaginationParams(r, defaultPageSize, maxPageSize)
+	page, pageSize, sort, asc, err := pagination.ParseParams(r, 1, defaultPageSize, maxPageSize)
 	if err != nil {
 		httperror.BadRequest(w, fmt.Errorf(`Error while parsing pagination: %v`, err))
 		return
@@ -57,7 +57,7 @@ func (a App) listTags(w http.ResponseWriter, r *http.Request, user *model.User) 
 		httperror.InternalServerError(w, fmt.Errorf(`Error while searching tags: %v`, err))
 	} else if count, err := a.countTags(user, query); err != nil {
 		httperror.InternalServerError(w, fmt.Errorf(`Error while counting tags: %v`, err))
-	} else if err := httpjson.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+	} else if err := httpjson.ResponsePaginatedJSON(w, http.StatusOK, page, pageSize, count, list, httpjson.IsPretty(r)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
@@ -69,7 +69,7 @@ func (a App) readTag(w http.ResponseWriter, r *http.Request, user *model.User, i
 		} else {
 			httperror.InternalServerError(w, fmt.Errorf(`Error while getting tag: %v`, err))
 		}
-	} else if err := httpjson.ResponseJSON(w, http.StatusOK, foundTag, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+	} else if err := httpjson.ResponseJSON(w, http.StatusOK, foundTag, httpjson.IsPretty(r)); err != nil {
 		httperror.InternalServerError(w, err)
 	}
 }
@@ -84,7 +84,7 @@ func (a App) createTag(w http.ResponseWriter, r *http.Request, user *model.User)
 
 		if err := a.saveTag(bodyTag, nil); err != nil {
 			httperror.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
-		} else if err := httpjson.ResponseJSON(w, http.StatusCreated, bodyTag, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+		} else if err := httpjson.ResponseJSON(w, http.StatusCreated, bodyTag, httpjson.IsPretty(r)); err != nil {
 			httperror.InternalServerError(w, err)
 		}
 	}
@@ -102,7 +102,7 @@ func (a App) updateTag(w http.ResponseWriter, r *http.Request, user *model.User,
 
 		if err := a.saveTag(bodyTag, nil); err != nil {
 			httperror.InternalServerError(w, fmt.Errorf(`Error while saving tag: %v`, err))
-		} else if err := httpjson.ResponseJSON(w, http.StatusCreated, bodyTag, httpjson.IsPretty(r.URL.RawQuery)); err != nil {
+		} else if err := httpjson.ResponseJSON(w, http.StatusCreated, bodyTag, httpjson.IsPretty(r)); err != nil {
 			httperror.InternalServerError(w, err)
 		}
 	}
