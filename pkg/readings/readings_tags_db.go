@@ -34,7 +34,7 @@ func (a App) scanReadingsTags(rows *sql.Rows, pageSize uint) ([]*readingsTags, e
 
 	for rows.Next() {
 		if err := rows.Scan(&readingID, &tagID); err != nil {
-			return nil, fmt.Errorf(`Error while scanning line: %v`, err)
+			return nil, fmt.Errorf(`error while scanning line: %v`, err)
 		}
 
 		list = append(list, &readingsTags{readingID, tagID})
@@ -46,7 +46,7 @@ func (a App) scanReadingsTags(rows *sql.Rows, pageSize uint) ([]*readingsTags, e
 func (a App) findReadingsTagsByIds(ids []uint) ([]*readingsTags, error) {
 	rows, err := a.db.Query(listReadingsTagsOfReadingsQuery, db.WhereInUint(ids))
 	if err != nil {
-		return nil, fmt.Errorf(`Error while querying: %v`, err)
+		return nil, fmt.Errorf(`error while querying: %v`, err)
 	}
 
 	defer func() {
@@ -68,7 +68,7 @@ func (a App) enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
 
 	tagsLink, err := a.findReadingsTagsByIds(readingsID)
 	if err != nil {
-		return nil, fmt.Errorf(`Error while finding readings tags: %v`, err)
+		return nil, fmt.Errorf(`error while finding readings tags: %v`, err)
 	}
 
 	tagsID := make([]uint, len(tagsLink))
@@ -85,7 +85,7 @@ func (a App) enrichReadingsWithTags(readings []*reading) ([]*reading, error) {
 
 	tags, err := a.findTagsByIds(tagsID)
 	if err != nil {
-		return nil, fmt.Errorf(`Error while finding tags: %v`, err)
+		return nil, fmt.Errorf(`error while finding tags: %v`, err)
 	}
 
 	tagsByID := make(map[uint]*tag, 0)

@@ -31,7 +31,7 @@ func (a App) Handler() http.Handler {
 			fakeWriter := writer.ResponseWriter{}
 			request, err := http.NewRequest(http.MethodGet, fmt.Sprintf(`%s/health`, url), nil)
 			if err != nil {
-				httperror.InternalServerError(w, fmt.Errorf(`Error while creating health request: %v`, err))
+				httperror.InternalServerError(w, fmt.Errorf(`error while creating health request: %v`, err))
 				return
 			}
 

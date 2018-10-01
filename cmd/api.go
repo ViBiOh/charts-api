@@ -53,7 +53,7 @@ func main() {
 
 	eponaeDB, err := db.GetDB(eponaeDbConfig)
 	if err != nil {
-		err = fmt.Errorf(`Error while initializing database: %v`, err)
+		err = fmt.Errorf(`error while initializing database: %v`, err)
 	}
 	conservatoriesApp := conservatories.NewApp(eponaeDB)
 	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))

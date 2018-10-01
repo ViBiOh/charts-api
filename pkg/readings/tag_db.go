@@ -90,8 +90,8 @@ WHERE
   id = $1
 `
 
-var errNilUser = errors.New(`Unable to request with nil User`)
-var errNilTag = errors.New(`Unable to save nil Tag`)
+var errNilUser = errors.New(`unable to request with nil User`)
+var errNilTag = errors.New(`unable to save nil Tag`)
 
 func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 	var (
@@ -103,7 +103,7 @@ func scanTags(rows *sql.Rows, pageSize uint) ([]*tag, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &name); err != nil {
-			return nil, fmt.Errorf(`Error while scanning tag line: %v`, err)
+			return nil, fmt.Errorf(`error while scanning tag line: %v`, err)
 		}
 
 		list = append(list, &tag{ID: id, Name: name})
@@ -139,7 +139,7 @@ func (a App) searchTags(page, pageSize uint, sortKey string, sortAsc bool, user 
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf(`Error while querying: %v`, err)
+		return nil, fmt.Errorf(`error while querying: %v`, err)
 	}
 
 	defer func() {
@@ -168,7 +168,7 @@ func (a App) countTags(user *model.User, search string) (count uint, err error) 
 	}
 
 	if err != nil {
-		err = fmt.Errorf(`Error while querying: %v`, err)
+		err = fmt.Errorf(`error while querying: %v`, err)
 	}
 
 	return
@@ -177,7 +177,7 @@ func (a App) countTags(user *model.User, search string) (count uint, err error) 
 func (a App) findTagsByIds(ids []uint) ([]*tag, error) {
 	rows, err := a.db.Query(findTagsByidsQuery, db.WhereInUint(ids))
 	if err != nil {
-		return nil, fmt.Errorf(`Error while querying: %v`, err)
+		return nil, fmt.Errorf(`error while querying: %v`, err)
 	}
 
 	defer func() {
@@ -201,7 +201,7 @@ func (a App) getTag(id uint, user *model.User) (*tag, error) {
 		if err == sql.ErrNoRows {
 			return nil, err
 		}
-		return nil, fmt.Errorf(`Error while querying: %v`, err)
+		return nil, fmt.Errorf(`error while querying: %v`, err)
 	}
 
 	return &tag{ID: resultID, Name: name, user: user}, nil
@@ -229,13 +229,13 @@ func (a App) saveTag(o *tag, tx *sql.Tx) (err error) {
 
 	if o.ID != 0 {
 		if _, err = usedTx.Exec(updateTagQuery, o.ID, o.Name); err != nil {
-			err = fmt.Errorf(`Error while updating: %v`, err)
+			err = fmt.Errorf(`error while updating: %v`, err)
 		}
 	} else {
 		var newID uint
 
 		if err = usedTx.QueryRow(insertTagQuery, o.user.ID, o.Name).Scan(&newID); err != nil {
-			err = fmt.Errorf(`Error while creating: %v`, err)
+			err = fmt.Errorf(`error while creating: %v`, err)
 		} else {
 			o.ID = newID
 		}
@@ -265,7 +265,7 @@ func (a App) deleteTag(o *tag, tx *sql.Tx) (err error) {
 	}
 
 	if _, err = usedTx.Exec(deleteTagQuery, o.ID); err != nil {
-		err = fmt.Errorf(`Error while deleting: %v`, err)
+		err = fmt.Errorf(`error while deleting: %v`, err)
 	}
 
 	return

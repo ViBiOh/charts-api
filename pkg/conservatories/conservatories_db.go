@@ -83,7 +83,7 @@ func scanConservatoryRows(rows *sql.Rows, pageSize uint) ([]*conservatory, error
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &name, &category, &street, &city, &department, &zip, &latitude, &longitude); err != nil {
-			return nil, fmt.Errorf(`Error while scanning conservatory line: %v`, err)
+			return nil, fmt.Errorf(`error while scanning conservatory line: %v`, err)
 		}
 
 		conservatories = append(conservatories, &conservatory{ID: id, Name: name, Category: category, Street: street, City: city, Department: department, Zip: zip, Latitude: latitude, Longitude: longitude})
@@ -102,7 +102,7 @@ func scanAggregateRows(rows *sql.Rows) (map[string]uint, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&key, &count); err != nil {
-			return nil, fmt.Errorf(`Error while scanning aggregate line: %v`, err)
+			return nil, fmt.Errorf(`error while scanning aggregate line: %v`, err)
 		}
 
 		aggregate[key] = count
@@ -158,7 +158,7 @@ func (a App) searchConservatories(page, pageSize uint, sortKey string, sortAsc b
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf(`Error while searching conservatories: %v`, err)
+		return nil, fmt.Errorf(`error while searching conservatories: %v`, err)
 	}
 
 	defer func() {
@@ -171,7 +171,7 @@ func (a App) searchConservatories(page, pageSize uint, sortKey string, sortAsc b
 func (a App) countByDepartment() (map[string]uint, error) {
 	rows, err := a.db.Query(conservatoriesByDepartementQuery)
 	if err != nil {
-		return nil, fmt.Errorf(`Error while counting by department: %v`, err)
+		return nil, fmt.Errorf(`error while counting by department: %v`, err)
 	}
 
 	return scanAggregateRows(rows)
@@ -180,7 +180,7 @@ func (a App) countByDepartment() (map[string]uint, error) {
 func (a App) countByZipOfDepartment(department string) (map[string]uint, error) {
 	rows, err := a.db.Query(conservatoriesByZipOfDepartmentQuery, department)
 	if err != nil {
-		return nil, fmt.Errorf(`Error while counting by zip of department: %v`, err)
+		return nil, fmt.Errorf(`error while counting by zip of department: %v`, err)
 	}
 
 	return scanAggregateRows(rows)
