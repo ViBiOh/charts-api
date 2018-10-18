@@ -20,6 +20,7 @@ import (
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
+	"github.com/ViBiOh/httputils/pkg/prometheus"
 	"github.com/ViBiOh/httputils/pkg/server"
 )
 
@@ -35,6 +36,7 @@ func main() {
 	opentracingConfig := opentracing.Flags(`tracing`)
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
+	prometheusConfig := prometheus.Flags(`prometheus`)
 
 	eponaeDbConfig := db.Flags(`eponaeDb`)
 	readingsAuthConfig := auth.Flags(`readingsAuth`)
@@ -49,6 +51,7 @@ func main() {
 	opentracingApp := opentracing.NewApp(opentracingConfig)
 	owaspApp := owasp.NewApp(owaspConfig)
 	corsApp := cors.NewApp(corsConfig)
+	prometheusApp := prometheus.NewApp(prometheusConfig)
 	gzipApp := gzip.NewApp()
 
 	eponaeDB, err := db.GetDB(eponaeDbConfig)
@@ -79,7 +82,7 @@ func main() {
 		}
 	})
 
-	handler := server.ChainMiddlewares(apihandler, opentracingApp, gzipApp, owaspApp, corsApp)
+	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp)
 
 	serverApp.ListenAndServe(handler, nil, healthcheckApp)
 }

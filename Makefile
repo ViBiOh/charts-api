@@ -43,8 +43,8 @@ go: format lint tst bench build
 .PHONY: deps
 deps:
 	go get github.com/golang/dep/cmd/dep
-	go get github.com/golang/lint/golint
 	go get github.com/kisielk/errcheck
+	go get golang.org/x/lint/golint
 	go get golang.org/x/tools/cmd/goimports
 	dep ensure
 
