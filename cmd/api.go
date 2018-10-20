@@ -33,10 +33,10 @@ const (
 func main() {
 	serverConfig := httputils.Flags(``)
 	alcotestConfig := alcotest.Flags(``)
+	prometheusConfig := prometheus.Flags(`prometheus`)
 	opentracingConfig := opentracing.Flags(`tracing`)
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
-	prometheusConfig := prometheus.Flags(`prometheus`)
 
 	eponaeDbConfig := db.Flags(`eponaeDb`)
 	readingsAuthConfig := auth.Flags(`readingsAuth`)
@@ -48,11 +48,11 @@ func main() {
 
 	serverApp := httputils.NewApp(serverConfig)
 	healthcheckApp := healthcheck.NewApp()
+	prometheusApp := prometheus.NewApp(prometheusConfig)
 	opentracingApp := opentracing.NewApp(opentracingConfig)
+	gzipApp := gzip.NewApp()
 	owaspApp := owasp.NewApp(owaspConfig)
 	corsApp := cors.NewApp(corsConfig)
-	prometheusApp := prometheus.NewApp(prometheusConfig)
-	gzipApp := gzip.NewApp()
 
 	eponaeDB, err := db.GetDB(eponaeDbConfig)
 	if err != nil {
