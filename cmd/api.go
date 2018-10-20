@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -18,6 +17,7 @@ import (
 	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/gzip"
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
+	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
 	"github.com/ViBiOh/httputils/pkg/prometheus"
@@ -56,7 +56,7 @@ func main() {
 
 	eponaeDB, err := db.GetDB(eponaeDbConfig)
 	if err != nil {
-		err = fmt.Errorf(`error while initializing database: %v`, err)
+		logger.Fatal(`%+v`, err)
 	}
 	conservatoriesApp := conservatories.NewApp(eponaeDB)
 	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))

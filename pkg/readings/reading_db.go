@@ -2,11 +2,10 @@ package readings
 
 import (
 	"database/sql"
-	"errors"
-	"fmt"
 
 	"github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/db"
+	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
 const listReadingsOfUserQuery = `
@@ -62,7 +61,7 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 
 	for rows.Next() {
 		if err := rows.Scan(&id, &url, &public, &read); err != nil {
-			return nil, fmt.Errorf(`error while scanning reading line: %v`, err)
+			return nil, errors.WithStack(err)
 		}
 
 		list = append(list, &reading{ID: id, URL: url, Public: public, Read: read})
@@ -74,7 +73,7 @@ func scanReadings(rows *sql.Rows) ([]*reading, error) {
 func (a App) listReadingsOfUser(user *model.User) ([]*reading, error) {
 	rows, err := a.db.Query(listReadingsOfUserQuery, user.ID)
 	if err != nil {
-		return nil, fmt.Errorf(`error while listing readings of user: %v`, err)
+		return nil, errors.WithStack(err)
 	}
 
 	defer func() {
@@ -83,7 +82,7 @@ func (a App) listReadingsOfUser(user *model.User) ([]*reading, error) {
 
 	list, err := scanReadings(rows)
 	if err != nil {
-		return nil, fmt.Errorf(`error while scanning readings: %v`, err)
+		return nil, err
 	}
 
 	return a.enrichReadingsWithTags(list)
@@ -107,13 +106,13 @@ func (a App) saveReading(o *reading, tx *sql.Tx) (err error) {
 
 	if o.ID != 0 {
 		if _, err = usedTx.Exec(updateReading, o.ID, o.URL, o.Public, o.Read); err != nil {
-			err = fmt.Errorf(`error while updating reading for user=%s: %v`, o.user.Username, err)
+			err = errors.WithStack(err)
 		}
 	} else {
 		var newID uint
 
 		if err = usedTx.QueryRow(insertReading, o.user.ID, o.URL, o.Public, o.Read).Scan(&newID); err != nil {
-			err = fmt.Errorf(`error while creating reading for user=%s: %v`, o.user.Username, err)
+			err = errors.WithStack(err)
 		} else {
 			o.ID = newID
 		}
