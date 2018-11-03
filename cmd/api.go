@@ -60,10 +60,10 @@ func main() {
 	}
 	conservatoriesApp := conservatories.NewApp(eponaeDB)
 	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))
-	readingsApp := readings.NewApp(eponaeDB, readingsAuthApp)
+	readingsApp := readings.NewApp(eponaeDB)
 
 	conservatoriesHandler := http.StripPrefix(conservatoriesPath, conservatoriesApp.Handler())
-	readingsHandler := http.StripPrefix(readingsPath, readingsApp.Handler())
+	readingsHandler := server.ChainMiddlewares(http.StripPrefix(readingsPath, readingsApp.Handler()), readingsAuthApp)
 
 	healthcheckApp.NextHealthcheck(http.StripPrefix(healthcheckPath, apiHealthcheck.NewApp(map[string]http.Handler{
 		conservatoriesPath: conservatoriesHandler,

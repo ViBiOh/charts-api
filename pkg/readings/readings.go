@@ -8,6 +8,7 @@ import (
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/db"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/httperror"
 	"github.com/ViBiOh/httputils/pkg/httpjson"
 )
@@ -16,15 +17,13 @@ const healthcheckPath = `/health`
 
 // App stores informations and secret of API
 type App struct {
-	db      *sql.DB
-	authApp *auth.App
+	db *sql.DB
 }
 
 // NewApp creates new App from Flags' config
-func NewApp(db *sql.DB, authApp *auth.App) *App {
+func NewApp(db *sql.DB) *App {
 	return &App{
-		db:      db,
-		authApp: authApp,
+		db: db,
 	}
 }
 
@@ -45,16 +44,6 @@ func (a App) listReadings(w http.ResponseWriter, r *http.Request, user *model.Us
 
 // Handler for Readings request. Should be use with net/http
 func (a App) Handler() http.Handler {
-	authHandler := a.authApp.Handler(func(w http.ResponseWriter, r *http.Request, user *model.User) {
-		if strings.HasPrefix(r.URL.Path, tagsPath) {
-			a.tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
-		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
-			a.listReadings(w, r, user)
-		} else {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-		}
-	})
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusNoContent)
@@ -70,6 +59,17 @@ func (a App) Handler() http.Handler {
 			return
 		}
 
-		authHandler.ServeHTTP(w, r)
+		user := auth.UserFromContext(r.Context())
+		if user == nil {
+			httperror.InternalServerError(w, errors.New(`no user provided`))
+		}
+
+		if strings.HasPrefix(r.URL.Path, tagsPath) {
+			a.tagsHandler(w, r, user, strings.TrimPrefix(r.URL.Path, tagsPath))
+		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
+			a.listReadings(w, r, user)
+		} else {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+		}
 	})
 }
