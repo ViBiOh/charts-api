@@ -1,49 +1,54 @@
 -- Cleaning
-DROP TABLE IF EXISTS readings_tags;
-DROP TABLE IF EXISTS readings;
-DROP TABLE IF EXISTS tags;
+DROP TABLE IF EXISTS reading_tag;
+DROP TABLE IF EXISTS reading;
+DROP TABLE IF EXISTS tag;
 
-DROP INDEX IF EXISTS readings_id;
-DROP INDEX IF EXISTS readings_user;
-DROP INDEX IF EXISTS tags_id;
-DROP INDEX IF EXISTS tags_user;
-DROP INDEX IF EXISTS tags_name;
+DROP INDEX IF EXISTS user_id;
+DROP INDEX IF EXISTS user_login;
+DROP INDEX IF EXISTS reading_id;
+DROP INDEX IF EXISTS reading_user;
+DROP INDEX IF EXISTS tag_id;
+DROP INDEX IF EXISTS tag_user;
+DROP INDEX IF EXISTS tag_name;
 
-DROP SEQUENCE IF EXISTS readings_id_seq;
-DROP SEQUENCE IF EXISTS tags_id_seq;
+-- user
+CREATE TABLE user (
+  id TEXT NOT NULL,
+  login TEXT NOT NULL,
+  password TEXT NOT NULL,
+  creation_date TIMESTAMP DEFAULT now()
+);
 
--- Readings
-CREATE SEQUENCE readings_id_seq;
+CREATE UNIQUE INDEX user_id ON user (id);
+CREATE UNIQUE INDEX user_login ON user (login);
 
-CREATE TABLE readings (
-  id INTEGER NOT NULL DEFAULT nextval('readings_id_seq'),
-  user_id INTEGER NOT NULL,
+-- reading
+CREATE TABLE reading (
+  id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
   url TEXT NOT NULL,
-  public BOOLEAN NOT NULL DEFAULT FALSE,
   read BOOLEAN NOT NULL DEFAULT FALSE,
   creation_date TIMESTAMP DEFAULT now()
 );
 
-CREATE UNIQUE INDEX readings_id ON readings (id);
-CREATE INDEX readings_user ON readings (user_id);
+CREATE UNIQUE INDEX reading_id ON reading (id);
+CREATE INDEX reading_user ON reading (user_id);
 
--- Tags
-CREATE SEQUENCE tags_id_seq;
-
-CREATE TABLE tags (
-  id INTEGER NOT NULL DEFAULT nextval('tags_id_seq'),
-  user_id INTEGER NOT NULL,
+-- tag
+CREATE TABLE tag (
+  id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
   name TEXT NOT NULL,
   creation_date TIMESTAMP DEFAULT now()
 );
 
-CREATE UNIQUE INDEX tags_id ON tags (id);
-CREATE INDEX tags_user ON tags (user_id);
-CREATE INDEX tags_name ON tags (name);
+CREATE UNIQUE INDEX tag_id ON tag (id);
+CREATE INDEX tag_user ON tag (user_id);
+CREATE INDEX tag_name ON tag (name);
 
--- Tags / Readings
-CREATE TABLE readings_tags (
-  readings_id INTEGER NOT NULL REFERENCES readings(id),
-  tags_id INTEGER NOT NULL REFERENCES tags(id),
+-- tag / reading association
+CREATE TABLE reading_tag (
+  reading_id TEXT NOT NULL REFERENCES reading(id),
+  tag_id TEXT NOT NULL REFERENCES tag(id),
   creation_date TIMESTAMP DEFAULT now()
 );

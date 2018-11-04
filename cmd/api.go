@@ -8,7 +8,6 @@ import (
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/auth/pkg/provider/basic"
 	authService "github.com/ViBiOh/auth/pkg/service"
-	"github.com/ViBiOh/eponae-api/pkg/conservatories"
 	apiHealthcheck "github.com/ViBiOh/eponae-api/pkg/healthcheck"
 	"github.com/ViBiOh/eponae-api/pkg/readings"
 	"github.com/ViBiOh/httputils/pkg"
@@ -25,9 +24,8 @@ import (
 )
 
 const (
-	healthcheckPath    = `/health`
-	conservatoriesPath = `/conservatories`
-	readingsPath       = `/readings`
+	healthcheckPath = `/health`
+	readingsPath    = `/readings`
 )
 
 func main() {
@@ -58,28 +56,27 @@ func main() {
 	if err != nil {
 		logger.Fatal(`%+v`, err)
 	}
-	conservatoriesApp := conservatories.NewApp(eponaeDB)
 	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))
 	readingsApp := readings.NewApp(eponaeDB)
 
-	conservatoriesHandler := http.StripPrefix(conservatoriesPath, conservatoriesApp.Handler())
 	readingsHandler := server.ChainMiddlewares(http.StripPrefix(readingsPath, readingsApp.Handler()), readingsAuthApp)
 
 	healthcheckApp.NextHealthcheck(http.StripPrefix(healthcheckPath, apiHealthcheck.NewApp(map[string]http.Handler{
-		conservatoriesPath: conservatoriesHandler,
-		readingsPath:       readingsHandler,
+		readingsPath: readingsHandler,
 	}).Handler()))
 
 	apihandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if strings.HasPrefix(r.URL.Path, conservatoriesPath) {
-			conservatoriesHandler.ServeHTTP(w, r)
-		} else if strings.HasPrefix(r.URL.Path, readingsPath) {
+		if strings.HasPrefix(r.URL.Path, readingsPath) {
 			readingsHandler.ServeHTTP(w, r)
-		} else if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
-			http.ServeFile(w, r, `doc/api.html`)
-		} else {
-			w.WriteHeader(http.StatusNotFound)
+			return
 		}
+
+		if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
+			http.ServeFile(w, r, `doc/api.html`)
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
 	})
 
 	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp)

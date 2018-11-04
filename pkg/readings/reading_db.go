@@ -12,7 +12,6 @@ const listReadingsOfUserQuery = `
 SELECT
   id,
   url,
-  public,
   read
 FROM
   readings
@@ -26,13 +25,11 @@ INSERT INTO
 (
   url,
   user_id,
-  public,
   read
 ) VALUES (
   $1,
   $2,
-  $3,
-  $4
+  $3
 )
 RETURNING id
 `
@@ -41,8 +38,7 @@ UPDATE
   tags
 SET
   url = $2,
-  public = $3,
-  read = $4
+  read = $3
 WHERE
   id = $1
 `
@@ -51,20 +47,19 @@ var errNilReading = errors.New(`unable to save nil reading`)
 
 func scanReadings(rows *sql.Rows) ([]*reading, error) {
 	var (
-		id     uint
-		url    string
-		public bool
-		read   bool
+		id   uint
+		url  string
+		read bool
 	)
 
 	list := make([]*reading, 0)
 
 	for rows.Next() {
-		if err := rows.Scan(&id, &url, &public, &read); err != nil {
+		if err := rows.Scan(&id, &url, &read); err != nil {
 			return nil, errors.WithStack(err)
 		}
 
-		list = append(list, &reading{ID: id, URL: url, Public: public, Read: read})
+		list = append(list, &reading{ID: id, URL: url, Read: read})
 	}
 
 	return list, nil
@@ -105,13 +100,13 @@ func (a App) saveReading(o *reading, tx *sql.Tx) (err error) {
 	}
 
 	if o.ID != 0 {
-		if _, err = usedTx.Exec(updateReading, o.ID, o.URL, o.Public, o.Read); err != nil {
+		if _, err = usedTx.Exec(updateReading, o.ID, o.URL, o.Read); err != nil {
 			err = errors.WithStack(err)
 		}
 	} else {
 		var newID uint
 
-		if err = usedTx.QueryRow(insertReading, o.user.ID, o.URL, o.Public, o.Read).Scan(&newID); err != nil {
+		if err = usedTx.QueryRow(insertReading, o.user.ID, o.URL, o.Read).Scan(&newID); err != nil {
 			err = errors.WithStack(err)
 		} else {
 			o.ID = newID
