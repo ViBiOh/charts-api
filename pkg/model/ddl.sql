@@ -4,8 +4,8 @@ DROP TABLE IF EXISTS reading;
 DROP TABLE IF EXISTS tag;
 DROP TABLE IF EXISTS "user";
 
-DROP INDEX IF EXISTS auth_user_id;
-DROP INDEX IF EXISTS auth_user_login;
+DROP INDEX IF EXISTS user_id;
+DROP INDEX IF EXISTS user_login;
 DROP INDEX IF EXISTS reading_id;
 DROP INDEX IF EXISTS reading_user;
 DROP INDEX IF EXISTS tag_id;
@@ -22,7 +22,7 @@ CREATE TABLE "user" (
 );
 
 CREATE UNIQUE INDEX user_id ON "user" (id);
-CREATE UNIQUE INDEX user_login ON "user" (login);
+CREATE UNIQUE INDEX user_login ON "user" (username);
 
 -- reading
 CREATE TABLE reading (

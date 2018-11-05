@@ -6,6 +6,7 @@ import (
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/errors"
+	"github.com/lib/pq"
 )
 
 func scanReadingTag(row model.RowScanner) (*model.ReadingTag, error) {
@@ -26,8 +27,8 @@ func scanReadingTag(row model.RowScanner) (*model.ReadingTag, error) {
 	return &model.ReadingTag{ReadingID: readingID, TagID: tagID}, nil
 }
 
-func (a App) scanReadingTags(rows *sql.Rows, pageSize uint) ([]*model.ReadingTag, error) {
-	list := make([]*model.ReadingTag, pageSize)
+func scanReadingTags(rows *sql.Rows) ([]*model.ReadingTag, error) {
+	list := make([]*model.ReadingTag, 0)
 
 	for rows.Next() {
 		readingTag, err := scanReadingTag(rows)
@@ -48,13 +49,13 @@ SELECT
 FROM
   reading_tag
 WHERE
-  reading_id IN ($1)
+  reading_id = ANY ($1)
 ORDER BY
   reading_id ASC
 `
 
 func (a App) listTagsByReadingIDs(ids []string) ([]*model.ReadingTag, error) {
-	rows, err := a.db.Query(listTagsByReadingIDsQuery, ids)
+	rows, err := a.db.Query(listTagsByReadingIDsQuery, pq.Array(ids))
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}
@@ -63,7 +64,7 @@ func (a App) listTagsByReadingIDs(ids []string) ([]*model.ReadingTag, error) {
 		err = db.RowsClose(rows, err)
 	}()
 
-	return a.scanReadingTags(rows, uint(len(ids)))
+	return scanReadingTags(rows)
 }
 
 // EnrichReadingsWithTags update given reading with tags data

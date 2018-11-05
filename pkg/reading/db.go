@@ -2,6 +2,7 @@ package reading
 
 import (
 	"database/sql"
+	"fmt"
 
 	authModel "github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
@@ -29,48 +30,73 @@ func scanReading(row model.RowScanner) (*model.Reading, error) {
 	return &model.Reading{UUID: id, URL: url, Read: read}, nil
 }
 
-func scanReadings(rows *sql.Rows) ([]*model.Reading, error) {
+func scanReadings(rows *sql.Rows) ([]*model.Reading, uint, error) {
+	var (
+		id         string
+		url        string
+		read       bool
+		totalCount uint
+	)
+
 	list := make([]*model.Reading, 0)
 
 	for rows.Next() {
-		reading, err := scanReading(rows)
-		if err != nil {
-			return nil, err
+		if err := rows.Scan(&id, &url, &read, &totalCount); err != nil {
+			if err == sql.ErrNoRows {
+				return nil, 0, err
+			}
+
+			return nil, 0, errors.WithStack(err)
 		}
 
-		list = append(list, reading)
+		list = append(list, &model.Reading{UUID: id, URL: url, Read: read})
 	}
 
-	return list, nil
+	return list, totalCount, nil
 }
 
 const listByUserQuery = `
 SELECT
   id,
   url,
-  read
+  read,
+  count(*) OVER() AS full_count
 FROM
   reading
 WHERE
   user_id = $1
+ORDER BY $4
+LIMIT $2
+OFFSET $3
 `
 
-func (a *App) listReadingsOfUser(user *authModel.User) ([]*model.Reading, error) {
-	rows, err := a.db.Query(listByUserQuery, user.ID)
+func (a App) listReadingsOfUser(user *authModel.User, page, pageSize uint, sortKey string, sortAsc bool) ([]*model.Reading, uint, error) {
+	order := `creation_date DESC`
+
+	if sortKey != `` {
+		order = sortKey
+	}
+	if !sortAsc {
+		order = fmt.Sprintf(`%s DESC`, order)
+	}
+
+	offset := (page - 1) * pageSize
+
+	rows, err := a.db.Query(listByUserQuery, user.ID, pageSize, offset, order)
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, 0, errors.WithStack(err)
 	}
 
 	defer func() {
 		err = db.RowsClose(rows, err)
 	}()
 
-	list, err := scanReadings(rows)
+	list, totalCount, err := scanReadings(rows)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return list, a.readingTagService.EnrichReadingsWithTags(list)
+	return list, totalCount, a.readingTagService.EnrichReadingsWithTags(list)
 }
 
 const getByIDQuery = `
@@ -85,7 +111,7 @@ WHERE
   id = $1
 `
 
-func (a *App) getReadingByID(id string) (*model.Reading, error) {
+func (a App) getReadingByID(id string) (*model.Reading, error) {
 	row := a.db.QueryRow(getByIDQuery, id)
 	reading, err := scanReading(row)
 	if err != nil {
@@ -121,7 +147,7 @@ WHERE
   id = $1
 `
 
-func (a *App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
+func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 	if o == nil {
 		return errors.New(`cannot save nil Reading`)
 	}
@@ -164,7 +190,7 @@ WHERE
   id = $1
 `
 
-func (a *App) deleteReading(o *model.Reading, tx *sql.Tx) (err error) {
+func (a App) deleteReading(o *model.Reading, tx *sql.Tx) (err error) {
 	if o == nil {
 		return errors.New(`cannot delete nil Reading`)
 	}

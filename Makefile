@@ -80,11 +80,19 @@ build:
 start:
 	go run \
 		cmd/api.go \
-		-tls=false
+		-tls=false \
+		-dbHost ${EPONAE_DATABASE_HOST} \
+		-dbUser ${EPONAE_DATABASE_USER} \
+		-dbPass ${EPONAE_DATABASE_PASS} \
+		-dbName ${EPONAE_DATABASE_NAME}
 
 ## debug: Debug app
 .PHONY: debug
 debug:
 	dlv debug \
 		cmd/api.go -- \
-		-tls=false
+		-tls=false \
+		-dbHost ${EPONAE_DATABASE_HOST} \
+		-dbUser ${EPONAE_DATABASE_USER} \
+		-dbPass ${EPONAE_DATABASE_PASS} \
+		-dbName ${EPONAE_DATABASE_NAME}

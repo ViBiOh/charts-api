@@ -11,7 +11,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:e626f26c24766f3f6afcfbf6f1ab5225924a6df59008f6a7d9d6487d4bc4beca"
+  digest = "1:620227b69a37848d412a19015f7268a83396aeca82f7d6a6bbd0956c80c08715"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
@@ -22,11 +22,11 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "c0e57afb6858113e7da813ea0d49b1e3363e6482"
+  revision = "91a3eb7f7c82a805f1a7e75c79c857a15aa9b26a"
 
 [[projects]]
   branch = "master"
-  digest = "1:728d122c64610f6b1dc5aaa53326bf8759ab042bf3747a72ecf7734636171dd0"
+  digest = "1:cef114ec2c4d61fa4b84a54e3957cbe648ddb38df0e613c8330d6ada84a69a74"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -53,7 +53,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "230680740254e2980f88cde241cad2d239f4d283"
+  revision = "08cb8f858a20d8b33b15504d05bff2b97b35883f"
 
 [[projects]]
   branch = "master"
@@ -245,6 +245,8 @@
     "github.com/ViBiOh/httputils/pkg/prometheus",
     "github.com/ViBiOh/httputils/pkg/server",
     "github.com/ViBiOh/httputils/pkg/uuid",
+    "github.com/lib/pq",
+    "github.com/pkg/errors",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

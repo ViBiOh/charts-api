@@ -2,7 +2,10 @@ package model
 
 import (
 	authModel "github.com/ViBiOh/auth/pkg/model"
+	"github.com/ViBiOh/httputils/pkg/crud"
 )
+
+var _ crud.Item = Tag{}
 
 // Tag describe a meta label defined by an user
 type Tag struct {
