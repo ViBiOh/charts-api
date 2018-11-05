@@ -42,8 +42,8 @@ jobs:
 stages:
   - Build
   - Publish
-  # - name: Deploy
-  #   if: branch = master
+  - name: Deploy
+    if: branch = master
 
 notifications:
   email: false
