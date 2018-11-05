@@ -5,20 +5,14 @@ services:
     image: vibioh/eponae-api
     command:
     - -tls
-    - -csp
-    - "default-src 'self'; script-src 'unsafe-inline' ajax.googleapis.com cdnjs.cloudflare.com; style-src 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; font-src data: fonts.gstatic.com cdnjs.cloudflare.com; img-src data:"
-    - -eponaeDbHost
+    - -dbHost
     - ${EPONAE_DATABASE_HOST}
-    - -eponaeDbUser
+    - -dbUser
     - ${EPONAE_DATABASE_USER}
-    - -eponaeDbPass
+    - -dbPass
     - ${EPONAE_DATABASE_PASS}
-    - -eponaeDbName
+    - -dbName
     - ${EPONAE_DATABASE_NAME}
-    - -readingsAuthUsers
-    - eponae:admin
-    - -readingsBasicUsers
-    - 1:eponae:$$2a$$12$$CTmdj1LZIt/5fYYC/xxS4u7iwGA/FBEp2q3ewCzySbV4P4o4Yjc0W
     - -tracingName
     - eponae_api
     labels:

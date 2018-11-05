@@ -11,30 +11,29 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:804206cc8ed778e0f1f33a57859748b54cdc94e718a4413a4f421fcba3e72b38"
+  digest = "1:e626f26c24766f3f6afcfbf6f1ab5225924a6df59008f6a7d9d6487d4bc4beca"
   name = "github.com/ViBiOh/auth"
   packages = [
     "pkg/auth",
     "pkg/cookie",
+    "pkg/ident",
+    "pkg/ident/basic",
+    "pkg/ident/service",
     "pkg/model",
-    "pkg/provider",
-    "pkg/provider/basic",
-    "pkg/provider/github",
-    "pkg/service",
   ]
   pruneopts = "UT"
-  revision = "a4a2ee5369dc471318e04fc9097643f3f174bb88"
+  revision = "c0e57afb6858113e7da813ea0d49b1e3363e6482"
 
 [[projects]]
   branch = "master"
-  digest = "1:8cfc2c3ec7972a8c25239dc06982ac7f6f9f15f0d58e7a1bd999ef6624112df6"
+  digest = "1:728d122c64610f6b1dc5aaa53326bf8759ab042bf3747a72ecf7734636171dd0"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
     "pkg/alcotest",
-    "pkg/cache",
     "pkg/cert",
     "pkg/cors",
+    "pkg/crud",
     "pkg/db",
     "pkg/errors",
     "pkg/gzip",
@@ -52,10 +51,9 @@
     "pkg/server",
     "pkg/tools",
     "pkg/uuid",
-    "pkg/writer",
   ]
   pruneopts = "UT"
-  revision = "c58a9f65c48ba7dcba0c44f4efed009c341c17a5"
+  revision = "230680740254e2980f88cde241cad2d239f4d283"
 
 [[projects]]
   branch = "master"
@@ -219,69 +217,34 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d6b719875cf8091fbab38527d81d34e71f4521b9ee9ccfbd4a32cff2ac5af96e"
+  digest = "1:76ee51c3f468493aff39dbacc401e8831fbb765104cbf613b89bef01cf4bad70"
   name = "golang.org/x/net"
-  packages = [
-    "context",
-    "context/ctxhttp",
-  ]
+  packages = ["context"]
   pruneopts = "UT"
   revision = "c10e9556a7bc0e7c942242b606f0acf024ad5d6a"
-
-[[projects]]
-  branch = "master"
-  digest = "1:4d341b181fab9b500aea9ffce309127aee1bfc59601d8eb7adfdf6dc7e000349"
-  name = "golang.org/x/oauth2"
-  packages = [
-    ".",
-    "github",
-    "internal",
-  ]
-  pruneopts = "UT"
-  revision = "232e45548389bd9357411a6922a07c5fd4068bda"
-
-[[projects]]
-  digest = "1:08206298775e5b462e6c0333f4471b44e63f1a70e42952b6ede4ecc9572281eb"
-  name = "google.golang.org/appengine"
-  packages = [
-    "internal",
-    "internal/base",
-    "internal/datastore",
-    "internal/log",
-    "internal/remote_api",
-    "internal/urlfetch",
-    "urlfetch",
-  ]
-  pruneopts = "UT"
-  revision = "4a4468ece617fc8205e99368fa2200e9d1fad421"
-  version = "v1.3.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
     "github.com/ViBiOh/auth/pkg/auth",
+    "github.com/ViBiOh/auth/pkg/ident/basic",
+    "github.com/ViBiOh/auth/pkg/ident/service",
     "github.com/ViBiOh/auth/pkg/model",
-    "github.com/ViBiOh/auth/pkg/provider/basic",
-    "github.com/ViBiOh/auth/pkg/service",
     "github.com/ViBiOh/httputils/pkg",
     "github.com/ViBiOh/httputils/pkg/alcotest",
     "github.com/ViBiOh/httputils/pkg/cors",
+    "github.com/ViBiOh/httputils/pkg/crud",
     "github.com/ViBiOh/httputils/pkg/db",
     "github.com/ViBiOh/httputils/pkg/errors",
     "github.com/ViBiOh/httputils/pkg/gzip",
     "github.com/ViBiOh/httputils/pkg/healthcheck",
-    "github.com/ViBiOh/httputils/pkg/httperror",
-    "github.com/ViBiOh/httputils/pkg/httpjson",
     "github.com/ViBiOh/httputils/pkg/logger",
     "github.com/ViBiOh/httputils/pkg/opentracing",
     "github.com/ViBiOh/httputils/pkg/owasp",
-    "github.com/ViBiOh/httputils/pkg/pagination",
     "github.com/ViBiOh/httputils/pkg/prometheus",
-    "github.com/ViBiOh/httputils/pkg/request",
     "github.com/ViBiOh/httputils/pkg/server",
-    "github.com/ViBiOh/httputils/pkg/writer",
-    "github.com/pkg/errors",
+    "github.com/ViBiOh/httputils/pkg/uuid",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

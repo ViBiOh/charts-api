@@ -6,13 +6,15 @@ import (
 	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
-	"github.com/ViBiOh/auth/pkg/provider/basic"
-	authService "github.com/ViBiOh/auth/pkg/service"
-	apiHealthcheck "github.com/ViBiOh/eponae-api/pkg/healthcheck"
-	"github.com/ViBiOh/eponae-api/pkg/readings"
+	"github.com/ViBiOh/auth/pkg/ident/basic"
+	identService "github.com/ViBiOh/auth/pkg/ident/service"
+	"github.com/ViBiOh/eponae-api/pkg/reading"
+	"github.com/ViBiOh/eponae-api/pkg/readingtag"
+	"github.com/ViBiOh/eponae-api/pkg/tag"
 	"github.com/ViBiOh/httputils/pkg"
 	"github.com/ViBiOh/httputils/pkg/alcotest"
 	"github.com/ViBiOh/httputils/pkg/cors"
+	"github.com/ViBiOh/httputils/pkg/crud"
 	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/gzip"
 	"github.com/ViBiOh/httputils/pkg/healthcheck"
@@ -24,8 +26,8 @@ import (
 )
 
 const (
-	healthcheckPath = `/health`
-	readingsPath    = `/readings`
+	readingsPath = `/readings`
+	tagsPath     = `/tags`
 )
 
 func main() {
@@ -36,9 +38,12 @@ func main() {
 	owaspConfig := owasp.Flags(``)
 	corsConfig := cors.Flags(`cors`)
 
-	eponaeDbConfig := db.Flags(`eponaeDb`)
-	readingsAuthConfig := auth.Flags(`readingsAuth`)
-	readingsAuthBasicConfig := basic.Flags(`readingsBasic`)
+	dbConfig := db.Flags(`db`)
+	authConfig := auth.Flags(`auth`)
+	basicConfig := basic.Flags(`basic`)
+
+	readingsConfig := crud.Flags(`readings`)
+	tagsConfig := crud.Flags(`tags`)
 
 	flag.Parse()
 
@@ -52,18 +57,21 @@ func main() {
 	owaspApp := owasp.NewApp(owaspConfig)
 	corsApp := cors.NewApp(corsConfig)
 
-	eponaeDB, err := db.GetDB(eponaeDbConfig)
+	apiDB, err := db.GetDB(dbConfig)
 	if err != nil {
 		logger.Fatal(`%+v`, err)
 	}
-	readingsAuthApp := auth.NewApp(readingsAuthConfig, authService.NewBasicApp(readingsAuthBasicConfig))
-	readingsApp := readings.NewApp(eponaeDB)
+	authApp := auth.NewServiceApp(authConfig, identService.NewBasicApp(basicConfig, apiDB))
 
-	readingsHandler := server.ChainMiddlewares(http.StripPrefix(readingsPath, readingsApp.Handler()), readingsAuthApp)
+	tagService := tag.NewService(apiDB)
+	readingTagService := readingtag.NewService(apiDB, tagService)
+	readingService := reading.NewService(apiDB, readingTagService)
 
-	healthcheckApp.NextHealthcheck(http.StripPrefix(healthcheckPath, apiHealthcheck.NewApp(map[string]http.Handler{
-		readingsPath: readingsHandler,
-	}).Handler()))
+	readingsApp := crud.NewApp(readingsConfig, readingService)
+	tagsApp := crud.NewApp(tagsConfig, tagService)
+
+	readingsHandler := readingsApp.Handler()
+	tagsHandler := tagsApp.Handler()
 
 	apihandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, readingsPath) {
@@ -71,15 +79,22 @@ func main() {
 			return
 		}
 
-		if r.Method == http.MethodGet && (r.URL.Path == `/` || r.URL.Path == ``) {
-			http.ServeFile(w, r, `doc/api.html`)
+		if strings.HasPrefix(r.URL.Path, tagsPath) {
+			tagsHandler.ServeHTTP(w, r)
 			return
 		}
 
 		w.WriteHeader(http.StatusNotFound)
 	})
 
-	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp)
+	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp, authApp)
+	healthcheckApp.NextHealthcheck(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if db.Ping(apiDB) {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		}
+	}))
 
 	serverApp.ListenAndServe(handler, nil, healthcheckApp)
 }

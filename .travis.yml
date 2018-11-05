@@ -25,19 +25,19 @@ jobs:
     after_success: |
       curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/eponae-api
 
-  # - stage: Deploy
+  - stage: Deploy
 
-  #   script: |
-  #     sed \
-  #       -e "s|\${EPONAE_DATABASE_HOST}|${EPONAE_DATABASE_HOST}|g" \
-  #       -e "s|\${EPONAE_DATABASE_USER}|${EPONAE_DATABASE_USER}|g" \
-  #       -e "s|\${EPONAE_DATABASE_PASS}|${EPONAE_DATABASE_PASS}|g" \
-  #       -e "s|\${EPONAE_DATABASE_NAME}|${EPONAE_DATABASE_NAME}|g" \
-  #       docker-compose.yml > docker-compose-env.yml
-  #   deploy:
-  #     provider: script
-  #     skip_cleanup: true
-  #     script: 'curl -H "Authorization: GitHub ${GITHUB_OAUTH_TOKEN}" -X POST https://dashboard-api.vibioh.fr/deploy/eponae_api/ --data-binary @docker-compose-env.yml'
+    script: |
+      sed \
+        -e "s|\${EPONAE_DATABASE_HOST}|${EPONAE_DATABASE_HOST}|g" \
+        -e "s|\${EPONAE_DATABASE_USER}|${EPONAE_DATABASE_USER}|g" \
+        -e "s|\${EPONAE_DATABASE_PASS}|${EPONAE_DATABASE_PASS}|g" \
+        -e "s|\${EPONAE_DATABASE_NAME}|${EPONAE_DATABASE_NAME}|g" \
+        docker-compose.yml > docker-compose-env.yml
+    deploy:
+      provider: script
+      skip_cleanup: true
+      script: 'curl -H "Authorization: GitHub ${GITHUB_OAUTH_TOKEN}" -X POST https://dashboard-api.vibioh.fr/deploy/eponae_api/ --data-binary @docker-compose-env.yml'
 
 stages:
   - Build

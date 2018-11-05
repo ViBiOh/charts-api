@@ -1,8 +1,8 @@
--- Cleaning
+-- clean
 DROP TABLE IF EXISTS reading_tag;
 DROP TABLE IF EXISTS reading;
 DROP TABLE IF EXISTS tag;
-DROP TABLE IF EXISTS auth_user;
+DROP TABLE IF EXISTS "user";
 
 DROP INDEX IF EXISTS auth_user_id;
 DROP INDEX IF EXISTS auth_user_login;
@@ -13,20 +13,21 @@ DROP INDEX IF EXISTS tag_user;
 DROP INDEX IF EXISTS tag_name;
 
 -- user
-CREATE TABLE auth_user (
+CREATE TABLE "user" (
   id TEXT NOT NULL,
-  login TEXT NOT NULL,
+  username TEXT NOT NULL,
+  email TEXT NOT NULL,
   password TEXT NOT NULL,
   creation_date TIMESTAMP DEFAULT now()
 );
 
-CREATE UNIQUE INDEX auth_user_id ON auth_user (id);
-CREATE UNIQUE INDEX auth_user_login ON auth_user (login);
+CREATE UNIQUE INDEX user_id ON "user" (id);
+CREATE UNIQUE INDEX user_login ON "user" (login);
 
 -- reading
 CREATE TABLE reading (
   id TEXT NOT NULL,
-  user_id TEXT NOT NULL REFERENCES auth_user(id),
+  user_id TEXT NOT NULL REFERENCES "user"(id),
   url TEXT NOT NULL,
   read BOOLEAN NOT NULL DEFAULT FALSE,
   creation_date TIMESTAMP DEFAULT now()
@@ -38,7 +39,7 @@ CREATE INDEX reading_user ON reading (user_id);
 -- tag
 CREATE TABLE tag (
   id TEXT NOT NULL,
-  user_id TEXT NOT NULL REFERENCES auth_user(id),
+  user_id TEXT NOT NULL REFERENCES "user"(id),
   name TEXT NOT NULL,
   creation_date TIMESTAMP DEFAULT now()
 );
