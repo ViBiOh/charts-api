@@ -41,7 +41,7 @@ jobs:
 
 stages:
   - Build
-  - Publish
+  - name: Publish
     if: branch = master
   - name: Deploy
     if: branch = master
