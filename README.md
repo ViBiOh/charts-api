@@ -6,8 +6,16 @@
 
 ## Usage
 
-```
+```bash
 Usage of api:
+  -authDisable
+      [auth] Disable auth
+  -authUrl string
+      [auth] Auth URL, if remote
+  -authUsers string
+      [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user
+  -basicUsers string
+      [Basic] Users in the form "id:username:password,id2:username2:password2"
   -corsCredentials
       [cors] Access-Control-Allow-Credentials
   -corsExpose string
@@ -20,15 +28,15 @@ Usage of api:
       [cors] Access-Control-Allow-Origin (default "*")
   -csp string
       [owasp] Content-Security-Policy (default "default-src 'self'; base-uri 'self'")
-  -eponaeDbHost string
+  -dbHost string
       [database] Host
-  -eponaeDbName string
+  -dbName string
       [database] Name
-  -eponaeDbPass string
+  -dbPass string
       [database] Pass
-  -eponaeDbPort string
+  -dbPort string
       [database] Port (default "5432")
-  -eponaeDbUser string
+  -dbUser string
       [database] User
   -frameOptions string
       [owasp] X-Frame-Options (default "deny")
@@ -38,14 +46,22 @@ Usage of api:
       Listen port (default 1080)
   -prometheusPath string
       [prometheus] Path for exposing metrics (default "/metrics")
-  -readingsAuthDisable
-      [auth] Disable auth
-  -readingsAuthUrl string
-      [auth] Auth URL, if remote
-  -readingsAuthUsers string
-      [auth] List of allowed users and profiles (e.g. user:profile1|profile2,user2:profile3)
-  -readingsBasicUsers string
-      [Basic] Users in the form "id:username:password,id2:username2:password2"
+  -readingsDefaultPage uint
+      [readings] Default page (default 1)
+  -readingsDefaultPageSize uint
+      [readings] Default page size (default 20)
+  -readingsMaxPageSize uint
+      [readings] Max page size (default 500)
+  -readingsPath string
+      [readings] HTTP Path prefix (default "/readings")
+  -tagsDefaultPage uint
+      [tags] Default page (default 1)
+  -tagsDefaultPageSize uint
+      [tags] Default page size (default 20)
+  -tagsMaxPageSize uint
+      [tags] Max page size (default 500)
+  -tagsPath string
+      [tags] HTTP Path prefix (default "/tags")
   -tls
       Serve TLS content (default true)
   -tlsCert string

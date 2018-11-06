@@ -1,6 +1,6 @@
 FROM golang:1.11 as builder
 
-ENV APP_NAME api
+ENV APP_NAME eponae-api
 ENV WORKDIR ${GOPATH}/src/github.com/ViBiOh/eponae-api
 
 WORKDIR ${WORKDIR}
@@ -20,4 +20,4 @@ HEALTHCHECK --retries=10 CMD [ "/api", "-url", "https://localhost:1080/health" ]
 ENTRYPOINT [ "/api" ]
 
 COPY --from=builder /app/cacert.pem /etc/ssl/certs/ca-certificates.crt
-COPY --from=builder /app/${APP_NAME} /
+COPY --from=builder /app/${APP_NAME} /api
