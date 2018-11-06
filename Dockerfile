@@ -13,7 +13,7 @@ RUN make ${APP_NAME} \
 
 FROM scratch
 
-ENV APP_NAME api
+ENV APP_NAME eponae-api
 EXPOSE 1080
 
 HEALTHCHECK --retries=10 CMD [ "/api", "-url", "https://localhost:1080/health" ]
