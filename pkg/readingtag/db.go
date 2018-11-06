@@ -126,5 +126,5 @@ func (a App) EnrichReadingsWithTags(readings []*model.Reading) error {
 
 // EnrichReadingWithTags update given reading with tags data
 func (a App) EnrichReadingWithTags(reading *model.Reading) error {
-	return nil
+	return a.EnrichReadingsWithTags([]*model.Reading{reading})
 }

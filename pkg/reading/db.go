@@ -102,17 +102,17 @@ func (a App) listReadingsOfUser(user *authModel.User, page, pageSize uint, sortK
 const getByIDQuery = `
 SELECT
   id,
-  user_id,
   url,
   read
 FROM
   reading
 WHERE
-  id = $1
+  user_id = $1
+  AND id = $2
 `
 
-func (a App) getReadingByID(id string) (*model.Reading, error) {
-	row := a.db.QueryRow(getByIDQuery, id)
+func (a App) getReadingByID(user *authModel.User, id string) (*model.Reading, error) {
+	row := a.db.QueryRow(getByIDQuery, user.ID, id)
 	reading, err := scanReading(row)
 	if err != nil {
 		return nil, err
@@ -130,8 +130,8 @@ INSERT INTO
   url,
   read
 ) VALUES (
-  $1,
   $2,
+  $1,
   $3,
   $4
 )
@@ -141,10 +141,11 @@ const updateQuery = `
 UPDATE
   reading
 SET
-  url = $2,
-  read = $3
+  url = $3,
+  read = $4
 WHERE
-  id = $1
+  user_id = $1
+  AND id = $2
 `
 
 func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
@@ -164,16 +165,17 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 	}
 
 	if o.UUID != `` {
-		if _, err = usedTx.Exec(updateQuery, o.UUID, o.URL, o.Read); err != nil {
+		if _, err = usedTx.Exec(updateQuery, o.User.ID, o.UUID, o.URL, o.Read); err != nil {
 			err = errors.WithStack(err)
 		}
 	} else {
-		newID, err := uuid.New()
+		var newID string
+		newID, err = uuid.New()
 		if err != nil {
 			return err
 		}
 
-		if _, err = usedTx.Exec(insertQuery, newID, o.User.ID, o.URL, o.Read); err != nil {
+		if _, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.URL, o.Read); err != nil {
 			err = errors.WithStack(err)
 		} else {
 			o.UUID = newID
@@ -184,10 +186,11 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 }
 
 const deleteQuery = `
-DELETE
+DELETE FROM
   reading
 WHERE
-  id = $1
+  user_id = $1
+  AND id = $2
 `
 
 func (a App) deleteReading(o *model.Reading, tx *sql.Tx) (err error) {
@@ -206,7 +209,7 @@ func (a App) deleteReading(o *model.Reading, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if _, err = usedTx.Exec(deleteQuery, o.UUID); err != nil {
+	if _, err = usedTx.Exec(deleteQuery, o.User.ID, o.UUID); err != nil {
 		err = errors.WithStack(err)
 	}
 

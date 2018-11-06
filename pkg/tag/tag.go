@@ -3,9 +3,11 @@ package tag
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/crud"
+	"github.com/pkg/errors"
 )
 
 var _ crud.ItemService = &App{}
@@ -22,9 +24,15 @@ func NewService(db *sql.DB) *App {
 	}
 }
 
-// Empty creates an empty Tag
-func (a App) Empty() crud.Item {
-	return model.Tag{}
+// Unmarsall a Tag
+func (a App) Unmarsall(content []byte) (crud.Item, error) {
+	var tag model.Tag
+
+	if err := json.Unmarshal(content, &tag); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &tag, nil
 }
 
 //List TODO

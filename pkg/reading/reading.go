@@ -3,11 +3,13 @@ package reading
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/readingtag"
 	"github.com/ViBiOh/httputils/pkg/crud"
+	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/logger"
 )
@@ -28,12 +30,18 @@ func NewService(db *sql.DB, readingTagService *readingtag.App) *App {
 	}
 }
 
-// Empty creates an empty Reading
-func (a App) Empty() crud.Item {
-	return model.Reading{}
+// Unmarsall a Reading
+func (a App) Unmarsall(content []byte) (crud.Item, error) {
+	var reading model.Reading
+
+	if err := json.Unmarshal(content, &reading); err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return &reading, nil
 }
 
-//List TODO
+// List readings of user
 func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sortAsc bool, filters map[string][]string) ([]crud.Item, uint, error) {
 	user := auth.UserFromContext(ctx)
 	if user == nil {
@@ -54,22 +62,115 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 	return itemsList, total, nil
 }
 
-//Get TODO
+// Get reading of user
 func (a App) Get(ctx context.Context, ID string) (crud.Item, error) {
-	return nil, nil
+	user := auth.UserFromContext(ctx)
+	if user == nil {
+		return nil, errors.New(`user not provided`)
+	}
+
+	reading, err := a.getReadingByID(user, ID)
+	if err != nil {
+		logger.Error(`%+v`, err)
+		return nil, errors.New(`unable to get reading`)
+	}
+
+	return reading, nil
 }
 
-//Create TODO
-func (a App) Create(ctx context.Context, o crud.Item) (crud.Item, error) {
-	return nil, nil
+// Create reading
+func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error) {
+	var reading *model.Reading
+	reading, err = getReadingFromItem(ctx, o)
+	if err != nil {
+		return
+	}
+
+	tx, err := a.db.Begin()
+	if err != nil {
+		logger.Error(`%+v`, err)
+		return nil, errors.New(`unable to get transaction`)
+	}
+
+	defer func() {
+		err = db.EndTx(tx, err)
+	}()
+
+	reading.UUID = ``
+
+	err = a.saveReading(reading, tx)
+	if err != nil {
+		logger.Error(`%+v`, err)
+		err = errors.New(`unable to create reading`)
+
+		return
+	}
+
+	item = reading
+
+	return
 }
 
 //Update TODO
-func (a App) Update(ctx context.Context, o crud.Item) (crud.Item, error) {
-	return nil, nil
+func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error) {
+	var reading *model.Reading
+	reading, err = getReadingFromItem(ctx, o)
+	if err != nil {
+		return
+	}
+
+	tx, err := a.db.Begin()
+	if err != nil {
+		logger.Error(`%+v`, err)
+		return nil, errors.New(`unable to get transaction`)
+	}
+
+	defer func() {
+		err = db.EndTx(tx, err)
+	}()
+
+	err = a.saveReading(reading, nil)
+	if err != nil {
+		logger.Error(`%+v`, err)
+		err = errors.New(`unable to update reading`)
+
+		return
+	}
+
+	item = reading
+
+	return
 }
 
 //Delete TODO
-func (a App) Delete(ctx context.Context, o crud.Item) error {
-	return nil
+func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
+	var reading *model.Reading
+	reading, err = getReadingFromItem(ctx, o)
+	if err != nil {
+		return
+	}
+
+	err = a.deleteReading(reading, nil)
+	if err != nil {
+		logger.Error(`%+v`, err)
+		err = errors.New(`unable to delete reading`)
+	}
+
+	return
+}
+
+func getReadingFromItem(ctx context.Context, o crud.Item) (*model.Reading, error) {
+	user := auth.UserFromContext(ctx)
+	if user == nil {
+		return nil, errors.New(`user not provided`)
+	}
+
+	item, ok := o.(*model.Reading)
+	if !ok {
+		return nil, errors.New(`item is not a reading`)
+	}
+
+	item.User = user
+
+	return item, nil
 }
