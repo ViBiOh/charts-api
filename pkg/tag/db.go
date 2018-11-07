@@ -188,9 +188,10 @@ func (a App) saveTag(o *model.Tag, tx *sql.Tx) (err error) {
 
 		if _, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.Name); err != nil {
 			err = errors.WithStack(err)
-		} else {
-			o.ID = newID
+			return
 		}
+
+		o.ID = newID
 	}
 
 	return

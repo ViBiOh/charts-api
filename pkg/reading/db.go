@@ -177,9 +177,10 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 
 		if _, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.URL, o.Read); err != nil {
 			err = errors.WithStack(err)
-		} else {
-			o.ID = newID
+			return
 		}
+
+		o.ID = newID
 	}
 
 	return

@@ -106,6 +106,13 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return
 	}
 
+	if err = a.readingTagService.CreateTagsForReading(reading, tx); err != nil {
+		logger.Error(`%+v`, err)
+		err = errors.New(`unable to create reading's tags`)
+
+		return
+	}
+
 	item = reading
 
 	return
