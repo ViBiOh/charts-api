@@ -96,7 +96,7 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		err = db.EndTx(tx, err)
 	}()
 
-	reading.UUID = ``
+	reading.ID = ``
 
 	err = a.saveReading(reading, tx)
 	if err != nil {
@@ -111,7 +111,7 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 	return
 }
 
-//Update TODO
+// Update reading
 func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error) {
 	var reading *model.Reading
 	reading, err = getReadingFromItem(ctx, o)
@@ -142,7 +142,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 	return
 }
 
-//Delete TODO
+// Delete reading
 func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 	var reading *model.Reading
 	reading, err = getReadingFromItem(ctx, o)

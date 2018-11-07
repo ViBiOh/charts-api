@@ -75,7 +75,7 @@ func (a App) EnrichReadingsWithTags(readings []*model.Reading) error {
 
 	readingsID := make([]string, len(readings))
 	for i, reading := range readings {
-		readingsID[i] = reading.UUID
+		readingsID[i] = reading.ID
 	}
 
 	readingTags, err := a.listTagsByReadingIDs(readingsID)
@@ -102,13 +102,13 @@ func (a App) EnrichReadingsWithTags(readings []*model.Reading) error {
 
 	tagsByID := make(map[string]*model.Tag, 0)
 	for _, tagObj := range tags {
-		if _, ok := tagsByID[tagObj.UUID]; !ok {
-			tagsByID[tagObj.UUID] = tagObj
+		if _, ok := tagsByID[tagObj.ID]; !ok {
+			tagsByID[tagObj.ID] = tagObj
 		}
 	}
 
 	for _, reading := range readings {
-		if tagsID, ok := tagsByReading[reading.UUID]; ok {
+		if tagsID, ok := tagsByReading[reading.ID]; ok {
 			for _, tagID := range tagsID {
 				if tagObj, ok := tagsByID[tagID]; ok {
 					if reading.Tags == nil {

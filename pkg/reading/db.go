@@ -27,7 +27,7 @@ func scanReading(row model.RowScanner) (*model.Reading, error) {
 		return nil, errors.WithStack(err)
 	}
 
-	return &model.Reading{UUID: id, URL: url, Read: read}, nil
+	return &model.Reading{ID: id, URL: url, Read: read}, nil
 }
 
 func scanReadings(rows *sql.Rows) ([]*model.Reading, uint, error) {
@@ -49,7 +49,7 @@ func scanReadings(rows *sql.Rows) ([]*model.Reading, uint, error) {
 			return nil, 0, errors.WithStack(err)
 		}
 
-		list = append(list, &model.Reading{UUID: id, URL: url, Read: read})
+		list = append(list, &model.Reading{ID: id, URL: url, Read: read})
 	}
 
 	return list, totalCount, nil
@@ -164,8 +164,8 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if o.UUID != `` {
-		if _, err = usedTx.Exec(updateQuery, o.User.ID, o.UUID, o.URL, o.Read); err != nil {
+	if o.ID != `` {
+		if _, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.URL, o.Read); err != nil {
 			err = errors.WithStack(err)
 		}
 	} else {
@@ -178,7 +178,7 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 		if _, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.URL, o.Read); err != nil {
 			err = errors.WithStack(err)
 		} else {
-			o.UUID = newID
+			o.ID = newID
 		}
 	}
 
@@ -209,7 +209,7 @@ func (a App) deleteReading(o *model.Reading, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if _, err = usedTx.Exec(deleteQuery, o.User.ID, o.UUID); err != nil {
+	if _, err = usedTx.Exec(deleteQuery, o.User.ID, o.ID); err != nil {
 		err = errors.WithStack(err)
 	}
 
