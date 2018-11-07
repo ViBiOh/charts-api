@@ -4,14 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/readingtag"
+	"github.com/ViBiOh/eponae-api/pkg/tag"
 	"github.com/ViBiOh/httputils/pkg/crud"
 	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/errors"
-	"github.com/ViBiOh/httputils/pkg/logger"
 )
 
 var _ crud.ItemService = &App{}
@@ -20,13 +21,15 @@ var _ crud.ItemService = &App{}
 type App struct {
 	db                *sql.DB
 	readingTagService *readingtag.App
+	tagService        *tag.App
 }
 
 // NewService creates new ItemService
-func NewService(db *sql.DB, readingTagService *readingtag.App) *App {
+func NewService(db *sql.DB, readingTagService *readingtag.App, tagService *tag.App) *App {
 	return &App{
 		db:                db,
 		readingTagService: readingTagService,
+		tagService:        tagService,
 	}
 }
 
@@ -50,8 +53,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 
 	list, total, err := a.listReadingsOfUser(user, page, pageSize, sortKey, sortAsc)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		return nil, 0, errors.New(`unable to list readings of users`)
+		return nil, 0, errors.Wrap(err, `unable to list readings of users`)
 	}
 
 	itemsList := make([]crud.Item, len(list))
@@ -71,8 +73,7 @@ func (a App) Get(ctx context.Context, ID string) (crud.Item, error) {
 
 	reading, err := a.getReadingByID(user, ID)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		return nil, errors.New(`unable to get reading`)
+		return nil, errors.Wrap(err, `unable to get reading`)
 	}
 
 	return reading, nil
@@ -86,10 +87,13 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return
 	}
 
+	if err = a.check(reading); err != nil {
+		return nil, err
+	}
+
 	tx, err := a.db.Begin()
 	if err != nil {
-		logger.Error(`%+v`, err)
-		return nil, errors.New(`unable to get transaction`)
+		return nil, errors.Wrap(err, `unable to get transaction`)
 	}
 
 	defer func() {
@@ -100,15 +104,13 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveReading(reading, tx)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		err = errors.New(`unable to create reading`)
+		err = errors.Wrap(err, `unable to create reading`)
 
 		return
 	}
 
 	if err = a.readingTagService.CreateTagsForReading(reading, tx); err != nil {
-		logger.Error(`%+v`, err)
-		err = errors.New(`unable to create reading's tags`)
+		err = errors.Wrap(err, `unable to create reading's tags`)
 
 		return
 	}
@@ -126,10 +128,13 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return
 	}
 
+	if err = a.check(reading); err != nil {
+		return nil, err
+	}
+
 	tx, err := a.db.Begin()
 	if err != nil {
-		logger.Error(`%+v`, err)
-		return nil, errors.New(`unable to get transaction`)
+		return nil, errors.Wrap(err, `unable to get transaction`)
 	}
 
 	defer func() {
@@ -138,8 +143,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveReading(reading, tx)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		err = errors.New(`unable to update reading`)
+		err = errors.Wrap(err, `unable to update reading`)
 
 		return
 	}
@@ -159,11 +163,32 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 
 	err = a.deleteReading(reading, nil)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		err = errors.New(`unable to delete reading`)
+		err = errors.Wrap(err, `unable to delete reading`)
 	}
 
 	return
+}
+
+func (a App) check(reading *model.Reading) error {
+	if strings.TrimSpace(reading.URL) == `` {
+		return errors.Wrap(crud.ErrInvalid, `url is required`)
+	}
+
+	tagsIDs := make([]string, len(reading.Tags))
+	for _, tag := range reading.Tags {
+		tagsIDs = append(tagsIDs, tag.ID)
+	}
+
+	tags, err := a.tagService.FindTagsByIds(tagsIDs)
+	if err != nil {
+		return errors.Wrap(err, `unable to list tags`)
+	}
+
+	if len(tags) != len(reading.Tags) {
+		return crud.ErrNotFound
+	}
+
+	return nil
 }
 
 func getReadingFromItem(ctx context.Context, o crud.Item) (*model.Reading, error) {

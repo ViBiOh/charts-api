@@ -65,7 +65,7 @@ func main() {
 
 	tagService := tag.NewService(apiDB)
 	readingTagService := readingtag.NewService(apiDB, tagService)
-	readingService := reading.NewService(apiDB, readingTagService)
+	readingService := reading.NewService(apiDB, readingTagService, tagService)
 
 	readingsApp := crud.NewApp(readingsConfig, readingService)
 	tagsApp := crud.NewApp(tagsConfig, tagService)

@@ -8,7 +8,6 @@ import (
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/crud"
-	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/pkg/errors"
 )
 
@@ -46,8 +45,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 
 	list, total, err := a.listTagsOfUser(user, page, pageSize, sortKey, sortAsc)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		return nil, 0, errors.New(`unable to list tags of users`)
+		return nil, 0, errors.Wrap(err, `unable to list tags of users`)
 	}
 
 	itemsList := make([]crud.Item, len(list))
@@ -67,8 +65,7 @@ func (a App) Get(ctx context.Context, ID string) (crud.Item, error) {
 
 	tag, err := a.getTagByID(user, ID)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		return nil, errors.New(`unable to get tag`)
+		return nil, errors.Wrap(err, `unable to get tag`)
 	}
 
 	return tag, nil
@@ -86,8 +83,7 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveTag(tag, nil)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		err = errors.New(`unable to create tag`)
+		err = errors.Wrap(err, `unable to create tag`)
 
 		return
 	}
@@ -107,8 +103,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveTag(tag, nil)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		err = errors.New(`unable to update tag`)
+		err = errors.Wrap(err, `unable to update tag`)
 
 		return
 	}
@@ -128,8 +123,7 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 
 	err = a.deleteTag(tag, nil)
 	if err != nil {
-		logger.Error(`%+v`, err)
-		err = errors.New(`unable to delete tag`)
+		err = errors.Wrap(err, `unable to delete tag`)
 	}
 
 	return
