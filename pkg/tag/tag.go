@@ -8,7 +8,6 @@ import (
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/crud"
-	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/pkg/errors"
 )
@@ -83,19 +82,9 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return
 	}
 
-	tx, err := a.db.Begin()
-	if err != nil {
-		logger.Error(`%+v`, err)
-		return nil, errors.New(`unable to get transaction`)
-	}
-
-	defer func() {
-		err = db.EndTx(tx, err)
-	}()
-
 	tag.ID = ``
 
-	err = a.saveTag(tag, tx)
+	err = a.saveTag(tag, nil)
 	if err != nil {
 		logger.Error(`%+v`, err)
 		err = errors.New(`unable to create tag`)
@@ -115,16 +104,6 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 	if err != nil {
 		return
 	}
-
-	tx, err := a.db.Begin()
-	if err != nil {
-		logger.Error(`%+v`, err)
-		return nil, errors.New(`unable to get transaction`)
-	}
-
-	defer func() {
-		err = db.EndTx(tx, err)
-	}()
 
 	err = a.saveTag(tag, nil)
 	if err != nil {

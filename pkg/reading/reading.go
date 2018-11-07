@@ -129,7 +129,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 		err = db.EndTx(tx, err)
 	}()
 
-	err = a.saveReading(reading, nil)
+	err = a.saveReading(reading, tx)
 	if err != nil {
 		logger.Error(`%+v`, err)
 		err = errors.New(`unable to update reading`)
