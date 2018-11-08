@@ -5,7 +5,7 @@ import (
 	"github.com/ViBiOh/httputils/pkg/crud"
 )
 
-var _ crud.Item = Reading{}
+var _ crud.Item = &Reading{}
 
 // Reading describe an url saved by an user
 type Reading struct {
@@ -14,4 +14,9 @@ type Reading struct {
 	Read bool            `json:"read"`
 	Tags []*Tag          `json:"tags"`
 	User *authModel.User `json:"-"`
+}
+
+// SetID setter for ID
+func (o *Reading) SetID(id string) {
+	o.ID = id
 }

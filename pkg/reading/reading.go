@@ -100,8 +100,6 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		err = db.EndTx(tx, err)
 	}()
 
-	reading.ID = ``
-
 	err = a.saveReading(reading, tx)
 	if err != nil {
 		err = errors.Wrap(err, `unable to create reading`)
@@ -148,6 +146,12 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return
 	}
 
+	if err = a.readingTagService.UpdateTagsForReading(reading, tx); err != nil {
+		err = errors.Wrap(err, `unable to update reading's tags`)
+
+		return
+	}
+
 	item = reading
 
 	return
@@ -169,14 +173,14 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 	return
 }
 
-func (a App) check(reading *model.Reading) error {
-	if strings.TrimSpace(reading.URL) == `` {
+func (a App) check(o *model.Reading) error {
+	if strings.TrimSpace(o.URL) == `` {
 		return errors.Wrap(crud.ErrInvalid, `url is required`)
 	}
 
-	tagsIDs := make([]string, len(reading.Tags))
-	for _, tag := range reading.Tags {
-		tagsIDs = append(tagsIDs, tag.ID)
+	tagsIDs := make([]string, len(o.Tags))
+	for index, tag := range o.Tags {
+		tagsIDs[index] = tag.ID
 	}
 
 	tags, err := a.tagService.FindTagsByIds(tagsIDs)
@@ -184,7 +188,7 @@ func (a App) check(reading *model.Reading) error {
 		return errors.Wrap(err, `unable to list tags`)
 	}
 
-	if len(tags) != len(reading.Tags) {
+	if len(tags) != len(o.Tags) {
 		return crud.ErrNotFound
 	}
 

@@ -4,11 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/crud"
-	"github.com/pkg/errors"
+	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
 var _ crud.ItemService = &App{}
@@ -79,7 +80,9 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return
 	}
 
-	tag.ID = ``
+	if err = a.check(tag); err != nil {
+		return nil, err
+	}
 
 	err = a.saveTag(tag, nil)
 	if err != nil {
@@ -99,6 +102,10 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 	tag, err = getTagFromItem(ctx, o)
 	if err != nil {
 		return
+	}
+
+	if err = a.check(tag); err != nil {
+		return nil, err
 	}
 
 	err = a.saveTag(tag, nil)
@@ -127,6 +134,14 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 	}
 
 	return
+}
+
+func (a App) check(o *model.Tag) error {
+	if strings.TrimSpace(o.Name) == `` {
+		return errors.Wrap(crud.ErrInvalid, `name is required`)
+	}
+
+	return nil
 }
 
 func getTagFromItem(ctx context.Context, o crud.Item) (*model.Tag, error) {

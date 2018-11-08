@@ -6,6 +6,7 @@ import (
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/errors"
+	"github.com/ViBiOh/httputils/pkg/tools"
 	"github.com/lib/pq"
 )
 
@@ -129,18 +130,6 @@ func (a App) EnrichReadingWithTags(o *model.Reading) error {
 	return a.EnrichReadingsWithTags([]*model.Reading{o})
 }
 
-const insertQuery = `
-INSERT INTO
-  reading_tag
-(
-  reading_id,
-  tag_id
-) VALUES (
-  $2,
-  $1
-)
-`
-
 // CreateTagsForReading creates tags' link for given reading
 func (a App) CreateTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
 	if o == nil {
@@ -159,11 +148,126 @@ func (a App) CreateTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
 	}
 
 	for _, tag := range o.Tags {
-		if _, err = usedTx.Exec(insertQuery, o.ID, tag.ID); err != nil {
-			err = errors.WithStack(err)
-
+		if err = a.insertReadingTag(&model.ReadingTag{ReadingID: o.ID, TagID: tag.ID}, usedTx); err != nil {
 			return
 		}
+	}
+
+	return
+}
+
+// UpdateTagsForReading update tags' link for given reading
+func (a App) UpdateTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
+	if o == nil {
+		return errors.New(`cannot create tag for nil Reading`)
+	}
+
+	var usedTx *sql.Tx
+	if usedTx, err = db.GetTx(a.db, tx); err != nil {
+		return
+	}
+
+	if usedTx != tx {
+		defer func() {
+			err = db.EndTx(usedTx, err)
+		}()
+	}
+
+	newTagIDs := make([]string, len(o.Tags))
+	for index, tag := range o.Tags {
+		newTagIDs[index] = tag.ID
+	}
+
+	var existingTags []*model.ReadingTag
+	existingTags, err = a.listTagsByReadingIDs([]string{o.ID})
+	if err != nil {
+		return
+	}
+
+	existingTagIDs := make([]string, len(existingTags))
+	for index, existingTag := range existingTags {
+		existingTagIDs[index] = existingTag.TagID
+
+		if !tools.IncludesString(newTagIDs, existingTag.TagID) {
+			err = a.deleteReadingTag(existingTag, usedTx)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	for _, newTagID := range newTagIDs {
+		if !tools.IncludesString(existingTagIDs, newTagID) {
+			if err = a.insertReadingTag(&model.ReadingTag{ReadingID: o.ID, TagID: newTagID}, usedTx); err != nil {
+				return
+			}
+		}
+	}
+
+	return
+}
+
+const insertQuery = `
+INSERT INTO
+  reading_tag
+(
+  reading_id,
+  tag_id
+) VALUES (
+  $1,
+  $2
+)
+`
+
+func (a App) insertReadingTag(o *model.ReadingTag, tx *sql.Tx) (err error) {
+	if o == nil {
+		return errors.New(`cannot insert nil ReadingTag`)
+	}
+
+	var usedTx *sql.Tx
+	if usedTx, err = db.GetTx(a.db, tx); err != nil {
+		return
+	}
+
+	if usedTx != tx {
+		defer func() {
+			err = db.EndTx(usedTx, err)
+		}()
+	}
+
+	if _, err = usedTx.Exec(insertQuery, o.ReadingID, o.TagID); err != nil {
+		err = errors.WithStack(err)
+	}
+
+	return
+}
+
+const deleteQuery = `
+DELETE FROM
+  reading_tag
+WHERE
+  reading_id = $1
+  AND tag_id = $2
+`
+
+func (a App) deleteReadingTag(o *model.ReadingTag, tx *sql.Tx) (err error) {
+	if o == nil {
+		return errors.New(`cannot delete nil ReadingTag`)
+	}
+
+	var usedTx *sql.Tx
+	if usedTx, err = db.GetTx(a.db, tx); err != nil {
+		return
+	}
+
+	if usedTx != tx {
+		defer func() {
+			err = db.EndTx(usedTx, err)
+		}()
+	}
+
+	if _, err = usedTx.Exec(deleteQuery, o.ReadingID, o.TagID); err != nil {
+		err = errors.WithStack(err)
 	}
 
 	return

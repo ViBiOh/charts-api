@@ -26,7 +26,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1fef3b60bb6b0b150cf38135e21d28f01fff0c582aec69d5c419b3d47b05fcd1"
+  digest = "1:18e1bdd779ae0016fc99566a01262760fc6529e6410c08b95f2e79d75ae27bdb"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
@@ -53,7 +53,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "f1d3b450743ae88b35992392df0e6ad4c49b0978"
+  revision = "9751b22aee7c5c567ed2fc12d8c68a1973d59293"
 
 [[projects]]
   branch = "master"
@@ -221,7 +221,7 @@
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = "UT"
-  revision = "a544f70c90f196e50d198126db0c4cb2b562fec0"
+  revision = "03003ca0c849e57b6ea29a4bab8d3cb6e4d568fe"
 
 [solve-meta]
   analyzer-name = "dep"
@@ -244,6 +244,7 @@
     "github.com/ViBiOh/httputils/pkg/owasp",
     "github.com/ViBiOh/httputils/pkg/prometheus",
     "github.com/ViBiOh/httputils/pkg/server",
+    "github.com/ViBiOh/httputils/pkg/tools",
     "github.com/ViBiOh/httputils/pkg/uuid",
     "github.com/lib/pq",
     "github.com/pkg/errors",
