@@ -130,34 +130,8 @@ func (a App) EnrichReadingWithTags(o *model.Reading) error {
 	return a.EnrichReadingsWithTags([]*model.Reading{o})
 }
 
-// CreateTagsForReading creates tags' link for given reading
-func (a App) CreateTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
-	if o == nil {
-		return errors.New(`cannot create tag for nil Reading`)
-	}
-
-	var usedTx *sql.Tx
-	if usedTx, err = db.GetTx(a.db, tx); err != nil {
-		return
-	}
-
-	if usedTx != tx {
-		defer func() {
-			err = db.EndTx(usedTx, err)
-		}()
-	}
-
-	for _, tag := range o.Tags {
-		if err = a.insertReadingTag(&model.ReadingTag{ReadingID: o.ID, TagID: tag.ID}, usedTx); err != nil {
-			return
-		}
-	}
-
-	return
-}
-
-// UpdateTagsForReading update tags' link for given reading
-func (a App) UpdateTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
+// SaveTagsForReading update tags' link for given reading
+func (a App) SaveTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
 	if o == nil {
 		return errors.New(`cannot create tag for nil Reading`)
 	}

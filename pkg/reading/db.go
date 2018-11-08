@@ -183,6 +183,12 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 		o.ID = newID
 	}
 
+	if err = a.readingTagService.SaveTagsForReading(o, usedTx); err != nil {
+		err = errors.Wrap(err, `unable to save reading's tags`)
+
+		return
+	}
+
 	return
 }
 

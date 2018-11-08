@@ -11,7 +11,6 @@ import (
 	"github.com/ViBiOh/eponae-api/pkg/readingtag"
 	"github.com/ViBiOh/eponae-api/pkg/tag"
 	"github.com/ViBiOh/httputils/pkg/crud"
-	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/errors"
 )
 
@@ -91,24 +90,9 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return nil, err
 	}
 
-	tx, err := a.db.Begin()
-	if err != nil {
-		return nil, errors.Wrap(err, `unable to get transaction`)
-	}
-
-	defer func() {
-		err = db.EndTx(tx, err)
-	}()
-
-	err = a.saveReading(reading, tx)
+	err = a.saveReading(reading, nil)
 	if err != nil {
 		err = errors.Wrap(err, `unable to create reading`)
-
-		return
-	}
-
-	if err = a.readingTagService.CreateTagsForReading(reading, tx); err != nil {
-		err = errors.Wrap(err, `unable to create reading's tags`)
 
 		return
 	}
@@ -130,24 +114,9 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return nil, err
 	}
 
-	tx, err := a.db.Begin()
-	if err != nil {
-		return nil, errors.Wrap(err, `unable to get transaction`)
-	}
-
-	defer func() {
-		err = db.EndTx(tx, err)
-	}()
-
-	err = a.saveReading(reading, tx)
+	err = a.saveReading(reading, nil)
 	if err != nil {
 		err = errors.Wrap(err, `unable to update reading`)
-
-		return
-	}
-
-	if err = a.readingTagService.UpdateTagsForReading(reading, tx); err != nil {
-		err = errors.Wrap(err, `unable to update reading's tags`)
 
 		return
 	}
