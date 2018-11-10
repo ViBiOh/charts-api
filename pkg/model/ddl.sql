@@ -14,7 +14,7 @@ DROP INDEX IF EXISTS tag_name;
 
 -- user
 CREATE TABLE "user" (
-  id TEXT NOT NULL,
+  id UUID NOT NULL,
   username TEXT NOT NULL,
   email TEXT NOT NULL,
   password TEXT NOT NULL,
@@ -26,8 +26,8 @@ CREATE UNIQUE INDEX user_login ON "user" (username);
 
 -- reading
 CREATE TABLE reading (
-  id TEXT NOT NULL,
-  user_id TEXT NOT NULL REFERENCES "user"(id),
+  id UUID NOT NULL,
+  user_id UUID NOT NULL REFERENCES "user"(id),
   url TEXT NOT NULL,
   read BOOLEAN NOT NULL DEFAULT FALSE,
   creation_date TIMESTAMP DEFAULT now()
@@ -38,8 +38,8 @@ CREATE INDEX reading_user ON reading (user_id);
 
 -- tag
 CREATE TABLE tag (
-  id TEXT NOT NULL,
-  user_id TEXT NOT NULL REFERENCES "user"(id),
+  id UUID NOT NULL,
+  user_id UUID NOT NULL REFERENCES "user"(id),
   name TEXT NOT NULL,
   creation_date TIMESTAMP DEFAULT now()
 );
@@ -50,7 +50,10 @@ CREATE INDEX tag_name ON tag (name);
 
 -- tag / reading association
 CREATE TABLE reading_tag (
-  reading_id TEXT NOT NULL REFERENCES reading(id),
-  tag_id TEXT NOT NULL REFERENCES tag(id),
+  reading_id UUID NOT NULL REFERENCES reading(id),
+  tag_id UUID NOT NULL REFERENCES tag(id),
   creation_date TIMESTAMP DEFAULT now()
 );
+
+CREATE INDEX reading_tag_reading_id ON reading_tag (reading_id);
+CREATE INDEX reading_tag_tag_id ON reading_tag (tag_id);
