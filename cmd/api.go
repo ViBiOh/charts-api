@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
@@ -47,7 +48,9 @@ func main() {
 	readingsConfig := crud.Flags(fs, `readings`)
 	tagsConfig := crud.Flags(fs, `tags`)
 
-	flag.Parse()
+	if err := fs.Parse(os.Args[1:]); err != nil {
+		logger.Fatal(`%+v`, err)
+	}
 
 	alcotest.DoAndExit(alcotestConfig)
 

@@ -7,7 +7,7 @@
 ## Usage
 
 ```bash
-Usage of api:
+Usage of eponae-api:
   -authDisable
       [auth] Disable auth
   -authUrl string
@@ -15,7 +15,7 @@ Usage of api:
   -authUsers string
       [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user
   -basicUsers string
-      [Basic] Users in the form "id:username:password,id2:username2:password2"
+      [basic] Users in the form "id:username:password,id2:username2:password2"
   -corsCredentials
       [cors] Access-Control-Allow-Credentials
   -corsExpose string
