@@ -6,14 +6,14 @@ import (
 	"github.com/ViBiOh/eponae-api/pkg/tag"
 )
 
-// App stores informations
+// App of package
 type App struct {
 	db         *sql.DB
 	tagService *tag.App
 }
 
-// NewService creates new Service
-func NewService(db *sql.DB, tagService *tag.App) *App {
+// New creates new App
+func New(db *sql.DB, tagService *tag.App) *App {
 	return &App{
 		db:         db,
 		tagService: tagService,

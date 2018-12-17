@@ -31,44 +31,46 @@ const (
 )
 
 func main() {
-	serverConfig := httputils.Flags(``)
-	alcotestConfig := alcotest.Flags(``)
-	prometheusConfig := prometheus.Flags(`prometheus`)
-	opentracingConfig := opentracing.Flags(`tracing`)
-	owaspConfig := owasp.Flags(``)
-	corsConfig := cors.Flags(`cors`)
+	fs := flag.NewFlagSet("eponae-api", flag.ExitOnError)
 
-	dbConfig := db.Flags(`db`)
-	authConfig := auth.Flags(`auth`)
-	basicConfig := basic.Flags(`basic`)
+	serverConfig := httputils.Flags(fs, ``)
+	alcotestConfig := alcotest.Flags(fs, ``)
+	prometheusConfig := prometheus.Flags(fs, `prometheus`)
+	opentracingConfig := opentracing.Flags(fs, `tracing`)
+	owaspConfig := owasp.Flags(fs, ``)
+	corsConfig := cors.Flags(fs, `cors`)
 
-	readingsConfig := crud.Flags(`readings`)
-	tagsConfig := crud.Flags(`tags`)
+	dbConfig := db.Flags(fs, `db`)
+	authConfig := auth.Flags(fs, `auth`)
+	basicConfig := basic.Flags(fs, `basic`)
+
+	readingsConfig := crud.Flags(fs, `readings`)
+	tagsConfig := crud.Flags(fs, `tags`)
 
 	flag.Parse()
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	serverApp := httputils.NewApp(serverConfig)
-	healthcheckApp := healthcheck.NewApp()
-	prometheusApp := prometheus.NewApp(prometheusConfig)
-	opentracingApp := opentracing.NewApp(opentracingConfig)
-	gzipApp := gzip.NewApp()
-	owaspApp := owasp.NewApp(owaspConfig)
-	corsApp := cors.NewApp(corsConfig)
+	serverApp := httputils.New(serverConfig)
+	healthcheckApp := healthcheck.New()
+	prometheusApp := prometheus.New(prometheusConfig)
+	opentracingApp := opentracing.New(opentracingConfig)
+	gzipApp := gzip.New()
+	owaspApp := owasp.New(owaspConfig)
+	corsApp := cors.New(corsConfig)
 
-	apiDB, err := db.GetDB(dbConfig)
+	apiDB, err := db.New(dbConfig)
 	if err != nil {
 		logger.Fatal(`%+v`, err)
 	}
-	authApp := auth.NewServiceApp(authConfig, identService.NewBasicApp(basicConfig, apiDB))
+	authApp := auth.NewService(authConfig, identService.NewBasic(basicConfig, apiDB))
 
-	tagService := tag.NewService(apiDB)
-	readingTagService := readingtag.NewService(apiDB, tagService)
-	readingService := reading.NewService(apiDB, readingTagService, tagService)
+	tagService := tag.New(apiDB)
+	readingTagService := readingtag.New(apiDB, tagService)
+	readingService := reading.New(apiDB, readingTagService, tagService)
 
-	readingsApp := crud.NewApp(readingsConfig, readingService)
-	tagsApp := crud.NewApp(tagsConfig, tagService)
+	readingsApp := crud.New(readingsConfig, readingService)
+	tagsApp := crud.New(tagsConfig, tagService)
 
 	readingsHandler := readingsApp.Handler()
 	tagsHandler := tagsApp.Handler()

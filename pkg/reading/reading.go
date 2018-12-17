@@ -16,15 +16,15 @@ import (
 
 var _ crud.ItemService = &App{}
 
-// App stores informations
+// App of package
 type App struct {
 	db                *sql.DB
 	readingTagService *readingtag.App
 	tagService        *tag.App
 }
 
-// NewService creates new ItemService
-func NewService(db *sql.DB, readingTagService *readingtag.App, tagService *tag.App) *App {
+// New creates new App
+func New(db *sql.DB, readingTagService *readingtag.App, tagService *tag.App) *App {
 	return &App{
 		db:                db,
 		readingTagService: readingTagService,

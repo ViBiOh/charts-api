@@ -14,13 +14,13 @@ import (
 
 var _ crud.ItemService = &App{}
 
-// App stores informations and secret of API
+// App of package
 type App struct {
 	db *sql.DB
 }
 
-// NewService creates new ItemService
-func NewService(db *sql.DB) *App {
+// New creates new App
+func New(db *sql.DB) *App {
 	return &App{
 		db: db,
 	}
