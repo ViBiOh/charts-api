@@ -22,7 +22,6 @@ import (
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
-	"github.com/ViBiOh/httputils/pkg/prometheus"
 	"github.com/ViBiOh/httputils/pkg/server"
 )
 
@@ -36,7 +35,6 @@ func main() {
 
 	serverConfig := httputils.Flags(fs, ``)
 	alcotestConfig := alcotest.Flags(fs, ``)
-	prometheusConfig := prometheus.Flags(fs, `prometheus`)
 	opentracingConfig := opentracing.Flags(fs, `tracing`)
 	owaspConfig := owasp.Flags(fs, ``)
 	corsConfig := cors.Flags(fs, `cors`)
@@ -56,7 +54,6 @@ func main() {
 
 	serverApp := httputils.New(serverConfig)
 	healthcheckApp := healthcheck.New()
-	prometheusApp := prometheus.New(prometheusConfig)
 	opentracingApp := opentracing.New(opentracingConfig)
 	gzipApp := gzip.New()
 	owaspApp := owasp.New(owaspConfig)
@@ -92,7 +89,7 @@ func main() {
 		w.WriteHeader(http.StatusNotFound)
 	})
 
-	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp, authApp)
+	handler := server.ChainMiddlewares(apihandler, opentracingApp, gzipApp, owaspApp, corsApp, authApp)
 	healthcheckApp.NextHealthcheck(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if db.Ping(apiDB) {
 			w.WriteHeader(http.StatusOK)
