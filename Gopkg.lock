@@ -22,7 +22,7 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "48d443fc36552b7af562cff26d6d42477b5438d6"
+  revision = "f1350386d8c8393f90ae80f615d0b10ff7529577"
 
 [[projects]]
   branch = "master"
@@ -52,7 +52,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "2fff2dd86693cb2230add917d8660d112cb7294a"
+  revision = "b569bdfdbf9036f8f2026fc7203db165decc61ec"
 
 [[projects]]
   branch = "master"
@@ -75,11 +75,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:5d7236b6cedaadd901d2f1533113f11c955bb676df646b676c94d13c43dfedbe"
+  digest = "1:bfc0c5e306ac24c94aaa10bcd8f22ef1436005582da9241c0742a1a26fd93174"
   name = "github.com/opentracing-contrib/go-stdlib"
   packages = ["nethttp"]
   pruneopts = "UT"
-  revision = "09659152d0aa5b83bb7683a9c33c79f8ee57038c"
+  revision = "77df8e8e70b403c6b13c0fffaa4867c9044ff4e9"
 
 [[projects]]
   digest = "1:450b7623b185031f3a456801155c8320209f75d0d4c4e633c6b1e59d44d6e392"
@@ -94,12 +94,12 @@
   version = "v1.0.2"
 
 [[projects]]
-  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
   name = "github.com/pkg/errors"
   packages = ["."]
   pruneopts = "UT"
-  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
-  version = "v0.8.0"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
 
 [[projects]]
   digest = "1:ac6f26e917fd2fb3194a7ebe2baf6fb32de2f2fbfed130c18aac0e758a6e1d22"
@@ -144,7 +144,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "505ab145d0a99da450461ae2c1a9f6cd10d1f447"
+  revision = "ff983b9c42bc9fbf91556e191cc8efb585c16908"
 
 [[projects]]
   branch = "master"
@@ -152,7 +152,7 @@
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = "UT"
-  revision = "e147a9138326bc0e9d4e179541ffd8af41cff8a9"
+  revision = "927f97764cc334a6575f4b7a1584a147864d5723"
 
 [solve-meta]
   analyzer-name = "dep"
