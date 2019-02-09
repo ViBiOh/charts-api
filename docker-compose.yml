@@ -13,6 +13,8 @@ services:
     - ${EPONAE_DATABASE_PASS}
     - -dbName
     - ${EPONAE_DATABASE_NAME}
+    - -tracingAgent
+    - monitoring_jaeger:6831
     - -tracingName
     - eponae_api
     labels:
