@@ -89,7 +89,7 @@ func main() {
 			return
 		}
 
-		w.WriteHeader(http.StatusNotFound)
+		http.ServeFile(w, r, `/api.html`)
 	})
 
 	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp, authApp)
