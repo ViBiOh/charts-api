@@ -22,7 +22,7 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "4ce7f4db1829a16f84fd5c047cbf69703fb45762"
+  revision = "d670266ec95226f3268b071e80580e81515929bc"
 
 [[projects]]
   branch = "master"
@@ -53,7 +53,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "5b2e3b39a3fbd11f191a87559ba9d9a9f0de2b24"
+  revision = "a1db1860e57f3e9b24c53fe39a6c247be70e8937"
 
 [[projects]]
   branch = "master"
@@ -76,19 +76,19 @@
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = "UT"
-  revision = "c823c79ea1570fb5ff454033735a8e68575d1d0f"
-  version = "v1.3.0"
+  revision = "b5d812f8a3706043e23a9cd5babf2e5423744d30"
+  version = "v1.3.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:7cefc4f7f6a411c2598d3344563e4d23fd4e4d88fd1591831fe39cccff41ad28"
+  digest = "1:a0fbab378714ec562fdf627fe78cfc819ac3c4a08a18d87f9acd8018817bf068"
   name = "github.com/lib/pq"
   packages = [
     ".",
     "oid",
   ]
   pruneopts = "UT"
-  revision = "9eb73efc1fcc404148b56765b0d3f61d9a5ef8ee"
+  revision = "5ccc9857e3a95a4233a13e445831cb31b90e73a6"
 
 [[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
@@ -100,11 +100,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:79c4e50acb2d5c0938b10b6536306693fd72a42f79f2e868df12d059671b419d"
+  digest = "1:c58bca71e857da7662bb1dbc23a06bdfa56a063297989ff3a12d6ccae0f15690"
   name = "github.com/opentracing-contrib/go-stdlib"
   packages = ["nethttp"]
   pruneopts = "UT"
-  revision = "464eb271c715662757b5c583d6b020270873f529"
+  revision = "431a6bc76b4852198549116d114392e4b9098836"
 
 [[projects]]
   digest = "1:450b7623b185031f3a456801155c8320209f75d0d4c4e633c6b1e59d44d6e392"
@@ -160,7 +160,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:01cd0cd47758f04c5604daa3be4637e2afa1e0c15af7e08289e95360369e4f48"
+  digest = "1:c31163bd62461e0c5f7ddc7363e39ef8d9e929693e77b5c11c709b05f9cb9219"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
@@ -170,7 +170,7 @@
     "xfs",
   ]
   pruneopts = "UT"
-  revision = "d0f344d83b0c80a1bc03b547a2374a9ec6711144"
+  revision = "55ae3d9d557340b5bc24cd8aa5f6fa2c2ab31352"
 
 [[projects]]
   digest = "1:ac6f26e917fd2fb3194a7ebe2baf6fb32de2f2fbfed130c18aac0e758a6e1d22"
@@ -215,7 +215,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "8dd112bcdc25174059e45e07517d9fc663123347"
+  revision = "b7391e95e576cacdcdd422573063bc057239113d"
 
 [[projects]]
   branch = "master"
@@ -223,7 +223,7 @@
   name = "golang.org/x/net"
   packages = ["context"]
   pruneopts = "UT"
-  revision = "16b79f2e4e95ea23b2bf9903c9809ff7b013ce85"
+  revision = "addf6b3196f61cd44ce5a76657913698c73479d0"
 
 [solve-meta]
   analyzer-name = "dep"
