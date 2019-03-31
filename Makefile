@@ -52,7 +52,7 @@ go: format lint tst bench build
 ## doc: Build doc
 .PHONY: doc
 doc:
-	docker run -it --rm -v $(pwd)/doc:/doc quay.io/bukalapak/snowboard html -o api.html api.apib
+	docker run -it --rm -v "$(pwd)/doc:/doc" quay.io/bukalapak/snowboard html -o api.html api.apib
 
 ## deps: Download dependencies
 .PHONY: deps
