@@ -47,12 +47,12 @@ func (a App) Unmarsall(content []byte) (crud.Item, error) {
 func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sortAsc bool, filters map[string][]string) ([]crud.Item, uint, error) {
 	user := auth.UserFromContext(ctx)
 	if user == nil {
-		return nil, 0, errors.New(`user not provided`)
+		return nil, 0, errors.New("user not provided")
 	}
 
 	list, total, err := a.listReadingsOfUser(user, page, pageSize, sortKey, sortAsc)
 	if err != nil {
-		return nil, 0, errors.Wrap(err, `unable to list readings of users`)
+		return nil, 0, errors.Wrap(err, "unable to list readings of users")
 	}
 
 	itemsList := make([]crud.Item, len(list))
@@ -67,12 +67,12 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 func (a App) Get(ctx context.Context, ID string) (crud.Item, error) {
 	user := auth.UserFromContext(ctx)
 	if user == nil {
-		return nil, errors.New(`user not provided`)
+		return nil, errors.New("user not provided")
 	}
 
 	reading, err := a.getReadingByID(user, ID)
 	if err != nil {
-		return nil, errors.Wrap(err, `unable to get reading`)
+		return nil, errors.Wrap(err, "unable to get reading")
 	}
 
 	return reading, nil
@@ -92,7 +92,7 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveReading(reading, nil)
 	if err != nil {
-		err = errors.Wrap(err, `unable to create reading`)
+		err = errors.Wrap(err, "unable to create reading")
 
 		return
 	}
@@ -116,7 +116,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveReading(reading, nil)
 	if err != nil {
-		err = errors.Wrap(err, `unable to update reading`)
+		err = errors.Wrap(err, "unable to update reading")
 
 		return
 	}
@@ -136,15 +136,15 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 
 	err = a.deleteReading(reading, nil)
 	if err != nil {
-		err = errors.Wrap(err, `unable to delete reading`)
+		err = errors.Wrap(err, "unable to delete reading")
 	}
 
 	return
 }
 
 func (a App) check(o *model.Reading) error {
-	if strings.TrimSpace(o.URL) == `` {
-		return errors.Wrap(crud.ErrInvalid, `url is required`)
+	if strings.TrimSpace(o.URL) == "" {
+		return errors.Wrap(crud.ErrInvalid, "url is required")
 	}
 
 	tagsIDs := make([]string, len(o.Tags))
@@ -154,7 +154,7 @@ func (a App) check(o *model.Reading) error {
 
 	tags, err := a.tagService.FindTagsByIds(tagsIDs)
 	if err != nil {
-		return errors.Wrap(err, `unable to list tags`)
+		return errors.Wrap(err, "unable to list tags")
 	}
 
 	if len(tags) != len(o.Tags) {
@@ -167,12 +167,12 @@ func (a App) check(o *model.Reading) error {
 func getReadingFromItem(ctx context.Context, o crud.Item) (*model.Reading, error) {
 	user := auth.UserFromContext(ctx)
 	if user == nil {
-		return nil, errors.New(`user not provided`)
+		return nil, errors.New("user not provided")
 	}
 
 	item, ok := o.(*model.Reading)
 	if !ok {
-		return nil, errors.New(`item is not a reading`)
+		return nil, errors.New("item is not a reading")
 	}
 
 	item.User = user

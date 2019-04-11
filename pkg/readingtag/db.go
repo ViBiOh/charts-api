@@ -133,7 +133,7 @@ func (a App) EnrichReadingWithTags(o *model.Reading) error {
 // SaveTagsForReading update tags' link for given reading
 func (a App) SaveTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
 	if o == nil {
-		return errors.New(`cannot create tag for nil Reading`)
+		return errors.New("cannot create tag for nil Reading")
 	}
 
 	var usedTx *sql.Tx
@@ -195,7 +195,7 @@ INSERT INTO
 
 func (a App) insertReadingTag(o *model.ReadingTag, tx *sql.Tx) (err error) {
 	if o == nil {
-		return errors.New(`cannot insert nil ReadingTag`)
+		return errors.New("cannot insert nil ReadingTag")
 	}
 
 	var usedTx *sql.Tx
@@ -226,7 +226,7 @@ WHERE
 
 func (a App) deleteReadingTag(o *model.ReadingTag, tx *sql.Tx) (err error) {
 	if o == nil {
-		return errors.New(`cannot delete nil ReadingTag`)
+		return errors.New("cannot delete nil ReadingTag")
 	}
 
 	var usedTx *sql.Tx

@@ -97,13 +97,13 @@ OFFSET $3
 `
 
 func (a App) listTagsOfUser(user *authModel.User, page, pageSize uint, sortKey string, sortAsc bool) ([]*model.Tag, uint, error) {
-	order := `creation_date DESC`
+	order := "creation_date DESC"
 
-	if sortKey != `` {
+	if sortKey != "" {
 		order = sortKey
 	}
 	if !sortAsc {
-		order = fmt.Sprintf(`%s DESC`, order)
+		order = fmt.Sprintf("%s DESC", order)
 	}
 
 	offset := (page - 1) * pageSize
@@ -161,7 +161,7 @@ WHERE
 
 func (a App) saveTag(o *model.Tag, tx *sql.Tx) (err error) {
 	if o == nil {
-		return errors.New(`cannot save nil Tag`)
+		return errors.New("cannot save nil Tag")
 	}
 
 	var usedTx *sql.Tx
@@ -175,7 +175,7 @@ func (a App) saveTag(o *model.Tag, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if o.ID != `` {
+	if o.ID != "" {
 		if _, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.Name); err != nil {
 			err = errors.WithStack(err)
 		}
@@ -207,7 +207,7 @@ WHERE
 
 func (a App) deleteTag(o *model.Tag, tx *sql.Tx) (err error) {
 	if o == nil {
-		return errors.New(`cannot delete nil Tag`)
+		return errors.New("cannot delete nil Tag")
 	}
 
 	var usedTx *sql.Tx

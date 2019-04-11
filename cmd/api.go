@@ -27,29 +27,29 @@ import (
 )
 
 const (
-	readingsPath = `/readings`
-	tagsPath     = `/tags`
+	readingsPath = "/readings"
+	tagsPath     = "/tags"
 )
 
 func main() {
 	fs := flag.NewFlagSet("eponae-api", flag.ExitOnError)
 
-	serverConfig := httputils.Flags(fs, ``)
-	alcotestConfig := alcotest.Flags(fs, ``)
-	prometheusConfig := prometheus.Flags(fs, `prometheus`)
-	opentracingConfig := opentracing.Flags(fs, `tracing`)
-	owaspConfig := owasp.Flags(fs, ``)
-	corsConfig := cors.Flags(fs, `cors`)
+	serverConfig := httputils.Flags(fs, "")
+	alcotestConfig := alcotest.Flags(fs, "")
+	prometheusConfig := prometheus.Flags(fs, "prometheus")
+	opentracingConfig := opentracing.Flags(fs, "tracing")
+	owaspConfig := owasp.Flags(fs, "")
+	corsConfig := cors.Flags(fs, "cors")
 
-	dbConfig := db.Flags(fs, `db`)
-	authConfig := auth.Flags(fs, `auth`)
-	basicConfig := basic.Flags(fs, `basic`)
+	dbConfig := db.Flags(fs, "db")
+	authConfig := auth.Flags(fs, "auth")
+	basicConfig := basic.Flags(fs, "basic")
 
-	readingsConfig := crud.Flags(fs, `readings`)
-	tagsConfig := crud.Flags(fs, `tags`)
+	readingsConfig := crud.Flags(fs, "readings")
+	tagsConfig := crud.Flags(fs, "tags")
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
-		logger.Fatal(`%+v`, err)
+		logger.Fatal("%+v", err)
 	}
 
 	alcotest.DoAndExit(alcotestConfig)
@@ -64,7 +64,7 @@ func main() {
 
 	apiDB, err := db.New(dbConfig)
 	if err != nil {
-		logger.Fatal(`%+v`, err)
+		logger.Fatal("%+v", err)
 	}
 	authApp := auth.NewService(authConfig, identService.NewBasic(basicConfig, apiDB))
 
@@ -89,7 +89,7 @@ func main() {
 			return
 		}
 
-		http.ServeFile(w, r, `/api.html`)
+		http.ServeFile(w, r, "/api.html")
 	})
 
 	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp, authApp)

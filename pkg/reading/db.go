@@ -71,13 +71,13 @@ OFFSET $3
 `
 
 func (a App) listReadingsOfUser(user *authModel.User, page, pageSize uint, sortKey string, sortAsc bool) ([]*model.Reading, uint, error) {
-	order := `creation_date DESC`
+	order := "creation_date DESC"
 
-	if sortKey != `` {
+	if sortKey != "" {
 		order = sortKey
 	}
 	if !sortAsc {
-		order = fmt.Sprintf(`%s DESC`, order)
+		order = fmt.Sprintf("%s DESC", order)
 	}
 
 	offset := (page - 1) * pageSize
@@ -150,7 +150,7 @@ WHERE
 
 func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 	if o == nil {
-		return errors.New(`cannot save nil Reading`)
+		return errors.New("cannot save nil Reading")
 	}
 
 	var usedTx *sql.Tx
@@ -164,7 +164,7 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if o.ID != `` {
+	if o.ID != "" {
 		if _, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.URL, o.Read); err != nil {
 			err = errors.WithStack(err)
 		}
@@ -184,7 +184,7 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 	}
 
 	if err = a.readingTagService.SaveTagsForReading(o, usedTx); err != nil {
-		err = errors.Wrap(err, `unable to save reading's tags`)
+		err = errors.Wrap(err, "unable to save reading's tags")
 
 		return
 	}
@@ -202,7 +202,7 @@ WHERE
 
 func (a App) deleteReading(o *model.Reading, tx *sql.Tx) (err error) {
 	if o == nil {
-		return errors.New(`cannot delete nil Reading`)
+		return errors.New("cannot delete nil Reading")
 	}
 
 	var usedTx *sql.Tx
