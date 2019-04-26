@@ -16,10 +16,6 @@ services:
     healthcheck:
       test: [ "CMD", "psql", "-q", "-t", "-c", "SELECT now();" ]
     user: postgres
-    logging:
-      driver: json-file
-      options:
-        max-size: '10m'
     restart: on-failure:5
     cpu_shares: 256
     mem_limit: 134217728
