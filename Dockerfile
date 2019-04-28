@@ -16,7 +16,7 @@ FROM scratch
 ENV APP_NAME eponae-api
 EXPOSE 1080
 
-HEALTHCHECK --retries=10 CMD [ "/api", "-url", "https://localhost:1080/health" ]
+HEALTHCHECK --retries=10 CMD [ "/api", "-url", "http://localhost:1080/health" ]
 ENTRYPOINT [ "/api" ]
 
 COPY ./doc/api.html /api.html
