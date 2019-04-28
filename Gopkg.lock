@@ -22,16 +22,15 @@
     "pkg/model",
   ]
   pruneopts = "UT"
-  revision = "de806f1e09f6e6d047588baed0b7d98961b265e8"
+  revision = "4aa85158665da5ea44aad4b27c1f7058c9e74688"
 
 [[projects]]
   branch = "master"
-  digest = "1:596cdfcd5e0e7fa0ba937b3a2c84e50a8aed521fff9b9e9a5e27ccbf83d2c947"
+  digest = "1:7a2efa21af10261734321f6df48092f9329fbbd811f124b34f87ff831a7c22e6"
   name = "github.com/ViBiOh/httputils"
   packages = [
     "pkg",
     "pkg/alcotest",
-    "pkg/cert",
     "pkg/cors",
     "pkg/crud",
     "pkg/db",
@@ -53,7 +52,7 @@
     "pkg/uuid",
   ]
   pruneopts = "UT"
-  revision = "751b4f2862d35d785f73bef12e38733e610e3b56"
+  revision = "7f155d4514001316eedafe5a74a3a52659a2fb5c"
 
 [[projects]]
   digest = "1:d6afaeed1502aa28e80a4ed0981d570ad91b2579193404256ce672ed0a609e0d"
@@ -153,11 +152,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:49b09905e781d7775c086604cc00083e1832d0783f1f421b79f42657c457d029"
+  digest = "1:2ea45e71e0198d6b989ed6302cc4f72a83be1e7d6469d08a59e56a2c447aea55"
   name = "github.com/prometheus/procfs"
   packages = ["."]
   pruneopts = "UT"
-  revision = "8368d24ba045f26503eb745b624d930cbe214c79"
+  revision = "87a4384529e0652f5035fb5cc8095faf73ea9b0b"
 
 [[projects]]
   digest = "1:3b0ac1ac6f703e6d43f4e29c97da2c9e34465c66e2e19f9828e9841d1c9279a4"
@@ -202,7 +201,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "df01cb2cc480549d72034218dd98bf97671450ac"
+  revision = "a29dc8fdc73485234dbef99ebedb95d2eced08de"
 
 [solve-meta]
   analyzer-name = "dep"
