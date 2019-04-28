@@ -4,7 +4,6 @@ services:
   api:
     image: vibioh/eponae-api
     command:
-    - -tls
     - -dbHost
     - ${EPONAE_DATABASE_HOST}
     - -dbUser
@@ -22,7 +21,7 @@ services:
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: api.eponae.fr'
-      traefik.protocol: 'https'
+      traefik.protocol: 'http'
       traefik.port: '1080'
       traefik.frontend.rateLimit.extractorFunc: 'client.ip'
       traefik.frontend.rateLimit.rateSet.first.period: '60s'

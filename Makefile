@@ -89,14 +89,12 @@ bench:
 ## build: Build binary
 .PHONY: build
 build:
-	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(BINARY_PATH) cmd/api.go
+	CGO_ENABLED=0 go build -ldflags="-s -w" -installsuffix nocgo -o $(BINARY_PATH) $(SERVER_SOURCE)
 
 ## start: Start app
 .PHONY: start
 start:
 	$(SERVER_RUNNER) \
-		cmd/api.go \
-		-tls=false \
 		-dbHost ${EPONAE_DATABASE_HOST} \
 		-dbUser ${EPONAE_DATABASE_USER} \
 		-dbPass ${EPONAE_DATABASE_PASS} \

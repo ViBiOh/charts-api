@@ -9,77 +9,67 @@
 ```bash
 Usage of eponae-api:
   -authDisable
-      [auth] Disable auth
+        [auth] Disable auth
   -authUrl string
-      [auth] Auth URL, if remote
+        [auth] Auth URL, if remote
   -authUsers string
-      [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user
-  -basicUsers string
-      [basic] Users in the form "id:username:password,id2:username2:password2"
+        [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user
+  -basicUsers id:username:password,id2:username2:password2
+        [basic] Users in the form id:username:password,id2:username2:password2
+  -cert string
+        [http] Certificate file
   -corsCredentials
-      [cors] Access-Control-Allow-Credentials
+        [cors] Access-Control-Allow-Credentials
   -corsExpose string
-      [cors] Access-Control-Expose-Headers
+        [cors] Access-Control-Expose-Headers
   -corsHeaders string
-      [cors] Access-Control-Allow-Headers (default "Content-Type")
+        [cors] Access-Control-Allow-Headers (default "Content-Type")
   -corsMethods string
-      [cors] Access-Control-Allow-Methods (default "GET")
+        [cors] Access-Control-Allow-Methods (default "GET")
   -corsOrigin string
-      [cors] Access-Control-Allow-Origin (default "*")
+        [cors] Access-Control-Allow-Origin (default "*")
   -csp string
-      [owasp] Content-Security-Policy (default "default-src 'self'; base-uri 'self'")
+        [owasp] Content-Security-Policy (default "default-src 'self'; base-uri 'self'")
   -dbHost string
-      [database] Host
+        [db] Host
   -dbName string
-      [database] Name
+        [db] Name
   -dbPass string
-      [database] Pass
+        [db] Pass
   -dbPort string
-      [database] Port (default "5432")
+        [db] Port (default "5432")
   -dbUser string
-      [database] User
+        [db] User
   -frameOptions string
-      [owasp] X-Frame-Options (default "deny")
+        [owasp] X-Frame-Options (default "deny")
   -hsts
-      [owasp] Indicate Strict Transport Security (default true)
+        [owasp] Indicate Strict Transport Security (default true)
+  -key string
+        [http] Key file
   -port int
-      Listen port (default 1080)
+        [http] Listen port (default 1080)
   -prometheusPath string
-      [prometheus] Path for exposing metrics (default "/metrics")
+        [prometheus] Path for exposing metrics (default "/metrics")
   -readingsDefaultPage uint
-      [readings] Default page (default 1)
+        [readings] Default page (default 1)
   -readingsDefaultPageSize uint
-      [readings] Default page size (default 20)
+        [readings] Default page size (default 20)
   -readingsMaxPageSize uint
-      [readings] Max page size (default 500)
-  -readingsPath string
-      [readings] HTTP Path prefix (default "/readings")
+        [readings] Max page size (default 500)
   -tagsDefaultPage uint
-      [tags] Default page (default 1)
+        [tags] Default page (default 1)
   -tagsDefaultPageSize uint
-      [tags] Default page size (default 20)
+        [tags] Default page size (default 20)
   -tagsMaxPageSize uint
-      [tags] Max page size (default 500)
-  -tagsPath string
-      [tags] HTTP Path prefix (default "/tags")
-  -tls
-      Serve TLS content (default true)
-  -tlsCert string
-      [tls] PEM Certificate file
-  -tlsHosts string
-      [tls] Self-signed certificate hosts, comma separated (default "localhost")
-  -tlsKey string
-      [tls] PEM Key file
-  -tlsOrganization string
-      [tls] Self-signed certificate organization (default "ViBiOh")
+        [tags] Max page size (default 500)
   -tracingAgent string
-      [opentracing] Jaeger Agent (e.g. host:port) (default "jaeger:6831")
+        [tracing] Jaeger Agent (e.g. host:port) (default "jaeger:6831")
   -tracingName string
-      [opentracing] Service name
+        [tracing] Service name
   -url string
-      [health] URL to check
+        [alcotest] URL to check
   -userAgent string
-      [health] User-Agent for check (default "Golang alcotest")
+        [alcotest] User-Agent for check (default "Golang alcotest")
 ```
 
 ## Postgres installation
