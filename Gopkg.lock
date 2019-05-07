@@ -72,7 +72,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:bdd53b87de8185da386bae179c84d4848854c6870bacacf6a154fe63e2e750f7"
+  digest = "1:50588ce0151209a5579bb0e8998f02da27682a1590589a0c8aaf403ae9d16614"
   name = "github.com/lib/pq"
   packages = [
     ".",
@@ -80,7 +80,7 @@
     "scram",
   ]
   pruneopts = "UT"
-  revision = "bc6a3c0594130b1e34005880bc600b6d3f49fa7f"
+  revision = "ceb88a0649027d76542fd8084fcb4e07b4d52295"
 
 [[projects]]
   digest = "1:ff5ebae34cfbf047d505ee150de27e60570e8c394b3b8fdbb720ff6ac71985fc"
@@ -152,14 +152,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:08f5524b0ca33fab03c05bd0015337c1d5658c3cf580d4772d789cbe42344db3"
+  digest = "1:191d4582bcd2323519d02fadd61dab4cd0b3425c23c2a1268afe2644d416bfd4"
   name = "github.com/prometheus/procfs"
   packages = [
     ".",
     "internal/fs",
   ]
   pruneopts = "UT"
-  revision = "740c0778500738e56e1877d52904c431a3fdc573"
+  revision = "bc6930f2d5103de3e494ee4f4dc68c195271c57b"
 
 [[projects]]
   digest = "1:3b0ac1ac6f703e6d43f4e29c97da2c9e34465c66e2e19f9828e9841d1c9279a4"
@@ -204,7 +204,7 @@
     "blowfish",
   ]
   pruneopts = "UT"
-  revision = "a29dc8fdc73485234dbef99ebedb95d2eced08de"
+  revision = "e1dfcc566284e143ba8f9afbb3fa563f2a0d212b"
 
 [solve-meta]
   analyzer-name = "dep"

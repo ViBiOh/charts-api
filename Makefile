@@ -49,11 +49,6 @@ $(APP_NAME): deps go
 .PHONY: go
 go: format lint test bench build
 
-## doc: Build doc
-.PHONY: doc
-doc:
-	docker run -it --rm -v "${PWD}/doc:/doc" quay.io/bukalapak/snowboard html -o api.html api.apib
-
 ## deps: Download dependencies
 .PHONY: deps
 deps:
@@ -95,6 +90,7 @@ build:
 .PHONY: start
 start:
 	$(SERVER_RUNNER) \
+		-csp "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' unpkg.com/swagger-ui-dist@3/; style-src 'self' 'unsafe-inline' unpkg.com/swagger-ui-dist@3/; img-src 'self' data:; connect-src 'self' api.eponae.fr" \
 		-dbHost ${EPONAE_DATABASE_HOST} \
 		-dbUser ${EPONAE_DATABASE_USER} \
 		-dbPass ${EPONAE_DATABASE_PASS} \

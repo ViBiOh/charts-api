@@ -4,6 +4,7 @@ import (
 	"flag"
 	"net/http"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
@@ -29,6 +30,8 @@ import (
 const (
 	readingsPath = "/readings"
 	tagsPath     = "/tags"
+
+	docPath = "doc/"
 )
 
 func main() {
@@ -89,13 +92,14 @@ func main() {
 			return
 		}
 
-		http.ServeFile(w, r, "/api.html")
+		w.Header().Set("Cache-Control", "no-cache")
+		http.ServeFile(w, r, path.Join(docPath, r.URL.Path))
 	})
 
 	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp, authApp)
 	healthcheckApp.NextHealthcheck(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if db.Ping(apiDB) {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 		} else {
 			w.WriteHeader(http.StatusServiceUnavailable)
 		}

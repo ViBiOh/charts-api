@@ -1,0 +1,15 @@
+openapi: 3.0.0
+info:
+  description: Eponae's API
+  title: API of Eponae
+  version: '0.0.1'
+
+paths:
+  /health:
+    get:
+      description: Healthcheck of app
+      responses:
+        '204':
+          description: Everything is fine
+        '503':
+          description: App is shutting down

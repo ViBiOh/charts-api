@@ -6,7 +6,3 @@ coverage.*
 # Docker
 cacert.pem
 data/
-
-# Documentation
-snowboard
-doc/*.html

@@ -4,6 +4,8 @@ services:
   api:
     image: vibioh/eponae-api
     command:
+    - -csp
+    - "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' unpkg.com/swagger-ui-dist@3/; style-src 'self' 'unsafe-inline' unpkg.com/swagger-ui-dist@3/; img-src 'self' data:; connect-src 'self' api.eponae.fr"
     - -dbHost
     - ${EPONAE_DATABASE_HOST}
     - -dbUser
@@ -12,8 +14,6 @@ services:
     - ${EPONAE_DATABASE_PASS}
     - -dbName
     - ${EPONAE_DATABASE_NAME}
-    - -csp
-    - "default-src 'self'; script-src 'unsafe-inline' ajax.googleapis.com cdnjs.cloudflare.com; style-src 'unsafe-inline' cdnjs.cloudflare.com fonts.googleapis.com; font-src data: fonts.gstatic.com cdnjs.cloudflare.com; img-src data:"
     - -tracingAgent
     - monitoring_jaeger:6831
     - -tracingName
