@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   description: Eponae's API
   title: API of Eponae
-  version: '0.0.1'
+  version: '1.0.0'
 
 paths:
   /health:
@@ -13,3 +13,264 @@ paths:
           description: Everything is fine
         '503':
           description: App is shutting down
+
+  /tags:
+    get:
+      description: List Tags with pagination
+      parameters:
+      - name: page
+        in: query
+        description: Page of list
+        default: 1
+        schema:
+          type: integer
+          format: int
+      - name: pageSize
+        in: query
+        description: Page size of list
+        default: 20
+        schema:
+          type: integer
+          format: int
+      - name: sort
+        in: query
+        description: Sort key of list
+        schema:
+          type: string
+      - name: desc
+        in: query
+        description: Sort by descending order
+        schema:
+          type: boolean
+
+      responses:
+        '200':
+          description: Paginated list of Tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    format: int
+                    description: Page of list
+                  pageSize:
+                    type: integer
+                    format: int
+                    description: Pagesize of list
+                  pageCount:
+                    type: integer
+                    format: int
+                    description: Number of pages
+                  total:
+                    type: integer
+                    format: int
+                    description: Total count of Tags
+                  results:
+                    $ref: '#/components/schemas/Tags'
+
+        '400':
+          description: Invalid pagination parameters
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '416':
+          description: No more data for pagination
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+    options:
+      description: Show crud headers
+
+      responses:
+        '204':
+          description: Headers for Tags
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+    post:
+      description: Create a Tag
+      requestBody:
+        description: Tag to create
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Tag's name
+
+      responses:
+        '201':
+          description: Tag created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+        '400':
+          description: Invalid payload for creation
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+  /tags/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Tag's ID
+        required: true
+        schema:
+          type: string
+
+    get:
+      description: Retrieve a Tag
+
+      responses:
+        '200':
+          description: Tag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '404':
+          description: Tag not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+    options:
+      description: Show crud headers
+
+      responses:
+        '204':
+          description: Headers for Tags
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+    put:
+      description: Update a Tag
+      requestBody:
+        description: Tag data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+
+      responses:
+        '200':
+          description: Tag updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+        '400':
+          description: Invalid payload for update
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '404':
+          description: Tag not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+    delete:
+      description: Delete a Tag
+
+      responses:
+        '204':
+          description: Tag deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '404':
+          description: Tag not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  schemas:
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Tag's identifier
+        name:
+          type: string
+          description: Tag's name
+
+    Tags:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tag'
+
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      headers:
+        Www-Authenticate:
+          schema:
+            type: string
+
+    Error:
+      description: Internal server error
+      content:
+        text/plain:
+          schema:
+            type: string
+
+security:
+- basicAuth: []

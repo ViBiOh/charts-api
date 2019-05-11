@@ -78,8 +78,8 @@ func main() {
 	readingsApp := crud.New(readingsConfig, readingService)
 	tagsApp := crud.New(tagsConfig, tagService)
 
-	readingsHandler := readingsApp.Handler()
-	tagsHandler := tagsApp.Handler()
+	readingsHandler := http.StripPrefix(readingsPath, readingsApp.Handler())
+	tagsHandler := http.StripPrefix(tagsPath, tagsApp.Handler())
 
 	apihandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, readingsPath) {

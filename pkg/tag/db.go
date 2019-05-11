@@ -58,7 +58,7 @@ const listTagsByIDs = `
 SELECT
   id,
   name,
-  count(*) OVER() AS full_count
+  count(id) OVER() AS full_count
 FROM
   tag
 WHERE
