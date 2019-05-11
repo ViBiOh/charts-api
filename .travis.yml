@@ -7,7 +7,7 @@ jobs:
     - docker
     script: |
       make doc
-      docker build --build-arg "VERSION=$(make version)" -t "vibioh/$(make name):$(make version)" .
+      docker build --build-arg "APP_VERSION=$(make version)" -t "vibioh/$(make name):$(make version)" .
     after_success: |
       echo "${DOCKER_PASS}" | docker login -u vibioh --password-stdin
       docker push "vibioh/$(make name):$(make version)"
