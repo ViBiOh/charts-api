@@ -1,13 +1,12 @@
 # eponae-api
 
 [![Build Status](https://travis-ci.org/ViBiOh/eponae-api.svg?branch=master)](https://travis-ci.org/ViBiOh/eponae-api)
-[![codecov](https://codecov.io/gh/ViBiOh/eponae-api/branch/master/graph/badge.svg)](https://codecov.io/gh/ViBiOh/eponae-api)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ViBiOh/eponae-api)](https://goreportcard.com/report/github.com/ViBiOh/eponae-api)
 
 ## Usage
 
 ```bash
-Usage of eponae-api:
+Usage of eponae-api:Usage of eponae-api:
   -authDisable
         [auth] Disable auth
   -authUrl string
@@ -42,6 +41,8 @@ Usage of eponae-api:
         [db] User
   -frameOptions string
         [owasp] X-Frame-Options (default "deny")
+  -graceful string
+        [http] Graceful close duration (default "35s")
   -hsts
         [owasp] Indicate Strict Transport Security (default true)
   -key string
