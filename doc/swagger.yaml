@@ -14,6 +14,18 @@ paths:
         '503':
           description: App is shutting down
 
+  /version:
+    get:
+      description: Version of app
+
+      responses:
+        '200':
+          description: Version of app
+          content:
+            text/plain:
+              schema:
+                type: string
+
   /tags:
     get:
       description: List Tags with pagination
