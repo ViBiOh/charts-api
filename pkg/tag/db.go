@@ -7,9 +7,9 @@ import (
 	authModel "github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/pkg/db"
+	"github.com/ViBiOh/httputils/pkg/errors"
 	"github.com/ViBiOh/httputils/pkg/uuid"
 	"github.com/lib/pq"
-	"github.com/pkg/errors"
 )
 
 func scanTag(row model.RowScanner) (*model.Tag, error) {
