@@ -121,6 +121,7 @@ paths:
                 name:
                   type: string
                   description: Tag's name
+                  required: true
 
       responses:
         '201':
@@ -248,6 +249,236 @@ paths:
         '500':
           $ref: '#/components/schemas/Error'
 
+  /readings:
+    get:
+      description: List Readings with pagination
+      parameters:
+      - name: page
+        in: query
+        description: Page of list
+        default: 1
+        schema:
+          type: integer
+          format: int
+      - name: pageSize
+        in: query
+        description: Page size of list
+        default: 20
+        schema:
+          type: integer
+          format: int
+      - name: sort
+        in: query
+        description: Sort key of list
+        schema:
+          type: string
+      - name: desc
+        in: query
+        description: Sort by descending order
+        schema:
+          type: boolean
+
+      responses:
+        '200':
+          description: Paginated list of Readings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    format: int
+                    description: Page of list
+                  pageSize:
+                    type: integer
+                    format: int
+                    description: Pagesize of list
+                  pageCount:
+                    type: integer
+                    format: int
+                    description: Number of pages
+                  total:
+                    type: integer
+                    format: int
+                    description: Total count of Readings
+                  results:
+                    $ref: '#/components/schemas/readings'
+
+        '400':
+          description: Invalid pagination parameters
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '416':
+          description: No more data for pagination
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+    options:
+      description: Show crud headers
+
+      responses:
+        '204':
+          description: Headers for Readings
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+    post:
+      description: Create a Tag
+      requestBody:
+        description: Tag to create
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: Reading's url
+                  required: true
+                read:
+                  type: boolean
+                  description: Reading's read state
+                tags:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Tag'
+
+      responses:
+        '201':
+          description: Tag created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+        '400':
+          description: Invalid payload for creation
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+  /readings/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Tag's ID
+        required: true
+        schema:
+          type: string
+
+    get:
+      description: Retrieve a Tag
+
+      responses:
+        '200':
+          description: Tag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '404':
+          description: Tag not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+    options:
+      description: Show crud headers
+
+      responses:
+        '204':
+          description: Headers for Readings
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+    put:
+      description: Update a Tag
+      requestBody:
+        description: Tag data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+
+      responses:
+        '200':
+          description: Tag updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+        '400':
+          description: Invalid payload for update
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '404':
+          description: Tag not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
+    delete:
+      description: Delete a Tag
+
+      responses:
+        '204':
+          description: Tag deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+
+        '401':
+          $ref: '#/components/schemas/UnauthorizedError'
+
+        '404':
+          description: Tag not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+        '500':
+          $ref: '#/components/schemas/Error'
+
 components:
   securitySchemes:
     basicAuth:
@@ -269,6 +500,28 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Tag'
+
+    Reading:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Reading's identifier
+        url:
+          type: string
+          description: Reading's url
+        read:
+          type: boolean
+          description: Reading's read state
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+
+    Readings:
+      type: array
+      items:
+        $ref: '#/components/schemas/Reading'
 
     UnauthorizedError:
       description: Authentication information is missing or invalid
