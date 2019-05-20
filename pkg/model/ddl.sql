@@ -18,7 +18,7 @@ CREATE TABLE "user" (
   username TEXT NOT NULL,
   email TEXT NOT NULL,
   password TEXT NOT NULL,
-  creation_date TIMESTAMP DEFAULT now()
+  creation_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 CREATE UNIQUE INDEX user_id ON "user" (id);
@@ -30,7 +30,7 @@ CREATE TABLE reading (
   user_id UUID NOT NULL REFERENCES "user"(id),
   url TEXT NOT NULL,
   read BOOLEAN NOT NULL DEFAULT FALSE,
-  creation_date TIMESTAMP DEFAULT now()
+  creation_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 CREATE UNIQUE INDEX reading_id ON reading (id);
@@ -41,7 +41,7 @@ CREATE TABLE tag (
   id UUID NOT NULL,
   user_id UUID NOT NULL REFERENCES "user"(id),
   name TEXT NOT NULL,
-  creation_date TIMESTAMP DEFAULT now()
+  creation_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 CREATE UNIQUE INDEX tag_id ON tag (id);
@@ -52,7 +52,7 @@ CREATE INDEX tag_name ON tag (name);
 CREATE TABLE reading_tag (
   reading_id UUID NOT NULL REFERENCES reading(id),
   tag_id UUID NOT NULL REFERENCES tag(id),
-  creation_date TIMESTAMP DEFAULT now()
+  creation_date TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 CREATE INDEX reading_tag_reading_id ON reading_tag (reading_id);
