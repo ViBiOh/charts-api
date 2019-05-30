@@ -332,9 +332,9 @@ paths:
           $ref: '#/components/schemas/UnauthorizedError'
 
     post:
-      description: Create a Tag
+      description: Create a Reading
       requestBody:
-        description: Tag to create
+        description: Reading to create
         required: true
         content:
           application/json:
@@ -355,11 +355,11 @@ paths:
 
       responses:
         '201':
-          description: Tag created
+          description: Reading created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                $ref: '#/components/schemas/Reading'
 
         '400':
           description: Invalid payload for creation
@@ -378,27 +378,27 @@ paths:
     parameters:
       - name: id
         in: path
-        description: Tag's ID
+        description: Reading's ID
         required: true
         schema:
           type: string
 
     get:
-      description: Retrieve a Tag
+      description: Retrieve a Reading
 
       responses:
         '200':
-          description: Tag
+          description: Reading
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                $ref: '#/components/schemas/Reading'
 
         '401':
           $ref: '#/components/schemas/UnauthorizedError'
 
         '404':
-          description: Tag not found
+          description: Reading not found
           content:
             text/plain:
               schema:
@@ -418,22 +418,22 @@ paths:
           $ref: '#/components/schemas/UnauthorizedError'
 
     put:
-      description: Update a Tag
+      description: Update a Reading
       requestBody:
-        description: Tag data
+        description: Reading data
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Tag'
+              $ref: '#/components/schemas/Reading'
 
       responses:
         '200':
-          description: Tag updated
+          description: Reading updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                $ref: '#/components/schemas/Reading'
 
         '400':
           description: Invalid payload for update
@@ -446,7 +446,7 @@ paths:
           $ref: '#/components/schemas/UnauthorizedError'
 
         '404':
-          description: Tag not found
+          description: Reading not found
           content:
             text/plain:
               schema:
@@ -456,21 +456,21 @@ paths:
           $ref: '#/components/schemas/Error'
 
     delete:
-      description: Delete a Tag
+      description: Delete a Reading
 
       responses:
         '204':
-          description: Tag deleted
+          description: Reading deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tag'
+                $ref: '#/components/schemas/Reading'
 
         '401':
           $ref: '#/components/schemas/UnauthorizedError'
 
         '404':
-          description: Tag not found
+          description: Reading not found
           content:
             text/plain:
               schema:
