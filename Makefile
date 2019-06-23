@@ -2,7 +2,7 @@ SHELL = /bin/sh
 
 APP_NAME = eponae-api
 PACKAGES ?= ./...
-GO_FILES = */*.go */*/*.go
+GO_FILES ?= */*.go */*/*.go
 
 GOBIN=bin
 BINARY_PATH=$(GOBIN)/$(APP_NAME)
