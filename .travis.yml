@@ -23,25 +23,27 @@ jobs:
     after_success:
     - curl -s -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/eponae-api
 
-  - stage: Deploy
-
-    script: |
-      sed \
-        -e "s|\${EPONAE_DATABASE_HOST}|${EPONAE_DATABASE_HOST}|g" \
-        -e "s|\${EPONAE_DATABASE_USER}|${EPONAE_DATABASE_USER}|g" \
-        -e "s|\${EPONAE_DATABASE_PASS}|${EPONAE_DATABASE_PASS}|g" \
-        -e "s|\${EPONAE_DATABASE_NAME}|${EPONAE_DATABASE_NAME}|g" \
-        -e "s|\\\$|\$\$|g" \
-        docker-compose.yml > docker-compose-env.yml
-    deploy:
-      provider: script
-      skip_cleanup: true
-      script: bash script/deploy "$(make name)" "$(make version)" "@docker-compose-env.yml"
+#  - stage: Deploy
+#
+#    script: |
+#      sed \
+#        -e "s|\${EPONAE_DATABASE_HOST}|${EPONAE_DATABASE_HOST}|g" \
+#        -e "s|\${EPONAE_DATABASE_USER}|${EPONAE_DATABASE_USER}|g" \
+#        -e "s|\${EPONAE_DATABASE_PASS}|${EPONAE_DATABASE_PASS}|g" \
+#        -e "s|\${EPONAE_DATABASE_NAME}|${EPONAE_DATABASE_NAME}|g" \
+#        -e "s|\\\$|\$\$|g" \
+#        docker-compose.yml > docker-compose-env.yml
+#    deploy:
+#      provider: script
+#      skip_cleanup: true
+#      script: bash script/deploy "$(make name)" "$(make version)" "@docker-compose-env.yml"
 
 stages:
   - Build
   - name: Publish
     if: branch = master
+#  - name: Deploy
+#    if: branch = master
 
 notifications:
   email: false
