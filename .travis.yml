@@ -42,8 +42,6 @@ stages:
   - Build
   - name: Publish
     if: branch = master
-  - name: Deploy
-    if: branch = master
 
 notifications:
   email: false
