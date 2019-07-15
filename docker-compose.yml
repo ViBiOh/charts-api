@@ -15,7 +15,7 @@ services:
     - -dbName
     - ${EPONAE_DATABASE_NAME}
     - -tracingAgent
-    - monitoring_jaeger:6831
+    - monitoring_jaeger_1:6831
     - -tracingName
     - eponae_api
     labels:
