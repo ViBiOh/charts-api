@@ -51,16 +51,12 @@ func main() {
 	readingsConfig := crud.Flags(fs, "readings")
 	tagsConfig := crud.Flags(fs, "tags")
 
-	if err := fs.Parse(os.Args[1:]); err != nil {
-		logger.Fatal("%#v", err)
-	}
+	logger.Fatal(fs.Parse(os.Args[1:]))
 
 	alcotest.DoAndExit(alcotestConfig)
 
 	serverApp, err := httputils.New(serverConfig)
-	if err != nil {
-		logger.Fatal("%#v", err)
-	}
+	logger.Fatal(err)
 
 	healthcheckApp := healthcheck.New()
 	prometheusApp := prometheus.New(prometheusConfig)
@@ -70,9 +66,7 @@ func main() {
 	corsApp := cors.New(corsConfig)
 
 	apiDB, err := db.New(dbConfig)
-	if err != nil {
-		logger.Fatal("%#v", err)
-	}
+	logger.Fatal(err)
 	authApp := auth.NewService(authConfig, identService.NewBasic(basicConfig, apiDB))
 
 	tagService := tag.New(apiDB)
