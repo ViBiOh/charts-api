@@ -14,10 +14,6 @@ services:
     - ${EPONAE_DATABASE_PASS}
     - -dbName
     - ${EPONAE_DATABASE_NAME}
-    - -tracingAgent
-    - monitoring_jaeger_1:6831
-    - -tracingName
-    - eponae_api
     labels:
       traefik.frontend.passHostHeader: 'true'
       traefik.frontend.rule: 'Host: api.eponae.fr'
