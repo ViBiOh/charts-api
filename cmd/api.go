@@ -19,12 +19,10 @@ import (
 	"github.com/ViBiOh/httputils/pkg/crud"
 	"github.com/ViBiOh/httputils/pkg/db"
 	"github.com/ViBiOh/httputils/pkg/gzip"
-	"github.com/ViBiOh/httputils/pkg/healthcheck"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
 	"github.com/ViBiOh/httputils/pkg/prometheus"
-	"github.com/ViBiOh/httputils/pkg/server"
 )
 
 const (
@@ -58,7 +56,6 @@ func main() {
 	serverApp, err := httputils.New(serverConfig)
 	logger.Fatal(err)
 
-	healthcheckApp := healthcheck.New()
 	prometheusApp := prometheus.New(prometheusConfig)
 	opentracingApp := opentracing.New(opentracingConfig)
 	gzipApp := gzip.New()
@@ -94,14 +91,13 @@ func main() {
 		http.ServeFile(w, r, path.Join(docPath, r.URL.Path))
 	})
 
-	handler := server.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp, authApp)
-	healthcheckApp.NextHealthcheck(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	handler := httputils.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp, authApp)
+
+	serverApp.ListenAndServe(handler, httputils.HealthHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if db.Ping(apiDB) {
 			w.WriteHeader(http.StatusNoContent)
 		} else {
 			w.WriteHeader(http.StatusServiceUnavailable)
 		}
-	}))
-
-	serverApp.ListenAndServe(handler, nil, healthcheckApp)
+	})), nil)
 }
