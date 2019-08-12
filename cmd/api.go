@@ -18,7 +18,6 @@ import (
 	"github.com/ViBiOh/httputils/pkg/cors"
 	"github.com/ViBiOh/httputils/pkg/crud"
 	"github.com/ViBiOh/httputils/pkg/db"
-	"github.com/ViBiOh/httputils/pkg/gzip"
 	"github.com/ViBiOh/httputils/pkg/logger"
 	"github.com/ViBiOh/httputils/pkg/opentracing"
 	"github.com/ViBiOh/httputils/pkg/owasp"
@@ -58,7 +57,6 @@ func main() {
 
 	prometheusApp := prometheus.New(prometheusConfig)
 	opentracingApp := opentracing.New(opentracingConfig)
-	gzipApp := gzip.New()
 	owaspApp := owasp.New(owaspConfig)
 	corsApp := cors.New(corsConfig)
 
@@ -91,7 +89,7 @@ func main() {
 		http.ServeFile(w, r, path.Join(docPath, r.URL.Path))
 	})
 
-	handler := httputils.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, gzipApp, owaspApp, corsApp, authApp)
+	handler := httputils.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, owaspApp, corsApp, authApp)
 
 	serverApp.ListenAndServe(handler, httputils.HealthHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if db.Ping(apiDB) {
