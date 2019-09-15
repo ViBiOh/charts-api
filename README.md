@@ -41,8 +41,6 @@ Usage of eponae-api:Usage of eponae-api:
         [db] User
   -frameOptions string
         [owasp] X-Frame-Options (default "deny")
-  -graceful string
-        [http] Graceful close duration (default "35s")
   -hsts
         [owasp] Indicate Strict Transport Security (default true)
   -key string
