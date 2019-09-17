@@ -6,7 +6,9 @@
 ## Usage
 
 ```bash
-Usage of eponae-api:Usage of eponae-api:
+Usage of eponae-api:
+  -address string
+        [http] Listen address
   -authDisable
         [auth] Disable auth
   -authUrl string
