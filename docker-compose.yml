@@ -15,14 +15,18 @@ services:
     - -dbName
     - ${EPONAE_DATABASE_NAME}
     labels:
-      traefik.frontend.passHostHeader: 'true'
-      traefik.frontend.rule: 'Host: api.eponae.fr'
-      traefik.protocol: 'http'
-      traefik.port: '1080'
-      traefik.frontend.rateLimit.extractorFunc: 'client.ip'
-      traefik.frontend.rateLimit.rateSet.first.period: '60s'
-      traefik.frontend.rateLimit.rateSet.first.average: '100'
-      traefik.frontend.rateLimit.rateSet.first.burst: '200'
+      traefik.http.routers.eponae-api-http.rule: Host(`api.eponae.fr`)
+      traefik.http.routers.eponae-api-http.entrypoints: http
+      traefik.http.routers.eponae-api-http.middlewares: redirect@file
+      traefik.http.routers.eponae-api-https.rule: Host(`api.eponae.fr`)
+      traefik.http.routers.eponae-api-https.entrypoints: https
+      traefik.http.routers.eponae-api-https.middlewares: compress@file
+      traefik.http.routers.eponae-api-https.tls: true
+      traefik.http.routers.eponae-api-https.tls.certResolver: default
+      traefik.http.services.eponae-api-service.loadbalancer.passhostheader: true
+      traefik.http.services.eponae-api-service.loadbalancer.server.port: '1080'
+      traefik.http.middlewares.eponae-api-rate-limit.ratelimit.average: '10'
+      traefik.http.middlewares.eponae-api-rate-limit.ratelimit.burst: '50'
     restart: on-failure:5
     read_only: true
     cpu_shares: 128
