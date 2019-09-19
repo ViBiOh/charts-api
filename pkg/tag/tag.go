@@ -8,8 +8,8 @@ import (
 
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/eponae-api/pkg/model"
-	"github.com/ViBiOh/httputils/pkg/crud"
-	"github.com/ViBiOh/httputils/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/crud"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
 )
 
 var _ crud.ItemService = &App{}

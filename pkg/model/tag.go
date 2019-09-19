@@ -2,7 +2,7 @@ package model
 
 import (
 	authModel "github.com/ViBiOh/auth/pkg/model"
-	"github.com/ViBiOh/httputils/pkg/crud"
+	"github.com/ViBiOh/httputils/v2/pkg/crud"
 )
 
 var _ crud.Item = &Tag{}

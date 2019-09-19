@@ -10,8 +10,8 @@ import (
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/readingtag"
 	"github.com/ViBiOh/eponae-api/pkg/tag"
-	"github.com/ViBiOh/httputils/pkg/crud"
-	"github.com/ViBiOh/httputils/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/crud"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
 )
 
 var _ crud.ItemService = &App{}

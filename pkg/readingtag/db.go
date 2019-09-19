@@ -4,9 +4,9 @@ import (
 	"database/sql"
 
 	"github.com/ViBiOh/eponae-api/pkg/model"
-	"github.com/ViBiOh/httputils/pkg/db"
-	"github.com/ViBiOh/httputils/pkg/errors"
-	"github.com/ViBiOh/httputils/pkg/tools"
+	"github.com/ViBiOh/httputils/v2/pkg/db"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/tools"
 	"github.com/lib/pq"
 )
 

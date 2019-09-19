@@ -6,9 +6,9 @@ import (
 
 	authModel "github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
-	"github.com/ViBiOh/httputils/pkg/db"
-	"github.com/ViBiOh/httputils/pkg/errors"
-	"github.com/ViBiOh/httputils/pkg/uuid"
+	"github.com/ViBiOh/httputils/v2/pkg/db"
+	"github.com/ViBiOh/httputils/v2/pkg/errors"
+	"github.com/ViBiOh/httputils/v2/pkg/uuid"
 )
 
 func scanReading(row model.RowScanner) (*model.Reading, error) {
