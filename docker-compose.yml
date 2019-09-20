@@ -11,7 +11,7 @@ services:
       traefik.http.routers.eponae-api-https.entrypoints: https
       traefik.http.routers.eponae-api-https.middlewares: compress@file, web-limit@file
       traefik.http.routers.eponae-api-https.tls: true
-      traefik.http.routers.eponae-api-https.tls.certResolver: default
+      traefik.http.routers.eponae-api-https.tls.certresolver: default
       traefik.http.services.eponae-api-service.loadbalancer.passhostheader: true
       traefik.http.services.eponae-api-service.loadbalancer.server.port: '1080'
     environment:
