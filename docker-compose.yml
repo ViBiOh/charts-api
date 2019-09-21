@@ -12,7 +12,6 @@ services:
       traefik.http.routers.eponae-api-https.middlewares: compress@file, web-limit@file
       traefik.http.routers.eponae-api-https.tls: true
       traefik.http.routers.eponae-api-https.tls.certresolver: default
-      traefik.http.services.eponae-api-service.loadbalancer.passhostheader: true
       traefik.http.services.eponae-api-service.loadbalancer.server.port: '1080'
     environment:
       EPONAE_API_CSP: "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' unpkg.com/swagger-ui-dist@3/; style-src 'self' 'unsafe-inline' unpkg.com/swagger-ui-dist@3/; img-src 'self' data:; connect-src 'self' api.eponae.fr"
