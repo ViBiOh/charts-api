@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ViBiOh/eponae-api.svg?branch=master)](https://travis-ci.org/ViBiOh/eponae-api)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ViBiOh/eponae-api)](https://goreportcard.com/report/github.com/ViBiOh/eponae-api)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=ViBiOh/eponae-api)](https://dependabot.com)
 
 ## Usage
 
