@@ -64,10 +64,6 @@ Usage of eponae-api:
         [tags] Default page size {EPONAE_API_TAGS_DEFAULT_PAGE_SIZE} (default 20)
   -tagsMaxPageSize uint
         [tags] Max page size {EPONAE_API_TAGS_MAX_PAGE_SIZE} (default 500)
-  -tracingAgent string
-        [tracing] Jaeger Agent (e.g. host:port) {EPONAE_API_TRACING_AGENT} (default "jaeger:6831")
-  -tracingName string
-        [tracing] Service name {EPONAE_API_TRACING_NAME}
   -url string
         [alcotest] URL to check {EPONAE_API_URL}
   -userAgent string

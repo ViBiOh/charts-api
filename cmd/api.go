@@ -19,7 +19,6 @@ import (
 	"github.com/ViBiOh/httputils/v2/pkg/crud"
 	"github.com/ViBiOh/httputils/v2/pkg/db"
 	"github.com/ViBiOh/httputils/v2/pkg/logger"
-	"github.com/ViBiOh/httputils/v2/pkg/opentracing"
 	"github.com/ViBiOh/httputils/v2/pkg/owasp"
 	"github.com/ViBiOh/httputils/v2/pkg/prometheus"
 )
@@ -37,7 +36,6 @@ func main() {
 	serverConfig := httputils.Flags(fs, "")
 	alcotestConfig := alcotest.Flags(fs, "")
 	prometheusConfig := prometheus.Flags(fs, "prometheus")
-	opentracingConfig := opentracing.Flags(fs, "tracing")
 	owaspConfig := owasp.Flags(fs, "")
 	corsConfig := cors.Flags(fs, "cors")
 
@@ -53,7 +51,6 @@ func main() {
 	alcotest.DoAndExit(alcotestConfig)
 
 	prometheusApp := prometheus.New(prometheusConfig)
-	opentracingApp := opentracing.New(opentracingConfig)
 	owaspApp := owasp.New(owaspConfig)
 	corsApp := cors.New(corsConfig)
 
@@ -86,7 +83,7 @@ func main() {
 		http.ServeFile(w, r, path.Join(docPath, r.URL.Path))
 	})
 
-	handler := httputils.ChainMiddlewares(apihandler, prometheusApp, opentracingApp, owaspApp, corsApp, authApp)
+	handler := httputils.ChainMiddlewares(apihandler, prometheusApp, owaspApp, corsApp, authApp)
 
 	httputils.New(serverConfig).ListenAndServe(handler, httputils.HealthHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if db.Ping(apiDB) {
