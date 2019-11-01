@@ -4,12 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/eponae-api/pkg/model"
-	"github.com/ViBiOh/httputils/v2/pkg/crud"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
+	"github.com/ViBiOh/httputils/v3/pkg/crud"
 )
 
 var _ crud.ItemService = &App{}
@@ -31,7 +32,7 @@ func (a App) Unmarsall(content []byte) (crud.Item, error) {
 	var tag model.Tag
 
 	if err := json.Unmarshal(content, &tag); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &tag, nil
@@ -46,7 +47,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 
 	list, total, err := a.listTagsOfUser(user, page, pageSize, sortKey, sortAsc)
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "unable to list tags of users")
+		return nil, 0, fmt.Errorf("unable to list tags of users: %w", err)
 	}
 
 	itemsList := make([]crud.Item, len(list))
@@ -66,7 +67,7 @@ func (a App) Get(ctx context.Context, ID string) (crud.Item, error) {
 
 	tag, err := a.getTagByID(user, ID)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get tag")
+		return nil, fmt.Errorf("unable to get tag: %w", err)
 	}
 
 	return tag, nil
@@ -86,7 +87,7 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveTag(tag, nil)
 	if err != nil {
-		err = errors.Wrap(err, "unable to create tag")
+		err = fmt.Errorf("unable to create tag: %w", err)
 
 		return
 	}
@@ -110,7 +111,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveTag(tag, nil)
 	if err != nil {
-		err = errors.Wrap(err, "unable to update tag")
+		err = fmt.Errorf("unable to update tag: %w", err)
 
 		return
 	}
@@ -130,7 +131,7 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 
 	err = a.deleteTag(tag, nil)
 	if err != nil {
-		err = errors.Wrap(err, "unable to delete tag")
+		err = fmt.Errorf("unable to delete tag: %w", err)
 	}
 
 	return
@@ -138,7 +139,7 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 
 func (a App) check(o *model.Tag) error {
 	if strings.TrimSpace(o.Name) == "" {
-		return errors.Wrap(crud.ErrInvalid, "name is required")
+		return fmt.Errorf("name is required: %w", crud.ErrInvalid)
 	}
 
 	return nil

@@ -4,14 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/ViBiOh/auth/pkg/auth"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/readingtag"
 	"github.com/ViBiOh/eponae-api/pkg/tag"
-	"github.com/ViBiOh/httputils/v2/pkg/crud"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
+	"github.com/ViBiOh/httputils/v3/pkg/crud"
 )
 
 var _ crud.ItemService = &App{}
@@ -37,7 +38,7 @@ func (a App) Unmarsall(content []byte) (crud.Item, error) {
 	var reading model.Reading
 
 	if err := json.Unmarshal(content, &reading); err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &reading, nil
@@ -52,7 +53,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 
 	list, total, err := a.listReadingsOfUser(user, page, pageSize, sortKey, sortAsc)
 	if err != nil {
-		return nil, 0, errors.Wrap(err, "unable to list readings of users")
+		return nil, 0, fmt.Errorf("unable to list readings of users: %w", err)
 	}
 
 	itemsList := make([]crud.Item, len(list))
@@ -72,7 +73,7 @@ func (a App) Get(ctx context.Context, ID string) (crud.Item, error) {
 
 	reading, err := a.getReadingByID(user, ID)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to get reading")
+		return nil, fmt.Errorf("unable to get reading: %w", err)
 	}
 
 	return reading, nil
@@ -92,7 +93,7 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveReading(reading, nil)
 	if err != nil {
-		err = errors.Wrap(err, "unable to create reading")
+		err = fmt.Errorf("unable to create reading: %w", err)
 
 		return
 	}
@@ -116,7 +117,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 
 	err = a.saveReading(reading, nil)
 	if err != nil {
-		err = errors.Wrap(err, "unable to update reading")
+		err = fmt.Errorf("unable to update reading: %w", err)
 
 		return
 	}
@@ -136,7 +137,7 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 
 	err = a.deleteReading(reading, nil)
 	if err != nil {
-		err = errors.Wrap(err, "unable to delete reading")
+		err = fmt.Errorf("unable to delete reading: %w", err)
 	}
 
 	return
@@ -144,7 +145,7 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 
 func (a App) check(o *model.Reading) error {
 	if strings.TrimSpace(o.URL) == "" {
-		return errors.Wrap(crud.ErrInvalid, "url is required")
+		return fmt.Errorf("url is required: %w", crud.ErrInvalid)
 	}
 
 	tagsIDs := make([]string, len(o.Tags))
@@ -154,7 +155,7 @@ func (a App) check(o *model.Reading) error {
 
 	tags, err := a.tagService.FindTagsByIds(tagsIDs)
 	if err != nil {
-		return errors.Wrap(err, "unable to list tags")
+		return fmt.Errorf("unable to list tags: %w", err)
 	}
 
 	if len(tags) != len(o.Tags) {

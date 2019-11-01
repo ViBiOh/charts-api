@@ -2,13 +2,13 @@ package reading
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	authModel "github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
-	"github.com/ViBiOh/httputils/v2/pkg/db"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/uuid"
+	"github.com/ViBiOh/httputils/v3/pkg/db"
+	"github.com/ViBiOh/httputils/v3/pkg/uuid"
 )
 
 func scanReading(row model.RowScanner) (*model.Reading, error) {
@@ -24,7 +24,7 @@ func scanReading(row model.RowScanner) (*model.Reading, error) {
 			return nil, err
 		}
 
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &model.Reading{ID: id, URL: url, Read: read}, nil
@@ -46,7 +46,7 @@ func scanReadings(rows *sql.Rows) ([]*model.Reading, uint, error) {
 				return nil, 0, err
 			}
 
-			return nil, 0, errors.WithStack(err)
+			return nil, 0, err
 		}
 
 		list = append(list, &model.Reading{ID: id, URL: url, Read: read})
@@ -84,7 +84,7 @@ func (a App) listReadingsOfUser(user *authModel.User, page, pageSize uint, sortK
 
 	rows, err := a.db.Query(listByUserQuery, user.ID, pageSize, offset, order)
 	if err != nil {
-		return nil, 0, errors.WithStack(err)
+		return nil, 0, err
 	}
 
 	defer func() {
@@ -165,9 +165,7 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 	}
 
 	if o.ID != "" {
-		if _, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.URL, o.Read); err != nil {
-			err = errors.WithStack(err)
-		}
+		_, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.URL, o.Read)
 	} else {
 		var newID string
 		newID, err = uuid.New()
@@ -175,8 +173,8 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 			return err
 		}
 
-		if _, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.URL, o.Read); err != nil {
-			err = errors.WithStack(err)
+		_, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.URL, o.Read)
+		if err != nil {
 			return
 		}
 
@@ -184,7 +182,7 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 	}
 
 	if err = a.readingTagService.SaveTagsForReading(o, usedTx); err != nil {
-		err = errors.Wrap(err, "unable to save reading's tags")
+		err = fmt.Errorf("unable to save reading's tags: %w", err)
 
 		return
 	}
@@ -216,9 +214,6 @@ func (a App) deleteReading(o *model.Reading, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if _, err = usedTx.Exec(deleteQuery, o.User.ID, o.ID); err != nil {
-		err = errors.WithStack(err)
-	}
-
+	_, err = usedTx.Exec(deleteQuery, o.User.ID, o.ID)
 	return
 }

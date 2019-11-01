@@ -2,13 +2,13 @@ package tag
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	authModel "github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
-	"github.com/ViBiOh/httputils/v2/pkg/db"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/uuid"
+	"github.com/ViBiOh/httputils/v3/pkg/db"
+	"github.com/ViBiOh/httputils/v3/pkg/uuid"
 	"github.com/lib/pq"
 )
 
@@ -24,7 +24,7 @@ func scanTag(row model.RowScanner) (*model.Tag, error) {
 			return nil, err
 		}
 
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &model.Tag{ID: id, Name: name}, nil
@@ -45,7 +45,7 @@ func scanTags(rows *sql.Rows) ([]*model.Tag, uint, error) {
 				return nil, 0, err
 			}
 
-			return nil, 0, errors.WithStack(err)
+			return nil, 0, err
 		}
 
 		list = append(list, &model.Tag{ID: id, Name: name})
@@ -71,7 +71,7 @@ ORDER BY
 func (a App) FindTagsByIds(ids []string) ([]*model.Tag, error) {
 	rows, err := a.db.Query(listTagsByIDs, pq.Array(ids))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	defer func() {
@@ -110,7 +110,7 @@ func (a App) listTagsOfUser(user *authModel.User, page, pageSize uint, sortKey s
 
 	rows, err := a.db.Query(listByUserQuery, user.ID, pageSize, offset, order)
 	if err != nil {
-		return nil, 0, errors.WithStack(err)
+		return nil, 0, err
 	}
 
 	defer func() {
@@ -176,9 +176,7 @@ func (a App) saveTag(o *model.Tag, tx *sql.Tx) (err error) {
 	}
 
 	if o.ID != "" {
-		if _, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.Name); err != nil {
-			err = errors.WithStack(err)
-		}
+		_, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.Name)
 	} else {
 		var newID string
 		newID, err = uuid.New()
@@ -186,8 +184,8 @@ func (a App) saveTag(o *model.Tag, tx *sql.Tx) (err error) {
 			return err
 		}
 
-		if _, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.Name); err != nil {
-			err = errors.WithStack(err)
+		_, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.Name)
+		if err != nil {
 			return
 		}
 
@@ -221,9 +219,6 @@ func (a App) deleteTag(o *model.Tag, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if _, err = usedTx.Exec(deleteQuery, o.User.ID, o.ID); err != nil {
-		err = errors.WithStack(err)
-	}
-
+	_, err = usedTx.Exec(deleteQuery, o.User.ID, o.ID)
 	return
 }

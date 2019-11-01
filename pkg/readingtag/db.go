@@ -2,11 +2,10 @@ package readingtag
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/ViBiOh/eponae-api/pkg/model"
-	"github.com/ViBiOh/httputils/v2/pkg/db"
-	"github.com/ViBiOh/httputils/v2/pkg/errors"
-	"github.com/ViBiOh/httputils/v2/pkg/tools"
+	"github.com/ViBiOh/httputils/v3/pkg/db"
 	"github.com/lib/pq"
 )
 
@@ -22,7 +21,7 @@ func scanReadingTag(row model.RowScanner) (*model.ReadingTag, error) {
 			return nil, err
 		}
 
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	return &model.ReadingTag{ReadingID: readingID, TagID: tagID}, nil
@@ -34,7 +33,7 @@ func scanReadingTags(rows *sql.Rows) ([]*model.ReadingTag, error) {
 	for rows.Next() {
 		readingTag, err := scanReadingTag(rows)
 		if err != nil {
-			return nil, errors.WithStack(err)
+			return nil, err
 		}
 
 		list = append(list, readingTag)
@@ -58,7 +57,7 @@ ORDER BY
 func (a App) listTagsByReadingIDs(ids []string) ([]*model.ReadingTag, error) {
 	rows, err := a.db.Query(listTagsByReadingIDsQuery, pq.Array(ids))
 	if err != nil {
-		return nil, errors.WithStack(err)
+		return nil, err
 	}
 
 	defer func() {
@@ -162,7 +161,7 @@ func (a App) SaveTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
 	for index, existingTag := range existingTags {
 		existingTagIDs[index] = existingTag.TagID
 
-		if !tools.IncludesString(newTagIDs, existingTag.TagID) {
+		if !IncludesString(newTagIDs, existingTag.TagID) {
 			err = a.deleteReadingTag(existingTag, usedTx)
 			if err != nil {
 				return
@@ -171,7 +170,7 @@ func (a App) SaveTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
 	}
 
 	for _, newTagID := range newTagIDs {
-		if !tools.IncludesString(existingTagIDs, newTagID) {
+		if !IncludesString(existingTagIDs, newTagID) {
 			if err = a.insertReadingTag(&model.ReadingTag{ReadingID: o.ID, TagID: newTagID}, usedTx); err != nil {
 				return
 			}
@@ -209,10 +208,7 @@ func (a App) insertReadingTag(o *model.ReadingTag, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if _, err = usedTx.Exec(insertQuery, o.ReadingID, o.TagID); err != nil {
-		err = errors.WithStack(err)
-	}
-
+	_, err = usedTx.Exec(insertQuery, o.ReadingID, o.TagID)
 	return
 }
 
@@ -240,9 +236,6 @@ func (a App) deleteReadingTag(o *model.ReadingTag, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if _, err = usedTx.Exec(deleteQuery, o.ReadingID, o.TagID); err != nil {
-		err = errors.WithStack(err)
-	}
-
+	_, err = usedTx.Exec(deleteQuery, o.ReadingID, o.TagID)
 	return
 }
