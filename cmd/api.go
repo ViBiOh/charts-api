@@ -13,11 +13,11 @@ import (
 	"github.com/ViBiOh/eponae-api/pkg/reading"
 	"github.com/ViBiOh/eponae-api/pkg/readingtag"
 	"github.com/ViBiOh/eponae-api/pkg/tag"
-	httputils "github.com/ViBiOh/httputils/v3/pkg"
 	"github.com/ViBiOh/httputils/v3/pkg/alcotest"
 	"github.com/ViBiOh/httputils/v3/pkg/cors"
 	"github.com/ViBiOh/httputils/v3/pkg/crud"
 	"github.com/ViBiOh/httputils/v3/pkg/db"
+	"github.com/ViBiOh/httputils/v3/pkg/httputils"
 	"github.com/ViBiOh/httputils/v3/pkg/logger"
 	"github.com/ViBiOh/httputils/v3/pkg/owasp"
 	"github.com/ViBiOh/httputils/v3/pkg/prometheus"
@@ -50,13 +50,8 @@ func main() {
 
 	alcotest.DoAndExit(alcotestConfig)
 
-	prometheusApp := prometheus.New(prometheusConfig)
-	owaspApp := owasp.New(owaspConfig)
-	corsApp := cors.New(corsConfig)
-
 	apiDB, err := db.New(dbConfig)
 	logger.Fatal(err)
-	authApp := auth.NewService(authConfig, identService.NewBasic(basicConfig, apiDB))
 
 	tagService := tag.New(apiDB)
 	readingTagService := readingtag.New(apiDB, tagService)
@@ -83,13 +78,17 @@ func main() {
 		http.ServeFile(w, r, path.Join(docPath, r.URL.Path))
 	})
 
-	handler := httputils.ChainMiddlewares(apihandler, prometheusApp, owaspApp, corsApp, authApp)
-
-	httputils.New(serverConfig).ListenAndServe(handler, httputils.HealthHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := httputils.New(serverConfig)
+	server.Health(httputils.HealthHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if db.Ping(apiDB) {
 			w.WriteHeader(http.StatusNoContent)
 		} else {
 			w.WriteHeader(http.StatusServiceUnavailable)
 		}
-	})), nil)
+	})))
+	server.Middleware(prometheus.New(prometheusConfig))
+	server.Middleware(owasp.New(owaspConfig))
+	server.Middleware(cors.New(corsConfig))
+	server.Middleware(auth.NewService(authConfig, identService.NewBasic(basicConfig, apiDB)))
+	server.ListenServeWait(apihandler)
 }

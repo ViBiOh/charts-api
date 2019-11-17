@@ -69,5 +69,5 @@ Usage of eponae-api:
   -url string
         [alcotest] URL to check {EPONAE_API_URL}
   -userAgent string
-        [alcotest] User-Agent for check {EPONAE_API_USER_AGENT} (default "Golang alcotest")
+        [alcotest] User-Agent for check {EPONAE_API_USER_AGENT} (default "Alcotest")
 ```
