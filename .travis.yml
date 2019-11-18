@@ -24,26 +24,20 @@ jobs:
     after_success:
     - curl -q -sSL --max-time 10 -X POST https://goreportcard.com/checks?repo=github.com/ViBiOh/eponae-api
 
- - stage: Deploy
+  - stage: Deploy
 
-   language: minimal
-   script: |
-     sed \
-       -e "s|\${EPONAE_DATABASE_HOST}|${EPONAE_DATABASE_HOST}|g" \
-       -e "s|\${EPONAE_DATABASE_USER}|${EPONAE_DATABASE_USER}|g" \
-       -e "s|\${EPONAE_DATABASE_PASS}|${EPONAE_DATABASE_PASS}|g" \
-       -e "s|\${EPONAE_DATABASE_NAME}|${EPONAE_DATABASE_NAME}|g" \
-       -e "s|\\\$|\$\$|g" \
-       docker-compose.yml > docker-compose-env.yml
-      curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "deploy"
-      scripts/deploy "$(make name)" "@docker-compose-env.yml"
+    language: minimal
+    script:
+    - curl -q -sSL --max-time 10 "https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap" | bash -s "deploy" "env_replace"
+    - scripts/env_replace docker-compose.yml EPONAE_DATABASE_HOST EPONAE_DATABASE_USER EPONAE_DATABASE_PASS EPONAE_DATABASE_NAME | sed "s|\\\$|\$\$|g" > docker-compose-env.yml
+    - scripts/deploy "$(make name)" "@docker-compose-env.yml"
 
 stages:
   - Build
   - name: Publish
     if: branch = master && type = push
- - name: Deploy
-   if: false
+  - name: Deploy
+    if: false
 
 notifications:
   email: false
