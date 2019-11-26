@@ -11,8 +11,8 @@ import (
 
 func scanReadingTag(row model.RowScanner) (*model.ReadingTag, error) {
 	var (
-		readingID string
-		tagID     string
+		readingID uint64
+		tagID     uint64
 	)
 
 	err := row.Scan(&readingID, &tagID)
@@ -54,7 +54,7 @@ ORDER BY
   reading_id ASC
 `
 
-func (a App) listTagsByReadingIDs(ids []string) ([]*model.ReadingTag, error) {
+func (a App) listTagsByReadingIDs(ids []uint64) ([]*model.ReadingTag, error) {
 	rows, err := a.db.Query(listTagsByReadingIDsQuery, pq.Array(ids))
 	if err != nil {
 		return nil, err
@@ -73,7 +73,7 @@ func (a App) EnrichReadingsWithTags(readings []*model.Reading) error {
 		return nil
 	}
 
-	readingsID := make([]string, len(readings))
+	readingsID := make([]uint64, len(readings))
 	for i, reading := range readings {
 		readingsID[i] = reading.ID
 	}
@@ -83,15 +83,15 @@ func (a App) EnrichReadingsWithTags(readings []*model.Reading) error {
 		return err
 	}
 
-	tagsID := make([]string, len(readingTags))
-	tagsByReading := make(map[string][]string, 0)
+	tagsID := make([]uint64, len(readingTags))
+	tagsByReading := make(map[uint64][]uint64, 0)
 	for i, link := range readingTags {
 		tagsID[i] = link.TagID
 
 		if e, ok := tagsByReading[link.ReadingID]; ok {
 			tagsByReading[link.ReadingID] = append(e, link.TagID)
 		} else {
-			tagsByReading[link.ReadingID] = []string{link.TagID}
+			tagsByReading[link.ReadingID] = []uint64{link.TagID}
 		}
 	}
 
@@ -100,7 +100,7 @@ func (a App) EnrichReadingsWithTags(readings []*model.Reading) error {
 		return err
 	}
 
-	tagsByID := make(map[string]*model.Tag, 0)
+	tagsByID := make(map[uint64]*model.Tag, 0)
 	for _, tagObj := range tags {
 		if _, ok := tagsByID[tagObj.ID]; !ok {
 			tagsByID[tagObj.ID] = tagObj
@@ -146,22 +146,22 @@ func (a App) SaveTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	newTagIDs := make([]string, len(o.Tags))
+	newTagIDs := make([]uint64, len(o.Tags))
 	for index, tag := range o.Tags {
 		newTagIDs[index] = tag.ID
 	}
 
 	var existingTags []*model.ReadingTag
-	existingTags, err = a.listTagsByReadingIDs([]string{o.ID})
+	existingTags, err = a.listTagsByReadingIDs([]uint64{o.ID})
 	if err != nil {
 		return
 	}
 
-	existingTagIDs := make([]string, len(existingTags))
+	existingTagIDs := make([]uint64, len(existingTags))
 	for index, existingTag := range existingTags {
 		existingTagIDs[index] = existingTag.TagID
 
-		if !IncludesString(newTagIDs, existingTag.TagID) {
+		if !IncludesUint64(newTagIDs, existingTag.TagID) {
 			err = a.deleteReadingTag(existingTag, usedTx)
 			if err != nil {
 				return
@@ -170,7 +170,7 @@ func (a App) SaveTagsForReading(o *model.Reading, tx *sql.Tx) (err error) {
 	}
 
 	for _, newTagID := range newTagIDs {
-		if !IncludesString(existingTagIDs, newTagID) {
+		if !IncludesUint64(existingTagIDs, newTagID) {
 			if err = a.insertReadingTag(&model.ReadingTag{ReadingID: o.ID, TagID: newTagID}, usedTx); err != nil {
 				return
 			}

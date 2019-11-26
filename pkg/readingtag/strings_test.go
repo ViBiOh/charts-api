@@ -2,36 +2,36 @@ package readingtag
 
 import "testing"
 
-func TestIncludesString(t *testing.T) {
+func TestIncludesUint64(t *testing.T) {
 	var cases = []struct {
 		intention string
-		array     []string
-		lookup    string
+		array     []uint64
+		lookup    uint64
 		want      bool
 	}{
 		{
 			"nil",
 			nil,
-			"",
+			0,
 			false,
 		},
 		{
 			"found",
-			[]string{"hello", "world"},
-			"WORLD",
+			[]uint64{8000, 6000},
+			8000,
 			true,
 		},
 		{
 			"not found",
-			[]string{"hello", "world"},
-			"bob",
+			[]uint64{8000, 6000},
+			7000,
 			false,
 		},
 	}
 
 	for _, testCase := range cases {
 		t.Run(testCase.intention, func(t *testing.T) {
-			if result := IncludesString(testCase.array, testCase.lookup); result != testCase.want {
+			if result := IncludesUint64(testCase.array, testCase.lookup); result != testCase.want {
 				t.Errorf("Includes() = %#v, want %#v", result, testCase.want)
 			}
 		})

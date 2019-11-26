@@ -8,12 +8,11 @@ import (
 	authModel "github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/v3/pkg/db"
-	"github.com/ViBiOh/httputils/v3/pkg/uuid"
 )
 
 func scanReading(row model.RowScanner) (*model.Reading, error) {
 	var (
-		id   string
+		id   uint64
 		url  string
 		read bool
 	)
@@ -32,7 +31,7 @@ func scanReading(row model.RowScanner) (*model.Reading, error) {
 
 func scanReadings(rows *sql.Rows) ([]*model.Reading, uint, error) {
 	var (
-		id         string
+		id         uint64
 		url        string
 		read       bool
 		totalCount uint
@@ -111,7 +110,7 @@ WHERE
   AND id = $2
 `
 
-func (a App) getReadingByID(user *authModel.User, id string) (*model.Reading, error) {
+func (a App) getReadingByID(user *authModel.User, id uint64) (*model.Reading, error) {
 	row := a.db.QueryRow(getByIDQuery, user.ID, id)
 	reading, err := scanReading(row)
 	if err != nil {
@@ -164,21 +163,16 @@ func (a App) saveReading(o *model.Reading, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if o.ID != "" {
+	if o.ID != 0 {
 		_, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.URL, o.Read)
+	} else if result, insertErr := usedTx.Exec(insertQuery, o.User.ID, 0, o.URL, o.Read); insertErr != nil {
+		if newID, idErr := result.LastInsertId(); idErr != nil {
+			err = idErr
+		} else {
+			o.ID = uint64(newID)
+		}
 	} else {
-		var newID string
-		newID, err = uuid.New()
-		if err != nil {
-			return err
-		}
-
-		_, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.URL, o.Read)
-		if err != nil {
-			return
-		}
-
-		o.ID = newID
+		err = insertErr
 	}
 
 	if err = a.readingTagService.SaveTagsForReading(o, usedTx); err != nil {

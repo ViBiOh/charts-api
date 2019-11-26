@@ -1,11 +1,9 @@
 package readingtag
 
-import "strings"
-
-// IncludesString checks in an array includes given string
-func IncludesString(array []string, lookup string) bool {
+// IncludesUint64 checks in an array includes given uint64
+func IncludesUint64(array []uint64, lookup uint64) bool {
 	for _, item := range array {
-		if strings.EqualFold(item, lookup) {
+		if item == lookup {
 			return true
 		}
 	}

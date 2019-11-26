@@ -6,3 +6,5 @@ bin/
 release/
 output.txt
 coverage.*
+
+.env

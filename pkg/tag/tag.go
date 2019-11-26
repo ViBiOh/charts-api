@@ -59,7 +59,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 }
 
 // Get tag of user
-func (a App) Get(ctx context.Context, ID string) (crud.Item, error) {
+func (a App) Get(ctx context.Context, ID uint64) (crud.Item, error) {
 	user := auth.UserFromContext(ctx)
 	if user == nil {
 		return nil, errors.New("user not provided")

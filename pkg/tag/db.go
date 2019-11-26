@@ -8,13 +8,12 @@ import (
 	authModel "github.com/ViBiOh/auth/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/v3/pkg/db"
-	"github.com/ViBiOh/httputils/v3/pkg/uuid"
 	"github.com/lib/pq"
 )
 
 func scanTag(row model.RowScanner) (*model.Tag, error) {
 	var (
-		id   string
+		id   uint64
 		name string
 	)
 
@@ -32,7 +31,7 @@ func scanTag(row model.RowScanner) (*model.Tag, error) {
 
 func scanTags(rows *sql.Rows) ([]*model.Tag, uint, error) {
 	var (
-		id         string
+		id         uint64
 		name       string
 		totalCount uint
 	)
@@ -68,7 +67,7 @@ ORDER BY
 `
 
 // FindTagsByIds finds tags by ids
-func (a App) FindTagsByIds(ids []string) ([]*model.Tag, error) {
+func (a App) FindTagsByIds(ids []uint64) ([]*model.Tag, error) {
 	rows, err := a.db.Query(listTagsByIDs, pq.Array(ids))
 	if err != nil {
 		return nil, err
@@ -131,7 +130,7 @@ WHERE
   AND id = $2
 `
 
-func (a App) getTagByID(user *authModel.User, id string) (*model.Tag, error) {
+func (a App) getTagByID(user *authModel.User, id uint64) (*model.Tag, error) {
 	return scanTag(a.db.QueryRow(getByIDQuery, user.ID, id))
 }
 
@@ -175,21 +174,16 @@ func (a App) saveTag(o *model.Tag, tx *sql.Tx) (err error) {
 		}()
 	}
 
-	if o.ID != "" {
+	if o.ID != 0 {
 		_, err = usedTx.Exec(updateQuery, o.User.ID, o.ID, o.Name)
+	} else if result, insertErr := usedTx.Exec(insertQuery, o.User.ID, 0, o.Name); insertErr != nil {
+		if newID, idErr := result.LastInsertId(); idErr != nil {
+			err = idErr
+		} else {
+			o.ID = uint64(newID)
+		}
 	} else {
-		var newID string
-		newID, err = uuid.New()
-		if err != nil {
-			return err
-		}
-
-		_, err = usedTx.Exec(insertQuery, o.User.ID, newID, o.Name)
-		if err != nil {
-			return
-		}
-
-		o.ID = newID
+		err = insertErr
 	}
 
 	return
