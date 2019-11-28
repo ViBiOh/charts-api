@@ -79,5 +79,4 @@ build:
 .PHONY: run
 run:
 	$(MAIN_RUNNER) \
-		-basicUsers "1:$(shell htpasswd -nbB admin admin | head -1)" \
 		-csp "default-src 'self'; base-uri 'self'; script-src 'self' 'unsafe-inline' unpkg.com/swagger-ui-dist@3/; style-src 'self' 'unsafe-inline' unpkg.com/swagger-ui-dist@3/; img-src 'self' data:; connect-src 'self' api.eponae.fr"
