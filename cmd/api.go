@@ -7,9 +7,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/ViBiOh/auth/pkg/auth"
-	"github.com/ViBiOh/auth/pkg/ident/basic"
-	identService "github.com/ViBiOh/auth/pkg/ident/service"
+	auth "github.com/ViBiOh/auth/v2/pkg/auth/db"
+	"github.com/ViBiOh/auth/v2/pkg/handler"
+	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
+	basicProvider "github.com/ViBiOh/auth/v2/pkg/ident/basic/db"
 	"github.com/ViBiOh/eponae-api/pkg/reading"
 	"github.com/ViBiOh/eponae-api/pkg/readingtag"
 	"github.com/ViBiOh/eponae-api/pkg/tag"
@@ -40,8 +41,6 @@ func main() {
 	corsConfig := cors.Flags(fs, "cors")
 
 	dbConfig := db.Flags(fs, "db")
-	authConfig := auth.Flags(fs, "auth")
-	basicConfig := basic.Flags(fs, "basic")
 
 	readingsConfig := crud.Flags(fs, "readings")
 	tagsConfig := crud.Flags(fs, "tags")
@@ -52,6 +51,10 @@ func main() {
 
 	apiDB, err := db.New(dbConfig)
 	logger.Fatal(err)
+
+	basicApp := basicProvider.New(apiDB)
+	basicProvider := basic.New(basicApp)
+	authApp := auth.New(apiDB)
 
 	tagService := tag.New(apiDB)
 	readingTagService := readingtag.New(apiDB, tagService)
@@ -89,6 +92,6 @@ func main() {
 	server.Middleware(prometheus.New(prometheusConfig))
 	server.Middleware(owasp.New(owaspConfig))
 	server.Middleware(cors.New(corsConfig))
-	server.Middleware(auth.NewService(authConfig, identService.NewBasic(basicConfig, apiDB)))
+	server.Middleware(handler.New(authApp, basicProvider))
 	server.ListenServeWait(apihandler)
 }

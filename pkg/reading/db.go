@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	authModel "github.com/ViBiOh/auth/pkg/model"
+	authModel "github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/v3/pkg/db"
 )
@@ -69,7 +69,7 @@ LIMIT $2
 OFFSET $3
 `
 
-func (a App) listReadingsOfUser(user *authModel.User, page, pageSize uint, sortKey string, sortAsc bool) ([]*model.Reading, uint, error) {
+func (a App) listReadingsOfUser(user authModel.User, page, pageSize uint, sortKey string, sortAsc bool) ([]*model.Reading, uint, error) {
 	order := "creation_date DESC"
 
 	if sortKey != "" {
@@ -110,7 +110,7 @@ WHERE
   AND id = $2
 `
 
-func (a App) getReadingByID(user *authModel.User, id uint64) (*model.Reading, error) {
+func (a App) getReadingByID(user authModel.User, id uint64) (*model.Reading, error) {
 	row := a.db.QueryRow(getByIDQuery, user.ID, id)
 	reading, err := scanReading(row)
 	if err != nil {

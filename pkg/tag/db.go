@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	authModel "github.com/ViBiOh/auth/pkg/model"
+	authModel "github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/v3/pkg/db"
 	"github.com/lib/pq"
@@ -95,7 +95,7 @@ LIMIT $2
 OFFSET $3
 `
 
-func (a App) listTagsOfUser(user *authModel.User, page, pageSize uint, sortKey string, sortAsc bool) ([]*model.Tag, uint, error) {
+func (a App) listTagsOfUser(user authModel.User, page, pageSize uint, sortKey string, sortAsc bool) ([]*model.Tag, uint, error) {
 	order := "creation_date DESC"
 
 	if sortKey != "" {
@@ -130,7 +130,7 @@ WHERE
   AND id = $2
 `
 
-func (a App) getTagByID(user *authModel.User, id uint64) (*model.Tag, error) {
+func (a App) getTagByID(user authModel.User, id uint64) (*model.Tag, error) {
 	return scanTag(a.db.QueryRow(getByIDQuery, user.ID, id))
 }
 

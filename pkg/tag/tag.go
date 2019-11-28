@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ViBiOh/auth/pkg/auth"
+	"github.com/ViBiOh/auth/v2/pkg/handler"
+	authModel "github.com/ViBiOh/auth/v2/pkg/model"
 	"github.com/ViBiOh/eponae-api/pkg/model"
 	"github.com/ViBiOh/httputils/v3/pkg/crud"
 )
@@ -40,8 +41,8 @@ func (a App) Unmarsall(content []byte) (crud.Item, error) {
 
 // List tags of user
 func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sortAsc bool, filters map[string][]string) ([]crud.Item, uint, error) {
-	user := auth.UserFromContext(ctx)
-	if user == nil {
+	user := handler.UserFromContext(ctx)
+	if user == authModel.NoneUser {
 		return nil, 0, errors.New("user not provided")
 	}
 
@@ -60,8 +61,8 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 
 // Get tag of user
 func (a App) Get(ctx context.Context, ID uint64) (crud.Item, error) {
-	user := auth.UserFromContext(ctx)
-	if user == nil {
+	user := handler.UserFromContext(ctx)
+	if user == authModel.NoneUser {
 		return nil, errors.New("user not provided")
 	}
 
@@ -146,8 +147,8 @@ func (a App) check(o *model.Tag) error {
 }
 
 func getTagFromItem(ctx context.Context, o crud.Item) (*model.Tag, error) {
-	user := auth.UserFromContext(ctx)
-	if user == nil {
+	user := handler.UserFromContext(ctx)
+	if user == authModel.NoneUser {
 		return nil, errors.New("user not provided")
 	}
 
