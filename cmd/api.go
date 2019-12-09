@@ -60,8 +60,10 @@ func main() {
 	readingTagService := readingtag.New(apiDB, tagService)
 	readingService := reading.New(apiDB, readingTagService, tagService)
 
-	readingsApp := crud.New(readingsConfig, readingService)
-	tagsApp := crud.New(tagsConfig, tagService)
+	readingsApp, err := crud.New(readingsConfig, readingService)
+	logger.Fatal(err)
+	tagsApp, err := crud.New(tagsConfig, tagService)
+	logger.Fatal(err)
 
 	readingsHandler := http.StripPrefix(readingsPath, readingsApp.Handler())
 	tagsHandler := http.StripPrefix(tagsPath, tagsApp.Handler())

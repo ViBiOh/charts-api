@@ -16,7 +16,7 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/crud"
 )
 
-var _ crud.ItemService = &App{}
+var _ crud.Service = &App{}
 
 // App of package
 type App struct {
@@ -88,10 +88,6 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return
 	}
 
-	if err = a.check(reading); err != nil {
-		return nil, err
-	}
-
 	err = a.saveReading(reading, nil)
 	if err != nil {
 		err = fmt.Errorf("unable to create reading: %w", err)
@@ -110,10 +106,6 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 	reading, err = getReadingFromItem(ctx, o)
 	if err != nil {
 		return
-	}
-
-	if err = a.check(reading); err != nil {
-		return nil, err
 	}
 
 	err = a.saveReading(reading, nil)
@@ -144,26 +136,30 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 	return
 }
 
-func (a App) check(o *model.Reading) error {
-	if strings.TrimSpace(o.URL) == "" {
-		return fmt.Errorf("url is required: %w", crud.ErrInvalid)
+// Check instance
+func (a App) Check(o crud.Item) []error {
+	reading := o.(*model.Reading)
+	errors := make([]error, 0)
+
+	if strings.TrimSpace(reading.URL) == "" {
+		errors = append(errors, fmt.Errorf("url is required: %w", crud.ErrInvalid))
 	}
 
-	tagsIDs := make([]uint64, len(o.Tags))
-	for index, tag := range o.Tags {
+	tagsIDs := make([]uint64, len(reading.Tags))
+	for index, tag := range reading.Tags {
 		tagsIDs[index] = tag.ID
 	}
 
 	tags, err := a.tagService.FindTagsByIds(tagsIDs)
 	if err != nil {
-		return fmt.Errorf("unable to list tags: %w", err)
+		errors = append(errors, fmt.Errorf("unable to list tags: %w", err))
 	}
 
-	if len(tags) != len(o.Tags) {
-		return crud.ErrNotFound
+	if len(tags) != len(reading.Tags) {
+		errors = append(errors, crud.ErrNotFound)
 	}
 
-	return nil
+	return errors
 }
 
 func getReadingFromItem(ctx context.Context, o crud.Item) (*model.Reading, error) {

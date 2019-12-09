@@ -14,7 +14,7 @@ import (
 	"github.com/ViBiOh/httputils/v3/pkg/crud"
 )
 
-var _ crud.ItemService = &App{}
+var _ crud.Service = &App{}
 
 // App of package
 type App struct {
@@ -82,10 +82,6 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 		return
 	}
 
-	if err = a.check(tag); err != nil {
-		return nil, err
-	}
-
 	err = a.saveTag(tag, nil)
 	if err != nil {
 		err = fmt.Errorf("unable to create tag: %w", err)
@@ -104,10 +100,6 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 	tag, err = getTagFromItem(ctx, o)
 	if err != nil {
 		return
-	}
-
-	if err = a.check(tag); err != nil {
-		return nil, err
 	}
 
 	err = a.saveTag(tag, nil)
@@ -138,12 +130,16 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 	return
 }
 
-func (a App) check(o *model.Tag) error {
-	if strings.TrimSpace(o.Name) == "" {
-		return fmt.Errorf("name is required: %w", crud.ErrInvalid)
+// Check instance
+func (a App) Check(o crud.Item) []error {
+	tag := o.(*model.Tag)
+	errors := make([]error, 0)
+
+	if strings.TrimSpace(tag.Name) == "" {
+		errors = append(errors, fmt.Errorf("name is required: %w", crud.ErrInvalid))
 	}
 
-	return nil
+	return errors
 }
 
 func getTagFromItem(ctx context.Context, o crud.Item) (*model.Tag, error) {
