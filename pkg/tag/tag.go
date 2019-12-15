@@ -28,8 +28,8 @@ func New(db *sql.DB) *App {
 	}
 }
 
-// Unmarsall a Tag
-func (a App) Unmarsall(content []byte) (crud.Item, error) {
+// Unmarshal a Tag
+func (a App) Unmarshal(content []byte) (interface{}, error) {
 	var tag model.Tag
 
 	if err := json.Unmarshal(content, &tag); err != nil {
@@ -40,7 +40,7 @@ func (a App) Unmarsall(content []byte) (crud.Item, error) {
 }
 
 // List tags of user
-func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sortAsc bool, filters map[string][]string) ([]crud.Item, uint, error) {
+func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sortAsc bool, filters map[string][]string) ([]interface{}, uint, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
 		return nil, 0, errors.New("user not provided")
@@ -51,7 +51,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 		return nil, 0, fmt.Errorf("unable to list tags of users: %w", err)
 	}
 
-	itemsList := make([]crud.Item, len(list))
+	itemsList := make([]interface{}, len(list))
 	for index, item := range list {
 		itemsList[index] = item
 	}
@@ -60,7 +60,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 }
 
 // Get tag of user
-func (a App) Get(ctx context.Context, ID uint64) (crud.Item, error) {
+func (a App) Get(ctx context.Context, ID uint64) (interface{}, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
 		return nil, errors.New("user not provided")
@@ -75,7 +75,7 @@ func (a App) Get(ctx context.Context, ID uint64) (crud.Item, error) {
 }
 
 // Create tag
-func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error) {
+func (a App) Create(ctx context.Context, o interface{}) (item interface{}, err error) {
 	var tag *model.Tag
 	tag, err = getTagFromItem(ctx, o)
 	if err != nil {
@@ -95,7 +95,7 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 }
 
 // Update tag
-func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error) {
+func (a App) Update(ctx context.Context, o interface{}) (item interface{}, err error) {
 	var tag *model.Tag
 	tag, err = getTagFromItem(ctx, o)
 	if err != nil {
@@ -115,7 +115,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 }
 
 // Delete tag
-func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
+func (a App) Delete(ctx context.Context, o interface{}) (err error) {
 	var tag *model.Tag
 	tag, err = getTagFromItem(ctx, o)
 	if err != nil {
@@ -131,18 +131,22 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 }
 
 // Check instance
-func (a App) Check(o crud.Item) []error {
-	tag := o.(*model.Tag)
-	errors := make([]error, 0)
+func (a App) Check(_ context.Context, _, new interface{}) []crud.Error {
+	if new == nil {
+		return nil
+	}
+
+	tag := new.(*model.Tag)
+	errors := make([]crud.Error, 0)
 
 	if strings.TrimSpace(tag.Name) == "" {
-		errors = append(errors, fmt.Errorf("name is required: %w", crud.ErrInvalid))
+		errors = append(errors, crud.NewError("name", "name is required"))
 	}
 
 	return errors
 }
 
-func getTagFromItem(ctx context.Context, o crud.Item) (*model.Tag, error) {
+func getTagFromItem(ctx context.Context, o interface{}) (*model.Tag, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
 		return nil, errors.New("user not provided")

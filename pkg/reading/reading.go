@@ -34,8 +34,8 @@ func New(db *sql.DB, readingTagService *readingtag.App, tagService *tag.App) *Ap
 	}
 }
 
-// Unmarsall a Reading
-func (a App) Unmarsall(content []byte) (crud.Item, error) {
+// Unmarshal a Reading
+func (a App) Unmarshal(content []byte) (interface{}, error) {
 	var reading model.Reading
 
 	if err := json.Unmarshal(content, &reading); err != nil {
@@ -46,7 +46,7 @@ func (a App) Unmarsall(content []byte) (crud.Item, error) {
 }
 
 // List readings of user
-func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sortAsc bool, filters map[string][]string) ([]crud.Item, uint, error) {
+func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sortAsc bool, filters map[string][]string) ([]interface{}, uint, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
 		return nil, 0, errors.New("user not provided")
@@ -57,7 +57,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 		return nil, 0, fmt.Errorf("unable to list readings of users: %w", err)
 	}
 
-	itemsList := make([]crud.Item, len(list))
+	itemsList := make([]interface{}, len(list))
 	for index, item := range list {
 		itemsList[index] = item
 	}
@@ -66,7 +66,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 }
 
 // Get reading of user
-func (a App) Get(ctx context.Context, ID uint64) (crud.Item, error) {
+func (a App) Get(ctx context.Context, ID uint64) (interface{}, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
 		return nil, errors.New("user not provided")
@@ -81,7 +81,7 @@ func (a App) Get(ctx context.Context, ID uint64) (crud.Item, error) {
 }
 
 // Create reading
-func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error) {
+func (a App) Create(ctx context.Context, o interface{}) (item interface{}, err error) {
 	var reading *model.Reading
 	reading, err = getReadingFromItem(ctx, o)
 	if err != nil {
@@ -101,7 +101,7 @@ func (a App) Create(ctx context.Context, o crud.Item) (item crud.Item, err error
 }
 
 // Update reading
-func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error) {
+func (a App) Update(ctx context.Context, o interface{}) (item interface{}, err error) {
 	var reading *model.Reading
 	reading, err = getReadingFromItem(ctx, o)
 	if err != nil {
@@ -121,7 +121,7 @@ func (a App) Update(ctx context.Context, o crud.Item) (item crud.Item, err error
 }
 
 // Delete reading
-func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
+func (a App) Delete(ctx context.Context, o interface{}) (err error) {
 	var reading *model.Reading
 	reading, err = getReadingFromItem(ctx, o)
 	if err != nil {
@@ -137,12 +137,16 @@ func (a App) Delete(ctx context.Context, o crud.Item) (err error) {
 }
 
 // Check instance
-func (a App) Check(o crud.Item) []error {
-	reading := o.(*model.Reading)
-	errors := make([]error, 0)
+func (a App) Check(_ context.Context, _, new interface{}) []crud.Error {
+	if new == nil {
+		return nil
+	}
+
+	reading := new.(*model.Reading)
+	errors := make([]crud.Error, 0)
 
 	if strings.TrimSpace(reading.URL) == "" {
-		errors = append(errors, fmt.Errorf("url is required: %w", crud.ErrInvalid))
+		errors = append(errors, crud.NewError("url", "url is required"))
 	}
 
 	tagsIDs := make([]uint64, len(reading.Tags))
@@ -152,17 +156,17 @@ func (a App) Check(o crud.Item) []error {
 
 	tags, err := a.tagService.FindTagsByIds(tagsIDs)
 	if err != nil {
-		errors = append(errors, fmt.Errorf("unable to list tags: %w", err))
+		errors = append(errors, crud.NewError("tags", "unable to list tags"))
 	}
 
 	if len(tags) != len(reading.Tags) {
-		errors = append(errors, crud.ErrNotFound)
+		errors = append(errors, crud.NewError("tags", "not found tags"))
 	}
 
 	return errors
 }
 
-func getReadingFromItem(ctx context.Context, o crud.Item) (*model.Reading, error) {
+func getReadingFromItem(ctx context.Context, o interface{}) (*model.Reading, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
 		return nil, errors.New("user not provided")
