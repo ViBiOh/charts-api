@@ -1,3 +1,5 @@
+---
+
 openapi: 3.0.0
 info:
   description: Eponae's API
@@ -30,30 +32,30 @@ paths:
     get:
       description: List Tags with pagination
       parameters:
-      - name: page
-        in: query
-        description: Page of list
-        default: 1
-        schema:
-          type: integer
-          format: int
-      - name: pageSize
-        in: query
-        description: Page size of list
-        default: 20
-        schema:
-          type: integer
-          format: int
-      - name: sort
-        in: query
-        description: Sort key of list
-        schema:
-          type: string
-      - name: desc
-        in: query
-        description: Sort by descending order
-        schema:
-          type: boolean
+        - name: page
+          in: query
+          description: Page of list
+          default: 1
+          schema:
+            type: integer
+            format: int
+        - name: pageSize
+          in: query
+          description: Page size of list
+          default: 20
+          schema:
+            type: integer
+            format: int
+        - name: sort
+          in: query
+          description: Sort key of list
+          schema:
+            type: string
+        - name: desc
+          in: query
+          description: Sort by descending order
+          schema:
+            type: boolean
 
       responses:
         '200':
@@ -253,30 +255,30 @@ paths:
     get:
       description: List Readings with pagination
       parameters:
-      - name: page
-        in: query
-        description: Page of list
-        default: 1
-        schema:
-          type: integer
-          format: int
-      - name: pageSize
-        in: query
-        description: Page size of list
-        default: 20
-        schema:
-          type: integer
-          format: int
-      - name: sort
-        in: query
-        description: Sort key of list
-        schema:
-          type: string
-      - name: desc
-        in: query
-        description: Sort by descending order
-        schema:
-          type: boolean
+        - name: page
+          in: query
+          description: Page of list
+          default: 1
+          schema:
+            type: integer
+            format: int
+        - name: pageSize
+          in: query
+          description: Page size of list
+          default: 20
+          schema:
+            type: integer
+            format: int
+        - name: sort
+          in: query
+          description: Sort key of list
+          schema:
+            type: string
+        - name: desc
+          in: query
+          description: Sort by descending order
+          schema:
+            type: boolean
 
       responses:
         '200':
@@ -538,4 +540,4 @@ components:
             type: string
 
 security:
-- basicAuth: []
+  - basicAuth: []

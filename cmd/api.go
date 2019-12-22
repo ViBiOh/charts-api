@@ -7,10 +7,9 @@ import (
 	"path"
 	"strings"
 
-	auth "github.com/ViBiOh/auth/v2/pkg/auth/db"
 	"github.com/ViBiOh/auth/v2/pkg/handler"
 	"github.com/ViBiOh/auth/v2/pkg/ident/basic"
-	basicProvider "github.com/ViBiOh/auth/v2/pkg/ident/basic/db"
+	basicDb "github.com/ViBiOh/auth/v2/pkg/provider/db"
 	"github.com/ViBiOh/eponae-api/pkg/reading"
 	"github.com/ViBiOh/eponae-api/pkg/readingtag"
 	"github.com/ViBiOh/eponae-api/pkg/tag"
@@ -52,9 +51,9 @@ func main() {
 	apiDB, err := db.New(dbConfig)
 	logger.Fatal(err)
 
-	basicApp := basicProvider.New(apiDB)
+	basicApp := basicDb.New(apiDB)
 	basicProvider := basic.New(basicApp)
-	authApp := auth.New(apiDB)
+	authApp := basicDb.New(apiDB)
 
 	tagService := tag.New(apiDB)
 	readingTagService := readingtag.New(apiDB, tagService)
@@ -83,17 +82,19 @@ func main() {
 		http.ServeFile(w, r, path.Join(docPath, r.URL.Path))
 	})
 
-	server := httputils.New(serverConfig)
-	server.Health(httputils.HealthHandler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	healthHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if db.Ping(apiDB) {
 			w.WriteHeader(http.StatusNoContent)
 		} else {
 			w.WriteHeader(http.StatusServiceUnavailable)
 		}
-	})))
-	server.Middleware(prometheus.New(prometheusConfig))
-	server.Middleware(owasp.New(owaspConfig))
-	server.Middleware(cors.New(corsConfig))
-	server.Middleware(handler.New(authApp, basicProvider))
+	})
+
+	server := httputils.New(serverConfig)
+	server.Health(healthHandler)
+	server.Middleware(prometheus.New(prometheusConfig).Middleware)
+	server.Middleware(owasp.New(owaspConfig).Middleware)
+	server.Middleware(cors.New(corsConfig).Middleware)
+	server.Middleware(handler.New(authApp, basicProvider).Middleware)
 	server.ListenServeWait(apihandler)
 }
