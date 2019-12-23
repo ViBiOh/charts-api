@@ -10,14 +10,6 @@
 Usage of eponae-api:
   -address string
         [http] Listen address {EPONAE_API_ADDRESS}
-  -authDisable
-        [auth] Disable auth {EPONAE_API_AUTH_DISABLE}
-  -authUrl string
-        [auth] Auth URL, if remote {EPONAE_API_AUTH_URL}
-  -authUsers string
-        [auth] Allowed users and profiles (e.g. user:profile1|profile2,user2:profile3). Empty allow any identified user {EPONAE_API_AUTH_USERS}
-  -basicUsers id:username:password,id2:username2:password2
-        [basic] Users in the form id:username:password,id2:username2:password2 {EPONAE_API_BASIC_USERS}
   -cert string
         [http] Certificate file {EPONAE_API_CERT}
   -corsCredentials
@@ -38,8 +30,8 @@ Usage of eponae-api:
         [db] Name {EPONAE_API_DB_NAME}
   -dbPass string
         [db] Pass {EPONAE_API_DB_PASS}
-  -dbPort string
-        [db] Port {EPONAE_API_DB_PORT} (default "5432")
+  -dbPort uint
+        [db] Port {EPONAE_API_DB_PORT} (default 5432)
   -dbSslmode string
         [db] SSL Mode {EPONAE_API_DB_SSLMODE} (default "disable")
   -dbUser string
@@ -50,7 +42,9 @@ Usage of eponae-api:
         [owasp] Indicate Strict Transport Security {EPONAE_API_HSTS} (default true)
   -key string
         [http] Key file {EPONAE_API_KEY}
-  -port int
+  -okStatus int
+        [http] Healthy HTTP Status code {EPONAE_API_OK_STATUS} (default 204)
+  -port uint
         [http] Listen port {EPONAE_API_PORT} (default 1080)
   -prometheusPath string
         [prometheus] Path for exposing metrics {EPONAE_API_PROMETHEUS_PATH} (default "/metrics")
