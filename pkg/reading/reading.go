@@ -49,7 +49,7 @@ func (a App) Unmarshal(content []byte) (interface{}, error) {
 func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sortAsc bool, filters map[string][]string) ([]interface{}, uint, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
-		return nil, 0, errors.New("user not provided")
+		return nil, 0, model.ErrUserNotProvided
 	}
 
 	list, total, err := a.listReadingsOfUser(user, page, pageSize, sortKey, sortAsc)
@@ -69,7 +69,7 @@ func (a App) List(ctx context.Context, page, pageSize uint, sortKey string, sort
 func (a App) Get(ctx context.Context, ID uint64) (interface{}, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
-		return nil, errors.New("user not provided")
+		return nil, model.ErrUserNotProvided
 	}
 
 	reading, err := a.getReadingByID(user, ID)
@@ -169,7 +169,7 @@ func (a App) Check(_ context.Context, _, new interface{}) []crud.Error {
 func getReadingFromItem(ctx context.Context, o interface{}) (*model.Reading, error) {
 	user := handler.UserFromContext(ctx)
 	if user == authModel.NoneUser {
-		return nil, errors.New("user not provided")
+		return nil, model.ErrUserNotProvided
 	}
 
 	item, ok := o.(*model.Reading)
