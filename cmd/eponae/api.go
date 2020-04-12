@@ -41,8 +41,8 @@ func main() {
 
 	dbConfig := db.Flags(fs, "db")
 
-	readingsConfig := crud.Flags(fs, "readings")
-	tagsConfig := crud.Flags(fs, "tags")
+	readingsConfig := crud.GetConfiguredFlags(readingsPath, "Readings")(fs, "readings")
+	tagsConfig := crud.GetConfiguredFlags(tagsPath, "Tags")(fs, "tags")
 
 	logger.Fatal(fs.Parse(os.Args[1:]))
 
@@ -82,16 +82,8 @@ func main() {
 		http.ServeFile(w, r, path.Join(docPath, r.URL.Path))
 	})
 
-	healthHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if db.Ping(apiDB) {
-			w.WriteHeader(http.StatusNoContent)
-		} else {
-			w.WriteHeader(http.StatusServiceUnavailable)
-		}
-	})
-
 	server := httputils.New(serverConfig)
-	server.Health(healthHandler)
+	server.Health(apiDB.Ping)
 	server.Middleware(prometheus.New(prometheusConfig).Middleware)
 	server.Middleware(owasp.New(owaspConfig).Middleware)
 	server.Middleware(cors.New(corsConfig).Middleware)
