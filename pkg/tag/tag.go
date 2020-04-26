@@ -29,7 +29,7 @@ func New(db *sql.DB) *App {
 }
 
 // Unmarshal a Tag
-func (a App) Unmarshal(content []byte) (interface{}, error) {
+func (a App) Unmarshal(content []byte, contentType string) (interface{}, error) {
 	var tag model.Tag
 
 	if err := json.Unmarshal(content, &tag); err != nil {

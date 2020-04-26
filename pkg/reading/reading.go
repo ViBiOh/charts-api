@@ -35,7 +35,7 @@ func New(db *sql.DB, readingTagService *readingtag.App, tagService *tag.App) *Ap
 }
 
 // Unmarshal a Reading
-func (a App) Unmarshal(content []byte) (interface{}, error) {
+func (a App) Unmarshal(content []byte, contentType string) (interface{}, error) {
 	var reading model.Reading
 
 	if err := json.Unmarshal(content, &reading); err != nil {
